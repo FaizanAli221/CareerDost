@@ -36,18 +36,23 @@ function setJsonLd(schema) {
     script.setAttribute('type', 'application/ld+json')
     document.head.appendChild(script)
   }
-  script.textContent = JSON.stringify(schema)
+  script.textContent = typeof schema === 'string' ? schema : JSON.stringify(schema)
 }
 
-export function useSeo({
-  title,
-  description,
-  canonical,
-  ogType = 'website',
-  ogImage = DEFAULT_IMAGE,
-  noIndex = false,
-  jsonLd = null,
-} = {}) {
+export function useSeo(options = {}) {
+  const opts = typeof options === 'string' ? { title: options } : (options || {})
+  const {
+    title,
+    description,
+    canonical,
+    ogType = 'website',
+    ogImage = DEFAULT_IMAGE,
+    noIndex = false,
+    jsonLd = null,
+  } = opts
+
+  const jsonLdString = jsonLd ? JSON.stringify(jsonLd) : ''
+
   useEffect(() => {
     // 1. Dynamic Page Title
     if (title) {
@@ -63,7 +68,10 @@ export function useSeo({
     setMetaTag('name', 'robots', noIndex ? 'noindex, nofollow' : 'index, follow')
 
     // 4. Canonical URL
-    const canonicalUrl = canonical ? (canonical.startsWith('http') ? canonical : `${DOMAIN}${canonical}`) : `${DOMAIN}${window.location.pathname}`
+    const pathname = window.location ? window.location.pathname : '/'
+    const canonicalUrl = canonical
+      ? (canonical.startsWith('http') ? canonical : `${DOMAIN}${canonical}`)
+      : `${DOMAIN}${pathname}`
     setLinkCanonical(canonicalUrl)
 
     // 5. Open Graph Meta Tags
@@ -81,7 +89,7 @@ export function useSeo({
     setMetaTag('name', 'twitter:image', ogImage)
 
     // 7. Structured Data JSON-LD
-    setJsonLd(jsonLd)
+    setJsonLd(jsonLdString ? JSON.parse(jsonLdString) : null)
 
-  }, [title, description, canonical, ogType, ogImage, noIndex, jsonLd])
+  }, [title, description, canonical, ogType, ogImage, noIndex, jsonLdString])
 }

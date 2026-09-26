@@ -81,24 +81,25 @@ export default function ArticlePage() {
   // JobPosting / Article Structured Data Schema
   const jsonLdSchema = useMemo(() => {
     if (!listing) return null
+    const jobTypeStr = String(listing.jobType || '').toLowerCase()
     return {
       '@context': 'https://schema.org',
       '@type': 'JobPosting',
-      title: listing.title,
-      description: listing.metaDescription || (Array.isArray(listing.content) ? listing.content.join(' ') : listing.content),
-      datePosted: listing.publishDate,
-      validThrough: listing.lastDate,
-      employmentType: listing.jobType?.toLowerCase().includes('part') ? 'PART_TIME' : 'FULL_TIME',
+      title: listing.title || 'Opportunity',
+      description: listing.metaDescription || (Array.isArray(listing.content) ? listing.content.join(' ') : String(listing.content || '')),
+      datePosted: listing.publishDate || undefined,
+      validThrough: listing.lastDate || undefined,
+      employmentType: jobTypeStr.includes('part') ? 'PART_TIME' : 'FULL_TIME',
       hiringOrganization: {
         '@type': 'Organization',
-        name: listing.organization,
+        name: listing.organization || 'CareerDost',
         sameAs: listing.officialLink ? safeUrl(listing.officialLink) : undefined,
       },
       jobLocation: {
         '@type': 'Place',
         address: {
           '@type': 'PostalAddress',
-          addressLocality: listing.location,
+          addressLocality: listing.location || 'Pakistan',
           addressCountry: 'PK',
         },
       },

@@ -2,7 +2,12 @@ import { Link } from 'react-router-dom'
 import { useSeo } from '../lib/useSeo'
 
 export default function NotFound() {
-  useSeo('Page not found — CareerDost')
+  useSeo({
+    title: 'Page Not Found — CareerDost',
+    description: 'The requested page or job listing could not be found on CareerDost.',
+    noIndex: true,
+  })
+
   return (
     <div className="container-x py-20 text-center">
       <h1 className="font-serif text-3xl text-ink mb-3">Page not found</h1>
