@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs'
 
-const SECRET_KEY = process.env.ADMIN_JWT_SECRET || 'careerdost-admin-secret-key-change-in-prod-v2'
+const SECRET_KEY = (typeof process !== 'undefined' && process.env && process.env.ADMIN_JWT_SECRET)
+  ? process.env.ADMIN_JWT_SECRET
+  : 'careerdost-admin-secret-key-change-in-prod-v2'
 
 function base64UrlEncode(str) {
   const b64 = globalThis.btoa ? btoa(str) : Buffer.from(str).toString('base64')
