@@ -11,17 +11,19 @@ const borderTone = {
 }
 
 export default function FeaturedCard({ listing }) {
-  const cat = categoryBySlug(listing.category) || { tone: 'slate', label: listing.category }
-  const tone = toneClasses[cat.tone] || toneClasses.slate
+  if (!listing || !listing.slug) return null
+
+  const cat = categoryBySlug(listing.category) || { tone: 'slate', label: listing.category || 'General' }
+  const toneKey = cat && cat.tone && toneClasses[cat.tone] ? cat.tone : 'slate'
   const dl = deadlineLabel(listing.lastDate)
 
   return (
     <Link
       to={`/jobs/${listing.slug}`}
-      className={`group block border border-line bg-white border-l-4 p-5 h-full hover:shadow-sm transition-all ${borderTone[cat.tone] || 'border-l-slate'}`}
+      className={`group block border border-line bg-white border-l-4 p-5 h-full hover:shadow-sm transition-all ${borderTone[toneKey] || 'border-l-slate'}`}
     >
       <div className="flex items-center justify-between gap-2 mb-2">
-        <CategoryTag slug={listing.category} linked={false} />
+        {listing.category && <CategoryTag slug={listing.category} linked={false} />}
         {listing.location && (
           <span className="text-xs font-sans text-inksoft flex items-center gap-1">
             📍 {listing.location}
@@ -30,11 +32,11 @@ export default function FeaturedCard({ listing }) {
       </div>
 
       <h3 className="font-serif text-xl leading-snug text-ink group-hover:text-green transition-colors mb-2">
-        {listing.title}
+        {listing.title || 'Featured Opportunity'}
       </h3>
 
       <p className="text-sm text-inksoft font-sans line-clamp-2 mb-4 leading-relaxed">
-        {listing.excerpt}
+        {listing.excerpt || (Array.isArray(listing.content) ? listing.content[0] : listing.content) || ''}
       </p>
 
       <div className="pt-3 border-t border-line space-y-1.5 font-sans text-xs">

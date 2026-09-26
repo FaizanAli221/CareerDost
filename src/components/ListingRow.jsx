@@ -4,8 +4,11 @@ import { deadlineLabel, formatDate } from '../lib/format'
 import { categoryBySlug, toneClasses } from '../data/categories'
 
 export default function ListingRow({ listing }) {
-  const cat = categoryBySlug(listing.category) || { tone: 'slate', label: listing.category }
-  const tone = toneClasses[cat.tone] || toneClasses.slate
+  if (!listing || !listing.slug) return null
+
+  const cat = categoryBySlug(listing.category) || { tone: 'slate', label: listing.category || 'General' }
+  const toneKey = cat && cat.tone && toneClasses[cat.tone] ? cat.tone : 'slate'
+  const tone = toneClasses[toneKey] || toneClasses.slate
   const dl = deadlineLabel(listing.lastDate)
 
   return (
@@ -18,12 +21,12 @@ export default function ListingRow({ listing }) {
           className={`shrink-0 w-10 h-10 flex items-center justify-center border font-sans text-xs font-bold rounded-xs ${tone.tag}`}
           aria-hidden="true"
         >
-          {listing.logoInitial || 'CD'}
+          {listing.logoInitial || (listing.organization ? listing.organization.charAt(0).toUpperCase() : 'CD')}
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 mb-1">
-            <CategoryTag slug={listing.category} linked={false} />
+            {listing.category && <CategoryTag slug={listing.category} linked={false} />}
             {listing.publishDate && (
               <span className="text-xs font-sans text-inksoft/80">
                 Posted {formatDate(listing.publishDate)}
@@ -42,11 +45,11 @@ export default function ListingRow({ listing }) {
           </div>
 
           <h3 className="font-serif text-base sm:text-lg leading-snug text-ink group-hover:text-green transition-colors font-medium">
-            {listing.title}
+            {listing.title || 'Untitled Opportunity'}
           </h3>
 
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-inksoft font-sans mt-1">
-            <span className="font-medium text-ink/80">{listing.organization}</span>
+            {listing.organization && <span className="font-medium text-ink/80">{listing.organization}</span>}
             {listing.location && <span>• 📍 {listing.location}</span>}
             {listing.qualification && <span className="hidden md:inline">• 🎓 {listing.qualification}</span>}
           </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link, Navigate } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { categoryBySlug as defaultCategoryBySlug, categories as defaultCategories } from '../data/categories'
 import { getListingsByCategory as defaultGetByCategory } from '../data/listings'
 import { getCategoryBySlugFromDb, getCategoriesFromDb } from '../api/client'
@@ -11,11 +11,15 @@ export default function CategoryPage() {
   const [sort, setSort] = useState('newest')
 
   const [categoriesList, setCategoriesList] = useState(() => defaultCategories)
-  const [cat, setCat] = useState(() => defaultCategoryBySlug(slug))
-  const [items, setItems] = useState(() => defaultGetByCategory(slug))
+  const [cat, setCat] = useState(null)
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [notFound, setNotFound] = useState(false)
 
   useEffect(() => {
     let isMounted = true
+    setLoading(true)
+    setNotFound(false)
 
     getCategoriesFromDb().then((cats) => {
       if (isMounted && cats && cats.length > 0) {
@@ -23,12 +27,43 @@ export default function CategoryPage() {
       }
     })
 
-    getCategoryBySlugFromDb(slug).then((res) => {
-      if (isMounted && res) {
-        if (res.category) setCat(res.category)
-        if (res.articles) setItems(res.articles)
-      }
-    })
+    getCategoryBySlugFromDb(slug)
+      .then((res) => {
+        if (!isMounted) return
+        if (res && res.category) {
+          setCat(res.category)
+          setItems(res.articles || [])
+          setNotFound(false)
+        } else {
+          const fallbackCat = defaultCategoryBySlug(slug)
+          if (fallbackCat) {
+            setCat(fallbackCat)
+            setItems(defaultGetByCategory(slug))
+            setNotFound(false)
+          } else {
+            setCat(null)
+            setItems([])
+            setNotFound(true)
+          }
+        }
+      })
+      .catch((err) => {
+        console.warn('Error fetching category:', err)
+        if (!isMounted) return
+        const fallbackCat = defaultCategoryBySlug(slug)
+        if (fallbackCat) {
+          setCat(fallbackCat)
+          setItems(defaultGetByCategory(slug))
+          setNotFound(false)
+        } else {
+          setCat(null)
+          setItems([])
+          setNotFound(true)
+        }
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false)
+      })
 
     return () => {
       isMounted = false
@@ -41,7 +76,36 @@ export default function CategoryPage() {
     canonical: `/category/${slug}`,
   })
 
-  if (!cat) return <Navigate to="/" replace />
+  if (loading) {
+    return (
+      <div className="container-x py-12 font-sans">
+        <div className="animate-pulse space-y-4 max-w-2xl">
+          <div className="h-4 bg-line/60 w-1/4 rounded"></div>
+          <div className="h-8 bg-line/60 w-1/2 rounded"></div>
+          <div className="h-4 bg-line/60 w-3/4 rounded"></div>
+          <div className="h-32 bg-line/30 rounded mt-6"></div>
+        </div>
+      </div>
+    )
+  }
+
+  if (notFound || !cat) {
+    return (
+      <div className="container-x py-16 font-sans text-center max-w-lg">
+        <div className="text-4xl mb-3">📁</div>
+        <h1 className="font-serif text-2xl font-bold text-ink mb-2">Category Not Found</h1>
+        <p className="text-sm text-inksoft mb-6 leading-relaxed">
+          The category &ldquo;{slug}&rdquo; does not exist or has been removed.
+        </p>
+        <Link
+          to="/"
+          className="inline-block border border-green bg-green text-white px-6 py-2.5 text-sm font-semibold hover:bg-green-dark transition-colors"
+        >
+          ← Return to Home
+        </Link>
+      </div>
+    )
+  }
 
   let sortedItems = [...items]
   if (sort === 'deadline') {
@@ -59,7 +123,7 @@ export default function CategoryPage() {
       </nav>
 
       <h1 className="font-serif text-2xl sm:text-3xl text-ink mb-2">{cat.label} in Pakistan</h1>
-      <p className="font-sans text-inksoft max-w-2xl mb-6">{cat.description}</p>
+      {cat.description && <p className="font-sans text-inksoft max-w-2xl mb-6">{cat.description}</p>}
 
       <div className="flex flex-wrap gap-2 mb-6 font-sans text-sm">
         {categoriesList.map((c) => (
@@ -67,10 +131,10 @@ export default function CategoryPage() {
             key={c.slug}
             to={`/category/${c.slug}`}
             className={`px-3 py-1.5 border ${
-              c.slug === slug ? 'border-green bg-green text-white' : 'border-line text-ink hover:border-green'
+              c.slug === slug ? 'border-green bg-green text-white font-medium' : 'border-line text-ink hover:border-green'
             }`}
           >
-            {c.short}
+            {c.short || c.label}
           </Link>
         ))}
       </div>

@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from 'react'
-import { useParams, Link, Navigate } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { getListingBySlug as defaultGetListing, getListingsByCategory as defaultGetByCategory } from '../data/listings'
 import { categoryBySlug as defaultCategoryBySlug } from '../data/categories'
 import { getArticleBySlugFromDb, getArticlesByCategoryFromDb, getCategoriesFromDb } from '../api/client'
 import CategoryTag from '../components/CategoryTag'
 import ListingRow from '../components/ListingRow'
 import { deadlineLabel, formatDate } from '../lib/format'
+import { safeUrl } from '../lib/security'
 import { useSeo } from '../lib/useSeo'
 
 function DetailRow({ label, value }) {
@@ -21,29 +22,52 @@ function DetailRow({ label, value }) {
 export default function ArticlePage() {
   const { slug } = useParams()
 
-  const [listing, setListing] = useState(() => defaultGetListing(slug))
-  const [related, setRelated] = useState(() => {
-    const initial = defaultGetListing(slug)
-    if (!initial) return []
-    return defaultGetByCategory(initial.category)
-      .filter((l) => l.slug !== initial.slug)
-      .slice(0, 4)
-  })
+  const [listing, setListing] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [notFound, setNotFound] = useState(false)
+  const [related, setRelated] = useState([])
   const [categoriesList, setCategoriesList] = useState([])
 
   useEffect(() => {
     let isMounted = true
+    setLoading(true)
+    setNotFound(false)
 
-    getArticleBySlugFromDb(slug).then((data) => {
-      if (isMounted && data) {
-        setListing(data)
-        getArticlesByCategoryFromDb(data.category).then((rel) => {
-          if (isMounted && rel) {
-            setRelated(rel.filter((l) => l.slug !== data.slug).slice(0, 4))
-          }
-        })
-      }
-    })
+    // Attempt to load from DB, then fallback to static file if needed
+    getArticleBySlugFromDb(slug)
+      .then((data) => {
+        if (!isMounted) return
+        const article = data || defaultGetListing(slug)
+
+        if (article) {
+          setListing(article)
+          setNotFound(false)
+
+          getArticlesByCategoryFromDb(article.category).then((rel) => {
+            if (!isMounted) return
+            const relatedList = rel && rel.length > 0 ? rel : defaultGetByCategory(article.category)
+            setRelated(relatedList.filter((l) => l.slug !== article.slug).slice(0, 4))
+          })
+        } else {
+          setListing(null)
+          setNotFound(true)
+        }
+      })
+      .catch((err) => {
+        console.warn('Error fetching article:', err)
+        if (!isMounted) return
+        const fallback = defaultGetListing(slug)
+        if (fallback) {
+          setListing(fallback)
+          setNotFound(false)
+        } else {
+          setListing(null)
+          setNotFound(true)
+        }
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false)
+      })
 
     getCategoriesFromDb().then((cats) => {
       if (isMounted && cats) setCategoriesList(cats)
@@ -68,7 +92,7 @@ export default function ArticlePage() {
       hiringOrganization: {
         '@type': 'Organization',
         name: listing.organization,
-        sameAs: listing.officialLink || undefined,
+        sameAs: listing.officialLink ? safeUrl(listing.officialLink) : undefined,
       },
       jobLocation: {
         '@type': 'Place',
@@ -92,20 +116,49 @@ export default function ArticlePage() {
   }, [listing])
 
   useSeo({
-    title: listing?.seoTitle || (listing ? `${listing.title} — CareerDost` : 'Listing — CareerDost'),
+    title: listing?.seoTitle || (listing ? `${listing.title} — CareerDost` : 'Opportunity — CareerDost'),
     description: listing?.metaDescription || listing?.excerpt || 'View job qualification, deadline, and official application details on CareerDost.',
     canonical: `/jobs/${slug}`,
     ogType: 'article',
     jsonLd: jsonLdSchema,
   })
 
-  if (!listing) return <Navigate to="/" replace />
+  if (loading) {
+    return (
+      <div className="container-x py-16 font-sans">
+        <div className="animate-pulse space-y-4 max-w-3xl">
+          <div className="h-4 bg-line/60 w-1/4 rounded"></div>
+          <div className="h-8 bg-line/60 w-3/4 rounded"></div>
+          <div className="h-4 bg-line/60 w-1/2 rounded"></div>
+          <div className="h-48 bg-line/30 rounded mt-6"></div>
+        </div>
+      </div>
+    )
+  }
+
+  if (notFound || !listing) {
+    return (
+      <div className="container-x py-16 font-sans text-center max-w-lg">
+        <div className="text-4xl mb-3">🔍</div>
+        <h1 className="font-serif text-2xl font-bold text-ink mb-2">Listing Not Found</h1>
+        <p className="text-sm text-inksoft mb-6 leading-relaxed">
+          The opportunity listing you are looking for may have expired, been removed, or moved to a different web address.
+        </p>
+        <Link
+          to="/"
+          className="inline-block border border-green bg-green text-white px-6 py-2.5 text-sm font-semibold hover:bg-green-dark transition-colors"
+        >
+          ← Return to Home
+        </Link>
+      </div>
+    )
+  }
 
   const cat =
     categoriesList.find((c) => c.slug === listing.category) ||
     defaultCategoryBySlug(listing.category) || {
-      slug: listing.category,
-      label: listing.category,
+      slug: listing.category || 'general',
+      label: listing.category || 'General',
     }
 
   const dl = deadlineLabel(listing.lastDate)
@@ -113,7 +166,7 @@ export default function ArticlePage() {
 
   return (
     <div className="container-x py-8">
-      {/* Breadcrumbs (Requirement 8) */}
+      {/* Breadcrumbs */}
       <nav className="text-xs font-sans text-inksoft mb-4 flex items-center flex-wrap gap-1">
         <Link to="/" className="hover:text-green font-medium">Home</Link>
         <span className="text-inksoft/60">/</span>
@@ -136,8 +189,12 @@ export default function ArticlePage() {
             <span>Posted: <strong className="text-ink">{formatDate(listing.publishDate)}</strong></span>
             <span>•</span>
             <span>Organization: <strong className="text-ink">{listing.organization}</strong></span>
-            <span>•</span>
-            <span>Location: <strong className="text-ink">{listing.location}</strong></span>
+            {listing.location && (
+              <>
+                <span>•</span>
+                <span>Location: <strong className="text-ink">{listing.location}</strong></span>
+              </>
+            )}
           </div>
 
           {/* Deadline Alert Box */}
@@ -182,7 +239,7 @@ export default function ArticlePage() {
 
             {listing.officialLink && (
               <a
-                href={listing.officialLink}
+                href={safeUrl(listing.officialLink)}
                 target="_blank"
                 rel="noopener noreferrer nofollow"
                 className="inline-block mt-5 border border-green bg-green text-white px-6 py-3 font-sans text-sm font-semibold hover:bg-green-dark transition-colors shadow-xs"
@@ -192,7 +249,7 @@ export default function ArticlePage() {
             )}
           </div>
 
-          {/* FAQ Section (Requirement 7) */}
+          {/* FAQ Section */}
           <div className="mt-10 border-t border-line pt-6 font-sans">
             <h2 className="font-serif text-xl text-ink font-bold mb-4">
               Frequently Asked Questions (FAQ)
@@ -232,7 +289,7 @@ export default function ArticlePage() {
         <aside className="space-y-6">
           <div className="border border-line bg-white p-5 shadow-xs">
             <h2 className="font-serif text-lg font-bold text-ink mb-3 border-b border-line pb-2">
-              Key Job Details
+              Key Details
             </h2>
             <DetailRow label="Organization" value={listing.organization} />
             <DetailRow label="Employment Type" value={listing.jobType} />

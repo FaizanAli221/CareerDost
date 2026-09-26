@@ -1,6 +1,31 @@
 import bcrypt from 'bcryptjs'
 
-const SECRET_KEY = 'careerdost-admin-secret-key-change-in-prod'
+const SECRET_KEY = process.env.ADMIN_JWT_SECRET || 'careerdost-admin-secret-key-change-in-prod-v2'
+
+function base64UrlEncode(str) {
+  const b64 = globalThis.btoa ? btoa(str) : Buffer.from(str).toString('base64')
+  return b64.replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
+}
+
+function base64UrlDecode(str) {
+  let b64 = str.replace(/-/g, '+').replace(/_/g, '/')
+  while (b64.length % 4) {
+    b64 += '='
+  }
+  return globalThis.atob ? atob(b64) : Buffer.from(b64, 'base64').toString('utf-8')
+}
+
+// Simple deterministic signature for edge/worker environments
+function generateSignature(payloadStr) {
+  let hash = 0
+  const combined = payloadStr + ':' + SECRET_KEY
+  for (let i = 0; i < combined.length; i++) {
+    const char = combined.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash |= 0 // Convert to 32bit integer
+  }
+  return Math.abs(hash).toString(36)
+}
 
 export class AdminModel {
   static async getByUsername(db, username) {
@@ -42,15 +67,30 @@ export class AdminModel {
       role: admin.role,
       exp: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
     }
-    const str = JSON.stringify(payload)
-    const b64 = globalThis.btoa ? btoa(str) : Buffer.from(str).toString('base64')
-    return b64
+    const payloadStr = JSON.stringify(payload)
+    const encodedPayload = base64UrlEncode(payloadStr)
+    const signature = generateSignature(payloadStr)
+    return `${encodedPayload}.${signature}`
   }
 
   static verifyToken(token) {
+    if (!token || typeof token !== 'string' || !token.includes('.')) {
+      return null
+    }
+
+    const [encodedPayload, signature] = token.split('.')
+    if (!encodedPayload || !signature) {
+      return null
+    }
+
     try {
-      const str = globalThis.atob ? atob(token) : Buffer.from(token, 'base64').toString('utf-8')
-      const payload = JSON.parse(str)
+      const payloadStr = base64UrlDecode(encodedPayload)
+      const expectedSignature = generateSignature(payloadStr)
+      if (signature !== expectedSignature) {
+        return null
+      }
+
+      const payload = JSON.parse(payloadStr)
       if (payload.exp && payload.exp < Date.now()) {
         return null
       }
