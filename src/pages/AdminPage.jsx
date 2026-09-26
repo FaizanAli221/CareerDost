@@ -70,8 +70,9 @@ export default function AdminPage() {
   })
 
   useEffect(() => {
-    if (!token) return
-    loadDashboardData()
+    if (token) {
+      loadDashboardData()
+    }
   }, [token, articleFilter])
 
   const loadDashboardData = async () => {

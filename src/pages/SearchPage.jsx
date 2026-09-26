@@ -17,7 +17,9 @@ export default function SearchPage() {
     canonical: q ? `/search?q=${encodeURIComponent(q)}` : '/search',
   })
 
-  useEffect(() => setInput(q), [q])
+  useEffect(() => {
+    setInput(q)
+  }, [q])
 
   useEffect(() => {
     let isMounted = true
