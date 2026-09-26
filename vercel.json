@@ -1,0 +1,24 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api"
+    },
+    {
+      "source": "/rss.xml",
+      "destination": "/api"
+    },
+    {
+      "source": "/((?!api/|sitemap\\.xml|rss\\.xml).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

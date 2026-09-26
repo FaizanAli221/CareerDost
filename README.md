@@ -4,7 +4,32 @@
 [![React](https://img.shields.io/badge/Frontend-React_18-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Bundler-Vite_5-646CFF?style=flat-square&logo=vite)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind_CSS_3-38BDF8?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
+[![Vercel](https://img.shields.io/badge/Deploy-Vercel-000000?style=flat-square&logo=vercel)](https://vercel.com/)
 [![Cloudflare Pages](https://img.shields.io/badge/Deploy-Cloudflare_Pages-F38020?style=flat-square&logo=cloudflare)](https://pages.cloudflare.com/)
+
+---
+
+## 🚀 Deployment
+
+### Option 1: Deploy to Vercel (Recommended)
+
+1. Import your GitHub repository `https://github.com/FaizanAli221/CareerDost.git` in the [Vercel Dashboard](https://vercel.com/new).
+2. Vercel will automatically detect `vercel.json` and Vite settings:
+   - **Framework Preset:** `Vite`
+   - **Build Command:** `npm run build`
+   - **Output Directory:** `dist`
+3. Click **Deploy**. Vercel will handle single-page routing and serverless `/api` endpoints out of the box!
+
+Alternatively, deploy using Vercel CLI:
+```bash
+npx vercel
+```
+
+### Option 2: Deploy to Cloudflare Pages
+
+```bash
+npm run deploy
+```
 
 **CareerDost** is a comprehensive portal dedicated to government vacancies, private sector jobs, bank careers, IT job listings, scholarships, internships, admissions, and results across Pakistan. It features an intuitive, fast, and accessible interface built for job seekers along with a full admin content management portal.
 
