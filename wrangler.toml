@@ -1,0 +1,8 @@
+name = "careerdost"
+compatibility_date = "2024-09-01"
+pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "careerdost-db"
+database_id = "defc3a6a-54b0-42e9-a36e-f1f6b1125d94"
