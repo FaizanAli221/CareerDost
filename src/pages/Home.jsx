@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { categories as defaultCategories } from '../data/categories'
-import { getFeaturedListings as defaultFeatured, getLatestListings as defaultLatest } from '../data/listings'
 import { getCategoriesFromDb, getFeaturedListingsFromDb, getLatestListingsFromDb } from '../api/client'
 import FeaturedCard from '../components/FeaturedCard'
 import ListingRow from '../components/ListingRow'
 import { useSeo } from '../lib/useSeo'
 
 export default function Home() {
-  const [featured, setFeatured] = useState(() => defaultFeatured().slice(0, 4))
-  const [latest, setLatest] = useState(() => defaultLatest(10))
+  const [featured, setFeatured] = useState([])
+  const [latest, setLatest] = useState([])
   const [categoriesList, setCategoriesList] = useState(() => defaultCategories)
+  const [loading, setLoading] = useState(true)
 
   useSeo({
     title: 'CareerDost — Pakistan Jobs, Scholarships & Admissions 2026',
@@ -32,17 +32,23 @@ export default function Home() {
   useEffect(() => {
     let isMounted = true
 
-    getFeaturedListingsFromDb(4).then((data) => {
-      if (isMounted && data && data.length > 0) setFeatured(data)
-    })
-
-    getLatestListingsFromDb(10).then((data) => {
-      if (isMounted && data && data.length > 0) setLatest(data)
-    })
-
-    getCategoriesFromDb().then((data) => {
-      if (isMounted && data && data.length > 0) setCategoriesList(data)
-    })
+    Promise.all([
+      getFeaturedListingsFromDb(4),
+      getLatestListingsFromDb(10),
+      getCategoriesFromDb(),
+    ])
+      .then(([featuredData, latestData, categoriesData]) => {
+        if (!isMounted) return
+        if (featuredData && featuredData.length > 0) setFeatured(featuredData)
+        if (latestData && latestData.length > 0) setLatest(latestData)
+        if (categoriesData && categoriesData.length > 0) setCategoriesList(categoriesData)
+      })
+      .catch((err) => {
+        console.warn('Home page data load warning:', err)
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false)
+      })
 
     return () => {
       isMounted = false
@@ -94,11 +100,24 @@ export default function Home() {
             <p className="text-xs font-sans text-inksoft mt-1">High-priority positions and major recruitment drives closing soon</p>
           </div>
         </div>
-        <div className="grid sm:grid-cols-2 gap-4">
-          {featured.map((l) => (
-            <FeaturedCard key={l.slug} listing={l} />
-          ))}
-        </div>
+
+        {loading ? (
+          <div className="grid sm:grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="border border-line bg-white p-5 h-40 animate-pulse">
+                <div className="h-4 bg-line/60 w-1/3 rounded mb-3"></div>
+                <div className="h-6 bg-line/60 w-3/4 rounded mb-2"></div>
+                <div className="h-4 bg-line/40 w-1/2 rounded"></div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 gap-4">
+            {featured.map((l) => (
+              <FeaturedCard key={l.slug} listing={l} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Main Content & Sidebar */}
@@ -112,11 +131,23 @@ export default function Home() {
                 View All Categories →
               </Link>
             </div>
-            <div className="divide-y divide-line">
-              {latest.map((l) => (
-                <ListingRow key={l.slug} listing={l} />
-              ))}
-            </div>
+
+            {loading ? (
+              <div className="space-y-4">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="py-4 border-b border-line animate-pulse">
+                    <div className="h-5 bg-line/60 w-2/3 rounded mb-2"></div>
+                    <div className="h-4 bg-line/40 w-1/3 rounded"></div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="divide-y divide-line">
+                {latest.map((l) => (
+                  <ListingRow key={l.slug} listing={l} />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -141,7 +172,7 @@ export default function Home() {
               </ul>
             </div>
 
-            {/* Why CareerDost Section (Requirement 11) */}
+            {/* Why CareerDost Section */}
             <div className="border border-line bg-paper p-5 font-sans">
               <h3 className="font-serif text-lg text-ink font-semibold mb-3 border-b border-line pb-2">
                 Why CareerDost?

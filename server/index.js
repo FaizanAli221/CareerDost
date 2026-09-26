@@ -10,9 +10,29 @@ import seoRouter from './routes/seo.js'
 const app = new Hono()
 
 // CORS Middleware
-app.use('*', cors())
+app.use('*', cors({
+  origin: '*',
+  allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400,
+}))
 
-// Auto-seed database middleware (ensures DB tables & initial data exist)
+// Global Error Handler
+app.onError((err, c) => {
+  console.error('API Error:', err)
+  return c.json({
+    success: false,
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'An unexpected error occurred.',
+  }, 500)
+})
+
+// Global 404 Handler for API
+app.notFound((c) => {
+  return c.json({ success: false, error: 'Endpoint Not Found' }, 404)
+})
+
+// Auto-seed / Table Check Middleware
 let seedAttempted = false
 app.use('*', async (c, next) => {
   if (!seedAttempted) {
@@ -21,7 +41,7 @@ app.use('*', async (c, next) => {
       const db = getDb(c)
       await seedDatabase(db)
     } catch (err) {
-      console.error('Database seeding error:', err)
+      console.warn('Database initialization note:', err.message)
     }
   }
   await next()
@@ -37,6 +57,11 @@ app.route('/api/articles', articlesRouter)
 app.route('/api/admin', adminRouter)
 
 // Health check endpoint
-app.get('/api/health', (c) => c.json({ status: 'ok', time: new Date().toISOString() }))
+app.get('/api/health', (c) => c.json({
+  success: true,
+  status: 'ok',
+  time: new Date().toISOString(),
+  environment: 'production',
+}))
 
 export default app

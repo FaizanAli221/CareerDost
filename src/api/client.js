@@ -3,7 +3,12 @@ import { listings as fallbackListings } from '../data/listings'
 
 const API_BASE = '/api'
 
+// Simple in-memory cache to prevent data flickering during SPA route changes
+const cacheMap = new Map()
+
 async function apiFetch(endpoint, options = {}) {
+  const cacheKey = `${options.method || 'GET'}:${endpoint}`
+
   try {
     const res = await fetch(`${API_BASE}${endpoint}`, {
       headers: {
@@ -12,18 +17,26 @@ async function apiFetch(endpoint, options = {}) {
       },
       ...options,
     })
+
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}))
       throw new Error(errData.error || `HTTP ${res.status}`)
     }
-    return await res.json()
+
+    const data = await res.json()
+    if ((!options.method || options.method === 'GET') && data.success) {
+      cacheMap.set(cacheKey, data)
+    }
+    return data
   } catch (err) {
-    console.warn(`API request to ${endpoint} failed:`, err.message)
+    if ((!options.method || options.method === 'GET') && cacheMap.has(cacheKey)) {
+      return cacheMap.get(cacheKey)
+    }
     throw err
   }
 }
 
-// Public API
+// Public API methods with cached fallback
 export async function getCategoriesFromDb() {
   try {
     const json = await apiFetch('/categories')
@@ -31,7 +44,7 @@ export async function getCategoriesFromDb() {
       return json.data
     }
   } catch {
-    // Fallback if API fails
+    // API failed, use fallback
   }
   return fallbackCategories
 }
@@ -54,7 +67,7 @@ export async function getCategoryBySlugFromDb(slug) {
 export async function getFeaturedListingsFromDb(limit = 4) {
   try {
     const json = await apiFetch(`/articles?featured=true&limit=${limit}`)
-    if (json.success && Array.isArray(json.data)) {
+    if (json.success && Array.isArray(json.data) && json.data.length > 0) {
       return json.data
     }
   } catch {
@@ -69,7 +82,7 @@ export async function getFeaturedListingsFromDb(limit = 4) {
 export async function getLatestListingsFromDb(limit = 10) {
   try {
     const json = await apiFetch(`/articles?latest=true&limit=${limit}`)
-    if (json.success && Array.isArray(json.data)) {
+    if (json.success && Array.isArray(json.data) && json.data.length > 0) {
       return json.data
     }
   } catch {
@@ -95,7 +108,7 @@ export async function getArticleBySlugFromDb(slug) {
 export async function getArticlesByCategoryFromDb(categorySlug) {
   try {
     const json = await apiFetch(`/articles?category=${categorySlug}`)
-    if (json.success && Array.isArray(json.data)) {
+    if (json.success && Array.isArray(json.data) && json.data.length > 0) {
       return json.data
     }
   } catch {
@@ -107,9 +120,9 @@ export async function getArticlesByCategoryFromDb(categorySlug) {
 }
 
 export async function searchListingsFromDb(query) {
-  if (!query.trim()) return []
+  if (!query || !query.trim()) return []
   try {
-    const json = await apiFetch(`/articles/search?q=${encodeURIComponent(query)}`)
+    const json = await apiFetch(`/articles/search?q=${encodeURIComponent(query.trim())}`)
     if (json.success && Array.isArray(json.data)) {
       return json.data
     }
@@ -150,6 +163,7 @@ export async function adminGetArticles(token, statusFilter = '') {
 }
 
 export async function adminCreateArticle(token, articleData) {
+  cacheMap.clear()
   return await apiFetch('/admin/articles', {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
@@ -158,6 +172,7 @@ export async function adminCreateArticle(token, articleData) {
 }
 
 export async function adminUpdateArticle(token, slug, articleData) {
+  cacheMap.clear()
   return await apiFetch(`/admin/articles/${slug}`, {
     method: 'PUT',
     headers: { Authorization: `Bearer ${token}` },
@@ -166,6 +181,7 @@ export async function adminUpdateArticle(token, slug, articleData) {
 }
 
 export async function adminToggleArticleStatus(token, slug, status) {
+  cacheMap.clear()
   return await apiFetch(`/admin/articles/${slug}/status`, {
     method: 'PATCH',
     headers: { Authorization: `Bearer ${token}` },
@@ -174,6 +190,7 @@ export async function adminToggleArticleStatus(token, slug, status) {
 }
 
 export async function adminDeleteArticle(token, slug) {
+  cacheMap.clear()
   return await apiFetch(`/admin/articles/${slug}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
@@ -181,6 +198,7 @@ export async function adminDeleteArticle(token, slug) {
 }
 
 export async function adminCreateCategory(token, categoryData) {
+  cacheMap.clear()
   return await apiFetch('/admin/categories', {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
@@ -189,6 +207,7 @@ export async function adminCreateCategory(token, categoryData) {
 }
 
 export async function adminUpdateCategory(token, slug, categoryData) {
+  cacheMap.clear()
   return await apiFetch(`/admin/categories/${slug}`, {
     method: 'PUT',
     headers: { Authorization: `Bearer ${token}` },
@@ -197,6 +216,7 @@ export async function adminUpdateCategory(token, slug, categoryData) {
 }
 
 export async function adminDeleteCategory(token, slug) {
+  cacheMap.clear()
   return await apiFetch(`/admin/categories/${slug}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },

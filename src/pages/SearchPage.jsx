@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { searchListingsFromDb } from '../api/client'
-import { searchListings as defaultSearch } from '../data/listings'
 import ListingRow from '../components/ListingRow'
 import { useSeo } from '../lib/useSeo'
 
@@ -9,7 +8,8 @@ export default function SearchPage() {
   const [params, setParams] = useSearchParams()
   const q = params.get('q') ?? ''
   const [input, setInput] = useState(q)
-  const [results, setResults] = useState(() => (q ? defaultSearch(q) : []))
+  const [results, setResults] = useState([])
+  const [loading, setLoading] = useState(Boolean(q))
 
   useSeo({
     title: q ? `Search: "${q}" — CareerDost` : 'Search Jobs & Admissions — CareerDost',
@@ -21,12 +21,22 @@ export default function SearchPage() {
 
   useEffect(() => {
     let isMounted = true
-    if (q) {
-      searchListingsFromDb(q).then((data) => {
-        if (isMounted) setResults(data)
-      })
+    if (q && q.trim()) {
+      setLoading(true)
+      searchListingsFromDb(q)
+        .then((data) => {
+          if (isMounted) setResults(data || [])
+        })
+        .catch((err) => {
+          console.warn('Search error:', err)
+          if (isMounted) setResults([])
+        })
+        .finally(() => {
+          if (isMounted) setLoading(false)
+        })
     } else {
       setResults([])
+      setLoading(false)
     }
     return () => {
       isMounted = false
@@ -55,23 +65,31 @@ export default function SearchPage() {
         </button>
       </form>
 
-      {q && (
+      {loading && (
+        <div className="py-6 font-sans text-sm text-inksoft animate-pulse">
+          Searching vacancies and opportunities for &ldquo;{q}&rdquo;…
+        </div>
+      )}
+
+      {!loading && q && (
         <p className="font-sans text-sm text-inksoft mb-3">
           {results.length} result{results.length === 1 ? '' : 's'} for &ldquo;{q}&rdquo;
         </p>
       )}
 
-      {q && results.length === 0 && (
-        <p className="font-sans text-inksoft">
+      {!loading && q && results.length === 0 && (
+        <p className="font-sans text-inksoft py-4">
           No listings matched your search. Try a broader term, or browse categories from the menu above.
         </p>
       )}
 
-      <div className="border-t border-line">
-        {results.map((l) => (
-          <ListingRow key={l.slug} listing={l} />
-        ))}
-      </div>
+      {!loading && results.length > 0 && (
+        <div className="border-t border-line">
+          {results.map((l) => (
+            <ListingRow key={l.slug} listing={l} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

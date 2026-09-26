@@ -29,10 +29,9 @@ export default function Header() {
     }
   }
 
-  // Pre-defined menu structure as requested by user
+  // Pre-defined menu structure
   const mainNavItems = [
     { label: 'Home', path: '/' },
-    { label: 'Latest Jobs', path: '/category/government-jobs' },
     { label: 'Government Jobs', path: '/category/government-jobs' },
     { label: 'Private Jobs', path: '/category/private-jobs' },
     { label: 'Bank Jobs', path: '/category/bank-jobs' },
