@@ -1,8 +1,5 @@
 import { useEffect } from 'react'
-
-const DOMAIN = 'https://careerdost.pk'
-const DEFAULT_IMAGE = `${DOMAIN}/og-image.jpg`
-const SITE_NAME = 'CareerDost'
+import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE, getAbsoluteUrl } from './config'
 
 function setMetaTag(attribute, key, content) {
   if (!content) return
@@ -46,7 +43,7 @@ export function useSeo(options = {}) {
     description,
     canonical,
     ogType = 'website',
-    ogImage = DEFAULT_IMAGE,
+    ogImage = DEFAULT_OG_IMAGE,
     noIndex = false,
     jsonLd = null,
   } = opts
@@ -56,7 +53,7 @@ export function useSeo(options = {}) {
   useEffect(() => {
     // 1. Dynamic Page Title
     if (title) {
-      document.title = title.includes('CareerDost') ? title : `${title} — CareerDost`
+      document.title = title.includes(SITE_NAME) ? title : `${title} — ${SITE_NAME}`
     }
 
     // 2. Meta Description
@@ -68,11 +65,16 @@ export function useSeo(options = {}) {
     setMetaTag('name', 'robots', noIndex ? 'noindex, nofollow' : 'index, follow')
 
     // 4. Canonical URL
-    const pathname = window.location ? window.location.pathname : '/'
+    const currentUrl = typeof window !== 'undefined' && window.location ? window.location.href : SITE_URL
+    const pathname = typeof window !== 'undefined' && window.location ? window.location.pathname : '/'
     const canonicalUrl = canonical
-      ? (canonical.startsWith('http') ? canonical : `${DOMAIN}${canonical}`)
-      : `${DOMAIN}${pathname}`
+      ? getAbsoluteUrl(canonical)
+      : (currentUrl.includes('localhost') ? currentUrl : getAbsoluteUrl(pathname))
+
     setLinkCanonical(canonicalUrl)
+
+    // Ensure absolute image URL for Open Graph & Twitter
+    const absoluteOgImage = getAbsoluteUrl(ogImage)
 
     // 5. Open Graph Meta Tags
     setMetaTag('property', 'og:site_name', SITE_NAME)
@@ -80,13 +82,13 @@ export function useSeo(options = {}) {
     setMetaTag('property', 'og:description', description || '')
     setMetaTag('property', 'og:url', canonicalUrl)
     setMetaTag('property', 'og:type', ogType)
-    setMetaTag('property', 'og:image', ogImage)
+    setMetaTag('property', 'og:image', absoluteOgImage)
 
     // 6. Twitter Card Meta Tags
     setMetaTag('name', 'twitter:card', 'summary_large_image')
     setMetaTag('name', 'twitter:title', title || SITE_NAME)
     setMetaTag('name', 'twitter:description', description || '')
-    setMetaTag('name', 'twitter:image', ogImage)
+    setMetaTag('name', 'twitter:image', absoluteOgImage)
 
     // 7. Structured Data JSON-LD
     setJsonLd(jsonLdString ? JSON.parse(jsonLdString) : null)

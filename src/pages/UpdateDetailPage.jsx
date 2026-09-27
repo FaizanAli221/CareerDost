@@ -4,7 +4,9 @@ import { getDailyUpdateBySlugFromDb, getLatestDailyUpdatesFromDb } from '../api/
 import CategoryFallbackImage from '../components/CategoryFallbackImage'
 import UpdateCard from '../components/UpdateCard'
 import WhatsAppCTA from '../components/WhatsAppCTA'
+import ShareButtons from '../components/ShareButtons'
 import { useSeo } from '../lib/useSeo'
+import { getAbsoluteUrl } from '../lib/config'
 
 function formatDate(dateStr) {
   if (!dateStr) return ''
@@ -27,6 +29,7 @@ export default function UpdateDetailPage() {
     title: updateItem ? `${updateItem.seoTitle || updateItem.title} — CareerDost` : 'Daily Update — CareerDost',
     description: updateItem ? updateItem.metaDescription || updateItem.shortDescription : 'Verified Pakistan daily update.',
     canonical: `/daily-updates/${slug}`,
+    ogImage: updateItem?.featuredImage ? getAbsoluteUrl(updateItem.featuredImage) : getAbsoluteUrl('/images/hec-commonwealth-scholarship-2027.jpg'),
     jsonLd: updateItem
       ? {
           '@context': 'https://schema.org',
@@ -37,7 +40,7 @@ export default function UpdateDetailPage() {
           publisher: {
             '@type': 'Organization',
             name: 'CareerDost',
-            url: 'https://careerdost.pk',
+            url: getAbsoluteUrl('/'),
           },
         }
       : null,
@@ -96,6 +99,9 @@ export default function UpdateDetailPage() {
   }
 
   const hasImage = updateItem.featuredImage && updateItem.featuredImage.trim().length > 0
+  const contentArray = Array.isArray(updateItem.content)
+    ? updateItem.content
+    : (typeof updateItem.content === 'string' ? updateItem.content.split('\n\n') : [])
 
   return (
     <article className="container-x py-8 sm:py-12 max-w-4xl">
@@ -126,6 +132,9 @@ export default function UpdateDetailPage() {
         <p className="font-sans text-base sm:text-lg text-inksoft leading-relaxed border-l-4 border-green pl-4 py-1 bg-paper mb-6">
           {updateItem.shortDescription}
         </p>
+
+        {/* Social Share Buttons */}
+        <ShareButtons title={updateItem.title} url={`/daily-updates/${updateItem.slug}`} className="my-4" />
       </header>
 
       {/* Featured Image */}
@@ -166,7 +175,7 @@ export default function UpdateDetailPage() {
 
       {/* Main Content Paragraphs */}
       <div className="font-sans text-ink text-base leading-relaxed space-y-5 mb-10 border-b border-line pb-8">
-        {updateItem.content.map((paragraph, idx) => (
+        {contentArray.map((paragraph, idx) => (
           <p key={idx}>{paragraph}</p>
         ))}
       </div>
@@ -201,6 +210,9 @@ export default function UpdateDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Social Share Buttons (Bottom) */}
+      <ShareButtons title={updateItem.title} url={`/daily-updates/${updateItem.slug}`} className="my-6" />
 
       {/* WHATSAPP CTA BANNER */}
       <WhatsAppCTA variant="banner" className="my-8" />

@@ -8,9 +8,11 @@ import ListingRow from '../components/ListingRow'
 import { deadlineLabel, formatDate } from '../lib/format'
 import { safeUrl } from '../lib/security'
 import { useSeo } from '../lib/useSeo'
+import { getAbsoluteUrl } from '../lib/config'
 
 import CategoryFallbackImage from '../components/CategoryFallbackImage'
 import WhatsAppCTA from '../components/WhatsAppCTA'
+import ShareButtons from '../components/ShareButtons'
 
 function DetailRow({ label, value }) {
   if (!value || value === 'N/A') return null
@@ -124,6 +126,7 @@ export default function ArticlePage() {
     description: listing?.metaDescription || listing?.excerpt || 'View job qualification, deadline, and official application details on CareerDost.',
     canonical: `/jobs/${slug}`,
     ogType: 'article',
+    ogImage: listing?.featuredImage ? getAbsoluteUrl(listing.featuredImage) : getAbsoluteUrl('/images/hec-commonwealth-scholarship-2027.jpg'),
     jsonLd: jsonLdSchema,
   })
 
@@ -190,7 +193,7 @@ export default function ArticlePage() {
             {listing.title}
           </h1>
 
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-sans text-inksoft mb-6 pb-4 border-b border-line">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-sans text-inksoft mb-4 pb-4 border-b border-line">
             <span>Posted: <strong className="text-ink">{formatDate(listing.publishDate)}</strong></span>
             <span>•</span>
             <span>Organization: <strong className="text-ink">{listing.organization}</strong></span>
@@ -201,6 +204,9 @@ export default function ArticlePage() {
               </>
             )}
           </div>
+
+          {/* Social Share Buttons */}
+          <ShareButtons title={listing.title} url={`/jobs/${listing.slug}`} className="mb-6" />
 
           {/* Featured Image / Fallback Cover Banner */}
           <div className="relative aspect-[16/9] w-full bg-slate-900 rounded-xs overflow-hidden mb-6 shadow-xs">
@@ -267,7 +273,7 @@ export default function ArticlePage() {
             )}
           </div>
 
-          {/* FAQ Section */}
+          {/* Frequently Asked Questions (FAQ) */}
           <div className="mt-10 border-t border-line pt-6 font-sans">
             <h2 className="font-serif text-xl text-ink font-bold mb-4">
               Frequently Asked Questions (FAQ)
@@ -301,6 +307,9 @@ export default function ArticlePage() {
               </div>
             </div>
           </div>
+
+          {/* Social Share Buttons (Bottom) */}
+          <ShareButtons title={listing.title} url={`/jobs/${listing.slug}`} className="mt-8 mb-6" />
 
           {/* WhatsApp Channel CTA */}
           <WhatsAppCTA variant="banner" className="mt-8 mb-0" />
