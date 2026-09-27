@@ -13,44 +13,59 @@ const sampleDailyUpdates = [
   { slug: 'pm-youth-laptop-scheme-phase-4-registration-alert', date: '2026-09-27' }
 ]
 
+function formatLastModDate(dateStr) {
+  if (!dateStr) return new Date().toISOString().split('T')[0]
+  try {
+    const date = new Date(dateStr)
+    if (!isNaN(date.getTime())) {
+      return date.toISOString().split('T')[0]
+    }
+  } catch {}
+  return '2026-09-27'
+}
+
 function generateSitemap() {
+  const todayStr = formatLastModDate(new Date())
+
   const staticPages = [
-    { loc: '/', priority: '1.0', changefreq: 'daily' },
-    { loc: '/daily-updates', priority: '0.9', changefreq: 'daily' },
-    { loc: '/about', priority: '0.5', changefreq: 'monthly' },
-    { loc: '/contact', priority: '0.5', changefreq: 'monthly' },
-    { loc: '/privacy-policy', priority: '0.3', changefreq: 'yearly' },
-    { loc: '/disclaimer', priority: '0.3', changefreq: 'yearly' },
-    { loc: '/terms-and-conditions', priority: '0.3', changefreq: 'yearly' }
+    { loc: '/', priority: '1.0', changefreq: 'daily', lastmod: todayStr },
+    { loc: '/daily-updates', priority: '0.9', changefreq: 'daily', lastmod: todayStr },
+    { loc: '/about', priority: '0.5', changefreq: 'monthly', lastmod: todayStr },
+    { loc: '/contact', priority: '0.5', changefreq: 'monthly', lastmod: todayStr },
+    { loc: '/privacy-policy', priority: '0.3', changefreq: 'yearly', lastmod: todayStr },
+    { loc: '/disclaimer', priority: '0.3', changefreq: 'yearly', lastmod: todayStr },
+    { loc: '/terms-and-conditions', priority: '0.3', changefreq: 'yearly', lastmod: todayStr }
   ]
 
   const categoryUrls = categories.map(cat => ({
     loc: `/category/${cat.slug}`,
     priority: '0.8',
-    changefreq: 'daily'
+    changefreq: 'daily',
+    lastmod: todayStr
   }))
 
   const jobUrls = listings.map(l => ({
     loc: `/jobs/${l.slug}`,
     priority: '0.9',
     changefreq: 'weekly',
-    lastmod: l.publishDate || '2026-09-27'
+    lastmod: formatLastModDate(l.publishDate)
   }))
 
   const updateUrls = sampleDailyUpdates.map(u => ({
     loc: `/daily-updates/${u.slug}`,
     priority: '0.9',
     changefreq: 'daily',
-    lastmod: u.date
+    lastmod: formatLastModDate(u.date)
   }))
 
   const allUrls = [...staticPages, ...categoryUrls, ...jobUrls, ...updateUrls]
 
-  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`
-  xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`
+  // Build clean XML string starting strictly at char index 0 without BOM or leading spaces
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+  xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
 
   for (const page of allUrls) {
-    xml += `  <url>\n`
+    xml += '  <url>\n'
     xml += `    <loc>${SITE_URL}${page.loc}</loc>\n`
     if (page.lastmod) {
       xml += `    <lastmod>${page.lastmod}</lastmod>\n`
@@ -59,20 +74,21 @@ function generateSitemap() {
       xml += `    <changefreq>${page.changefreq}</changefreq>\n`
     }
     xml += `    <priority>${page.priority}</priority>\n`
-    xml += `  </url>\n`
+    xml += '  </url>\n'
   }
 
-  xml += `</urlset>`
+  xml += '</urlset>'
 
   const publicDir = path.resolve(process.cwd(), 'public')
   if (!fs.existsSync(publicDir)) {
     fs.mkdirSync(publicDir, { recursive: true })
   }
 
+  // Write sitemap.xml with clean UTF-8 encoding
   fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), xml, 'utf8')
   console.log(`Generated sitemap.xml with ${allUrls.length} public URLs at public/sitemap.xml`)
 
-  // Also update robots.txt
+  // Write robots.txt
   const robotsTxt = `User-agent: *
 Allow: /
 Disallow: /admin

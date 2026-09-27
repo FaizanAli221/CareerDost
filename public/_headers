@@ -1,3 +1,17 @@
+/sitemap.xml
+  Content-Type: application/xml; charset=utf-8
+  Access-Control-Allow-Origin: *
+  X-Robots-Tag: index, follow
+
+/robots.txt
+  Content-Type: text/plain; charset=utf-8
+  Access-Control-Allow-Origin: *
+  X-Robots-Tag: index, follow
+
+/googlefa0859c31163b27d.html
+  Content-Type: text/html; charset=utf-8
+  Access-Control-Allow-Origin: *
+
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
