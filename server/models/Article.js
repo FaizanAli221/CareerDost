@@ -23,6 +23,8 @@ function formatArticle(row) {
     officialLink: row.official_link,
     featured: Boolean(row.featured),
     logoInitial: row.logo_initial,
+    featuredImage: row.featured_image || '',
+    imageAlt: row.image_alt || '',
     excerpt: row.excerpt,
     content: Array.isArray(content) ? content : [content],
     seoTitle: row.seo_title,
@@ -100,6 +102,22 @@ export class ArticleModel {
     return (results || []).map(formatArticle)
   }
 
+  static async getClosingSoon(db, limit = 6, statusOnly = null) {
+    const todayStr = new Date().toISOString().split('T')[0]
+    let sql = "SELECT * FROM articles WHERE last_date IS NOT NULL AND last_date != '' AND last_date >= ?"
+    const params = [todayStr]
+
+    if (statusOnly) {
+      sql += ' AND status = ?'
+      params.push(statusOnly)
+    }
+    sql += ' ORDER BY last_date ASC, id DESC LIMIT ?'
+    params.push(limit)
+
+    const { results } = await db.prepare(sql).bind(...params).all()
+    return (results || []).map(formatArticle)
+  }
+
   static async search(db, query, statusOnly = null) {
     const q = `%${query.trim()}%`
     let sql = `SELECT * FROM articles 
@@ -128,8 +146,8 @@ export class ArticleModel {
         `INSERT INTO articles (
           slug, title, category_slug, organization, job_type, location,
           qualification, salary, last_date, publish_date, official_link,
-          featured, logo_initial, excerpt, content, seo_title, meta_description, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          featured, logo_initial, featured_image, image_alt, excerpt, content, seo_title, meta_description, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .bind(
         data.slug,
@@ -145,6 +163,8 @@ export class ArticleModel {
         data.officialLink || data.official_link || '',
         data.featured ? 1 : 0,
         data.logoInitial || data.logo_initial || '',
+        data.featuredImage || data.featured_image || '',
+        data.imageAlt || data.image_alt || '',
         data.excerpt || '',
         contentJson,
         data.seoTitle || data.seo_title || data.title,
@@ -169,7 +189,7 @@ export class ArticleModel {
         `UPDATE articles SET
           slug = ?, title = ?, category_slug = ?, organization = ?, job_type = ?,
           location = ?, qualification = ?, salary = ?, last_date = ?, publish_date = ?,
-          official_link = ?, featured = ?, logo_initial = ?, excerpt = ?, content = ?,
+          official_link = ?, featured = ?, logo_initial = ?, featured_image = ?, image_alt = ?, excerpt = ?, content = ?,
           seo_title = ?, meta_description = ?, status = ?, updated_at = CURRENT_TIMESTAMP
         WHERE slug = ?`
       )
@@ -187,6 +207,8 @@ export class ArticleModel {
         data.officialLink || data.official_link || '',
         data.featured ? 1 : 0,
         data.logoInitial || data.logo_initial || '',
+        data.featuredImage || data.featured_image || '',
+        data.imageAlt || data.image_alt || '',
         data.excerpt || '',
         contentJson,
         data.seoTitle || data.seo_title || data.title,

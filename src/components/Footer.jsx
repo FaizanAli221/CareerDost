@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { categories } from '../data/categories'
+import { WHATSAPP_CHANNEL_URL, WhatsAppIcon } from './WhatsAppCTA'
 
 export default function Footer() {
   const year = new Date().getFullYear()
@@ -20,13 +21,24 @@ export default function Footer() {
           {/* Social Links (Requirement 10) */}
           <div className="pt-2">
             <div className="text-xs font-semibold uppercase tracking-wider text-inksoft mb-2">Connect With Us</div>
-            <div className="flex flex-wrap items-center gap-2 text-xs">
-              <a href="https://wa.me/923173425680" target="_blank" rel="noopener noreferrer" className="border border-line bg-paper px-2.5 py-1 text-ink hover:text-green hover:border-green transition-colors">
-                WhatsApp: 03173425680
+            <div className="flex flex-col gap-2 text-xs">
+              <a
+                href={WHATSAPP_CHANNEL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center space-x-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-3 py-1.5 rounded text-xs font-bold transition-colors w-fit shadow-xs"
+              >
+                <WhatsAppIcon className="w-4 h-4" />
+                <span>Join WhatsApp Channel</span>
               </a>
-              <a href="https://facebook.com/CareerDost" target="_blank" rel="noopener noreferrer" className="border border-line bg-paper px-2.5 py-1 text-ink hover:text-green hover:border-green transition-colors">
-                Facebook: CareerDost
-              </a>
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <a href="https://wa.me/923173425680" target="_blank" rel="noopener noreferrer" className="border border-line bg-paper px-2.5 py-1 text-ink hover:text-green hover:border-green transition-colors">
+                  Contact: 03173425680
+                </a>
+                <a href="https://facebook.com/CareerDost" target="_blank" rel="noopener noreferrer" className="border border-line bg-paper px-2.5 py-1 text-ink hover:text-green hover:border-green transition-colors">
+                  Facebook: CareerDost
+                </a>
+              </div>
             </div>
           </div>
         </div>

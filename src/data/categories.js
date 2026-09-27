@@ -74,6 +74,14 @@ export const categories = [
     description:
       'Announced results and roll-number slips for board exams, entry tests and recruitment tests across Pakistan.',
   },
+  {
+    slug: 'career-guides',
+    label: 'Career Guides',
+    short: 'Career Guides',
+    tone: 'green',
+    description:
+      'Evergreen educational guides on CV writing, interview preparation, career planning and job application strategies.',
+  },
 ]
 
 export const categoryBySlug = (slug) => categories.find((c) => c.slug === slug)

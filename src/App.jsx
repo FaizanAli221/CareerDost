@@ -4,6 +4,8 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import ErrorBoundary from './components/ErrorBoundary'
 import Home from './pages/Home'
+import DailyUpdatesPage from './pages/DailyUpdatesPage'
+import UpdateDetailPage from './pages/UpdateDetailPage'
 import CategoryPage from './pages/CategoryPage'
 import ArticlePage from './pages/ArticlePage'
 import SearchPage from './pages/SearchPage'
@@ -32,6 +34,8 @@ export default function App() {
         <ErrorBoundary>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/daily-updates" element={<DailyUpdatesPage />} />
+            <Route path="/daily-updates/:slug" element={<UpdateDetailPage />} />
             <Route path="/category/:slug" element={<CategoryPage />} />
             <Route path="/jobs/:slug" element={<ArticlePage />} />
             <Route path="/search" element={<SearchPage />} />

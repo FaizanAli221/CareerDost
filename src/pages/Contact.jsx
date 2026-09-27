@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSeo } from '../lib/useSeo'
+import { submitContactForm } from '../api/client'
 
 export default function Contact() {
   useSeo({
@@ -10,14 +11,32 @@ export default function Contact() {
 
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const onSubmit = (e) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: 'Report an outdated listing or deadline',
+    message: '',
+  })
+
+  const onSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-    setTimeout(() => {
+    setError('')
+
+    try {
+      const res = await submitContactForm(formData)
+      if (res.success) {
+        setSent(true)
+      } else {
+        setError(res.error || 'Failed to submit form. Please try again.')
+      }
+    } catch (err) {
+      setError(err.message || 'An error occurred. Please try again.')
+    } finally {
       setLoading(false)
-      setSent(true)
-    }, 600)
+    }
   }
 
   return (
@@ -28,7 +47,7 @@ export default function Contact() {
       </p>
 
       <div className="mb-8 p-4 border border-line bg-paper text-sm space-y-2">
-        <h2 className="font-semibold text-ink">Direct Contact & Social Media:</h2>
+        <h2 className="font-semibold text-ink">Direct Contact &amp; Social Media:</h2>
         <div className="flex flex-col sm:flex-row gap-4 text-xs text-ink font-medium">
           <a href="https://wa.me/923173425680" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-green">
             💬 <strong>WhatsApp:</strong> 03173425680
@@ -39,9 +58,15 @@ export default function Contact() {
         </div>
       </div>
 
+      {error && (
+        <div className="border border-brick/30 bg-brick-light text-brick px-4 py-3 text-sm font-medium mb-4">
+          {error}
+        </div>
+      )}
+
       {sent ? (
         <div className="border border-green/30 bg-green-light text-green px-5 py-4 text-sm font-medium">
-          ✓ Thank you — your message has been received. Our team will review your query shortly.
+          ✓ Thank you — your message has been received. Our team will review your query.
         </div>
       ) : (
         <form onSubmit={onSubmit} className="space-y-4">
@@ -51,7 +76,10 @@ export default function Contact() {
               id="name"
               name="name"
               required
+              maxLength={100}
               type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="e.g. Ali Ahmed"
               className="w-full border border-line bg-white px-3 py-2.5 text-sm text-ink placeholder:text-inksoft/60 focus:border-green"
             />
@@ -63,7 +91,10 @@ export default function Contact() {
               id="email"
               name="email"
               required
+              maxLength={150}
               type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               placeholder="name@example.com"
               className="w-full border border-line bg-white px-3 py-2.5 text-sm text-ink placeholder:text-inksoft/60 focus:border-green"
             />
@@ -74,6 +105,8 @@ export default function Contact() {
             <select
               id="subject"
               name="subject"
+              value={formData.subject}
+              onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
               className="w-full border border-line bg-white px-3 py-2.5 text-sm text-ink focus:border-green"
             >
               <option>Report an outdated listing or deadline</option>
@@ -89,7 +122,10 @@ export default function Contact() {
               id="message"
               name="message"
               required
+              maxLength={2000}
               rows={5}
+              value={formData.message}
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
               placeholder="Provide details or links relevant to your inquiry..."
               className="w-full border border-line bg-white px-3 py-2.5 text-sm text-ink placeholder:text-inksoft/60 focus:border-green"
             />

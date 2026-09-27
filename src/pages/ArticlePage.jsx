@@ -9,6 +9,9 @@ import { deadlineLabel, formatDate } from '../lib/format'
 import { safeUrl } from '../lib/security'
 import { useSeo } from '../lib/useSeo'
 
+import CategoryFallbackImage from '../components/CategoryFallbackImage'
+import WhatsAppCTA from '../components/WhatsAppCTA'
+
 function DetailRow({ label, value }) {
   if (!value || value === 'N/A') return null
   return (
@@ -164,6 +167,7 @@ export default function ArticlePage() {
 
   const dl = deadlineLabel(listing.lastDate)
   const contentArray = Array.isArray(listing.content) ? listing.content : [listing.content || '']
+  const hasImage = listing.featuredImage && listing.featuredImage.trim().length > 0
 
   return (
     <div className="container-x py-8">
@@ -195,6 +199,19 @@ export default function ArticlePage() {
                 <span>•</span>
                 <span>Location: <strong className="text-ink">{listing.location}</strong></span>
               </>
+            )}
+          </div>
+
+          {/* Featured Image / Fallback Cover Banner */}
+          <div className="relative aspect-[16/9] w-full bg-slate-900 rounded-xs overflow-hidden mb-6 shadow-xs">
+            {hasImage ? (
+              <img
+                src={listing.featuredImage}
+                alt={listing.imageAlt || listing.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <CategoryFallbackImage category={cat.label || listing.category} title={listing.title} />
             )}
           </div>
 
@@ -284,6 +301,9 @@ export default function ArticlePage() {
               </div>
             </div>
           </div>
+
+          {/* WhatsApp Channel CTA */}
+          <WhatsAppCTA variant="banner" className="mt-8 mb-0" />
         </article>
 
         {/* Sidebar Key Details */}
@@ -300,6 +320,8 @@ export default function ArticlePage() {
             <DetailRow label="Posted Date" value={formatDate(listing.publishDate)} />
             <DetailRow label="Application Deadline" value={formatDate(listing.lastDate)} />
           </div>
+
+          <WhatsAppCTA variant="sidebar" />
 
           {related.length > 0 && (
             <div>

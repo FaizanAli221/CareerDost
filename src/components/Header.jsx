@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { categories as defaultCategories } from '../data/categories'
 import { getCategoriesFromDb } from '../api/client'
+import WhatsAppCTA, { WHATSAPP_CHANNEL_URL, WhatsAppIcon } from './WhatsAppCTA'
 
 export default function Header() {
   const [open, setOpen] = useState(false)
@@ -32,6 +33,7 @@ export default function Header() {
   // Pre-defined menu structure
   const mainNavItems = [
     { label: 'Home', path: '/' },
+    { label: 'Daily Updates', path: '/daily-updates' },
     { label: 'Government Jobs', path: '/category/government-jobs' },
     { label: 'Private Jobs', path: '/category/private-jobs' },
     { label: 'Bank Jobs', path: '/category/bank-jobs' },
@@ -45,9 +47,22 @@ export default function Header() {
   return (
     <header className="border-b border-line bg-white sticky top-0 z-40 shadow-xs">
       {/* Top Banner Notice */}
-      <div className="bg-slate-dark text-white text-xs font-sans py-1.5 px-4 text-center hidden sm:block">
-        <span className="font-medium text-gold mr-2">CareerDost.pk:</span>
-        Official Pakistan Government &amp; Private Vacancies, Scholarships &amp; Admissions — Updated Daily
+      <div className="bg-slate-dark text-white text-xs font-sans py-1.5 px-4 hidden sm:block">
+        <div className="container-x flex items-center justify-between">
+          <div>
+            <span className="font-medium text-gold mr-2">CareerDost.pk:</span>
+            Official Pakistan Government &amp; Private Vacancies, Scholarships &amp; Admissions — Updated Daily
+          </div>
+          <a
+            href={WHATSAPP_CHANNEL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center space-x-1.5 text-[#25D366] hover:text-white font-semibold ml-4 shrink-0 transition-colors"
+          >
+            <WhatsAppIcon className="w-3.5 h-3.5" />
+            <span>Join WhatsApp Channel →</span>
+          </a>
+        </div>
       </div>
 
       <div className="container-x">
@@ -80,15 +95,20 @@ export default function Header() {
             </div>
           </form>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden font-sans text-xs font-semibold uppercase tracking-wider border border-line bg-paper px-3 py-2 text-ink hover:bg-white"
-            onClick={() => setOpen((o) => !o)}
-            aria-expanded={open}
-            aria-controls="mobile-menu"
-          >
-            {open ? '✕ Close' : '☰ Menu'}
-          </button>
+          {/* Right Header CTAs & Mobile Menu Button */}
+          <div className="flex items-center space-x-2">
+            <div className="hidden sm:block">
+              <WhatsAppCTA variant="button-only" />
+            </div>
+            <button
+              className="md:hidden font-sans text-xs font-semibold uppercase tracking-wider border border-line bg-paper px-3 py-2 text-ink hover:bg-white"
+              onClick={() => setOpen((o) => !o)}
+              aria-expanded={open}
+              aria-controls="mobile-menu"
+            >
+              {open ? '✕ Close' : '☰ Menu'}
+            </button>
+          </div>
         </div>
 
         {/* Desktop Navigation Bar */}
@@ -124,6 +144,19 @@ export default function Header() {
       {/* Mobile Drawer Menu */}
       {open && (
         <div id="mobile-menu" className="md:hidden border-t border-line bg-white shadow-lg">
+          {/* Mobile WhatsApp CTA Button */}
+          <div className="p-3 bg-emerald-950/5 border-b border-line">
+            <a
+              href={WHATSAPP_CHANNEL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center space-x-2 w-full py-2.5 bg-[#25D366] text-white rounded text-xs font-bold font-sans shadow-xs"
+            >
+              <WhatsAppIcon className="w-4 h-4" />
+              <span>Join WhatsApp Channel for Daily Alerts</span>
+            </a>
+          </div>
+
           <form onSubmit={submitSearch} className="flex p-3 gap-2 bg-paper border-b border-line">
             <input
               type="search"

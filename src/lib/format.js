@@ -33,9 +33,10 @@ export function daysRemaining(iso) {
 
 export function deadlineLabel(iso) {
   const days = daysRemaining(iso)
-  if (days === null) return { text: 'N/A', urgent: false, closed: false }
-  if (days < 0) return { text: 'Closed', urgent: false, closed: true }
-  if (days === 0) return { text: 'Closes today', urgent: true, closed: false }
-  if (days <= 5) return { text: `${days} day${days === 1 ? '' : 's'} left`, urgent: true, closed: false }
-  return { text: `${days} days left`, urgent: false, closed: false }
+  if (days === null) return { text: 'N/A', urgent: false, closed: false, days: 999 }
+  if (days < 0) return { text: 'Expired', urgent: false, closed: true, days: -1 }
+  if (days === 0) return { text: 'Closes Today', urgent: true, closed: false, days: 0 }
+  if (days === 1) return { text: '1 Day Left', urgent: true, closed: false, days: 1 }
+  if (days <= 5) return { text: `${days} Days Left`, urgent: true, closed: false, days }
+  return { text: `${days} Days Left`, urgent: false, closed: false, days }
 }

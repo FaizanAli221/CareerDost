@@ -10,11 +10,17 @@ app.get('/', async (c) => {
   const query = c.req.query('q')
   const featured = c.req.query('featured')
   const latest = c.req.query('latest')
+  const closingSoon = c.req.query('closingSoon')
   const limit = c.req.query('limit') ? parseInt(c.req.query('limit'), 10) : undefined
   const category = c.req.query('category')
 
   if (query) {
     const articles = await ArticleModel.search(db, query, 'published')
+    return c.json({ success: true, data: articles })
+  }
+
+  if (closingSoon === 'true') {
+    const articles = await ArticleModel.getClosingSoon(db, limit || 6, 'published')
     return c.json({ success: true, data: articles })
   }
 

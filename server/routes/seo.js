@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { getDb } from '../db.js'
 import { ArticleModel } from '../models/Article.js'
 import { CategoryModel } from '../models/Category.js'
+import { DailyUpdateModel } from '../models/DailyUpdate.js'
 
 const app = new Hono()
 
@@ -21,10 +22,12 @@ app.get('/sitemap.xml', async (c) => {
   const db = getDb(c)
 
   const articles = await ArticleModel.getAll(db, 'published')
+  const updates = await DailyUpdateModel.getAll(db, 'published')
   const categories = await CategoryModel.getAll(db)
 
   const staticPages = [
     { loc: '/', priority: '1.0', changefreq: 'daily' },
+    { loc: '/daily-updates', priority: '0.9', changefreq: 'daily' },
     { loc: '/search', priority: '0.6', changefreq: 'weekly' },
     { loc: '/about', priority: '0.5', changefreq: 'monthly' },
     { loc: '/contact', priority: '0.5', changefreq: 'monthly' },
@@ -39,6 +42,13 @@ app.get('/sitemap.xml', async (c) => {
     changefreq: 'daily',
   }))
 
+  const updateUrls = updates.map((upd) => ({
+    loc: `/daily-updates/${upd.slug}`,
+    priority: '0.9',
+    changefreq: 'daily',
+    lastmod: upd.publishDate ? upd.publishDate.split('T')[0] : new Date().toISOString().split('T')[0],
+  }))
+
   const articleUrls = articles.map((art) => ({
     loc: `/jobs/${art.slug}`,
     priority: '0.9',
@@ -46,7 +56,7 @@ app.get('/sitemap.xml', async (c) => {
     lastmod: art.publishDate || (art.updatedAt ? art.updatedAt.split('T')[0] : new Date().toISOString().split('T')[0]),
   }))
 
-  const allUrls = [...staticPages, ...categoryUrls, ...articleUrls]
+  const allUrls = [...staticPages, ...categoryUrls, ...updateUrls, ...articleUrls]
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`
   xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`
