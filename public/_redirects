@@ -1,7 +1,6 @@
-# Static pass-through rules for SEO & Verification files
+# Exclude static sitemap and robots from SPA rewrite
 /sitemap.xml /sitemap.xml 200
 /robots.txt /robots.txt 200
-/googlefa0859c31163b27d.html /googlefa0859c31163b27d.html 200
 
 # SPA fallback rule for React Router
 /* /index.html 200
