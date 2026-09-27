@@ -6,13 +6,13 @@ import { DailyUpdateModel } from '../models/DailyUpdate.js'
 
 const app = new Hono()
 
-const SITE_URL = 'https://careerdost.pk'
+const SITE_URL = 'https://careerdost.pages.dev'
 
 app.get('/robots.txt', (c) => {
   const content = `User-agent: *
 Allow: /
 Disallow: /admin
-Disallow: /api/admin/
+Disallow: /api/
 
 Sitemap: ${SITE_URL}/sitemap.xml`
   return c.text(content, 200, { 'Content-Type': 'text/plain; charset=utf-8' })
@@ -28,7 +28,6 @@ app.get('/sitemap.xml', async (c) => {
   const staticPages = [
     { loc: '/', priority: '1.0', changefreq: 'daily' },
     { loc: '/daily-updates', priority: '0.9', changefreq: 'daily' },
-    { loc: '/search', priority: '0.6', changefreq: 'weekly' },
     { loc: '/about', priority: '0.5', changefreq: 'monthly' },
     { loc: '/contact', priority: '0.5', changefreq: 'monthly' },
     { loc: '/privacy-policy', priority: '0.3', changefreq: 'yearly' },

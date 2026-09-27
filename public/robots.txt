@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /admin
-Disallow: /api/admin/
+Disallow: /api/
 
-Sitemap: https://careerdost.pk/sitemap.xml
+Sitemap: https://careerdost.pages.dev/sitemap.xml
