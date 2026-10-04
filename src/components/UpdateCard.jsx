@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import CategoryFallbackImage from './CategoryFallbackImage'
+import { getOpportunityStatus } from '../lib/format'
 
 function isRecent(publishDate, hours = 48) {
   if (!publishDate) return false
@@ -29,6 +30,7 @@ export default function UpdateCard({ updateItem }) {
   if (!updateItem) return null
 
   const isNew = isRecent(updateItem.publishDate)
+  const oppStatus = getOpportunityStatus(updateItem.deadline, updateItem.noDeadline)
   const hasImage = updateItem.featuredImage && updateItem.featuredImage.trim().length > 0
 
   return (
@@ -52,10 +54,15 @@ export default function UpdateCard({ updateItem }) {
           )}
 
           {/* Badges */}
-          <div className="absolute top-2 left-2 flex items-center gap-1.5 z-10">
+          <div className="absolute top-2 left-2 flex items-center gap-1.5 z-10 flex-wrap">
             {isNew && (
               <span className="bg-red-600 text-white text-[10px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm animate-pulse">
                 New
+              </span>
+            )}
+            {updateItem.isVerified && (
+              <span className="bg-emerald-600 text-white text-[10px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
+                ✓ Verified
               </span>
             )}
             <span className="bg-slate-950/80 backdrop-blur-xs text-white text-[11px] font-sans font-medium px-2.5 py-0.5 rounded-xs border border-white/20">
@@ -63,9 +70,9 @@ export default function UpdateCard({ updateItem }) {
             </span>
           </div>
 
-          {updateItem.deadline && (
-            <div className="absolute bottom-2 right-2 bg-amber-500 text-slate-950 text-[10px] font-sans font-bold px-2 py-0.5 rounded-xs shadow-xs z-10">
-              Closing: {updateItem.deadline}
+          {(updateItem.deadline || updateItem.noDeadline) && (
+            <div className={`absolute bottom-2 right-2 text-[10px] font-sans font-bold px-2 py-0.5 rounded-xs shadow-xs z-10 border ${oppStatus.badgeClass}`}>
+              {oppStatus.label}
             </div>
           )}
         </div>

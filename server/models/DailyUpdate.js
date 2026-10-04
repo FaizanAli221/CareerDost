@@ -20,9 +20,23 @@ function formatUpdate(row) {
     officialLink: row.official_link || '',
     applyLink: row.apply_link || '',
     deadline: row.deadline || '',
+    noDeadline: Boolean(row.no_deadline),
     publishDate: row.publish_date || new Date().toISOString(),
+    organization: row.organization || '',
+    location: row.location || '',
+    qualification: row.qualification || '',
+    experience: row.experience || '',
+    positions: row.positions || '',
+    jobType: row.job_type || '',
+    salary: row.salary || '',
+    isVerified: Boolean(row.is_verified),
+    featured: Boolean(row.featured),
     seoTitle: row.seo_title || row.title,
     metaDescription: row.meta_description || row.short_description || '',
+    focusKeyword: row.focus_keyword || '',
+    canonicalUrl: row.canonical_url || '',
+    ogTitle: row.og_title || '',
+    ogDescription: row.og_description || '',
     status: row.status || 'published',
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -111,8 +125,10 @@ export class DailyUpdateModel {
         `INSERT INTO daily_updates (
           slug, title, category, short_description, content,
           featured_image, image_alt, official_link, apply_link,
-          deadline, publish_date, seo_title, meta_description, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          deadline, no_deadline, publish_date, organization, location, qualification,
+          experience, positions, job_type, salary, is_verified, featured,
+          seo_title, meta_description, focus_keyword, canonical_url, og_title, og_description, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .bind(
         data.slug,
@@ -125,9 +141,23 @@ export class DailyUpdateModel {
         data.officialLink || data.official_link || '',
         data.applyLink || data.apply_link || '',
         data.deadline || '',
+        data.noDeadline ? 1 : 0,
         pubDate,
+        data.organization || '',
+        data.location || '',
+        data.qualification || '',
+        data.experience || '',
+        data.positions || '',
+        data.jobType || data.job_type || '',
+        data.salary || '',
+        data.isVerified ? 1 : 0,
+        data.featured ? 1 : 0,
         data.seoTitle || data.seo_title || data.title,
         data.metaDescription || data.meta_description || data.shortDescription || '',
+        data.focusKeyword || data.focus_keyword || '',
+        data.canonicalUrl || data.canonical_url || '',
+        data.ogTitle || data.og_title || data.title,
+        data.ogDescription || data.og_description || data.metaDescription || '',
         status
       )
       .run()
@@ -148,7 +178,9 @@ export class DailyUpdateModel {
         `UPDATE daily_updates SET
           slug = ?, title = ?, category = ?, short_description = ?, content = ?,
           featured_image = ?, image_alt = ?, official_link = ?, apply_link = ?,
-          deadline = ?, publish_date = ?, seo_title = ?, meta_description = ?,
+          deadline = ?, no_deadline = ?, publish_date = ?, organization = ?, location = ?, qualification = ?,
+          experience = ?, positions = ?, job_type = ?, salary = ?, is_verified = ?, featured = ?,
+          seo_title = ?, meta_description = ?, focus_keyword = ?, canonical_url = ?, og_title = ?, og_description = ?,
           status = ?, updated_at = CURRENT_TIMESTAMP
         WHERE slug = ?`
       )
@@ -163,9 +195,23 @@ export class DailyUpdateModel {
         data.officialLink || data.official_link || '',
         data.applyLink || data.apply_link || '',
         data.deadline || '',
+        data.noDeadline ? 1 : 0,
         data.publishDate || data.publish_date || '',
+        data.organization || '',
+        data.location || '',
+        data.qualification || '',
+        data.experience || '',
+        data.positions || '',
+        data.jobType || data.job_type || '',
+        data.salary || '',
+        data.isVerified ? 1 : 0,
+        data.featured ? 1 : 0,
         data.seoTitle || data.seo_title || data.title,
         data.metaDescription || data.meta_description || data.shortDescription || '',
+        data.focusKeyword || data.focus_keyword || '',
+        data.canonicalUrl || data.canonical_url || '',
+        data.ogTitle || data.og_title || data.title,
+        data.ogDescription || data.og_description || data.metaDescription || '',
         status,
         slug
       )

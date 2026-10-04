@@ -120,7 +120,7 @@ function generateSvg(item) {
   <!-- Top Bar -->
   <g transform="translate(60, 50)">
     <text font-family="'Segoe UI', system-ui, sans-serif" font-weight="800" font-size="28" fill="#ffffff">
-      CareerDost<tspan fill="${theme.accent}">.pk</tspan>
+      CareerDost
     </text>
     
     <!-- Category Pill -->

@@ -30,6 +30,18 @@ export function validateUrl(url) {
   }
 }
 
+export function sanitizeHtml(html) {
+  if (typeof html !== 'string') return ''
+  let clean = html.trim()
+  // Strip dangerous script/iframe tags and inline event handlers
+  clean = clean.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+  clean = clean.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+  clean = clean.replace(/\son\w+\s*=\s*(["']).*?\1/gi, '')
+  clean = clean.replace(/\son\w+\s*=\s*[^>\s]+/gi, '')
+  clean = clean.replace(/href\s*=\s*(["'])\s*javascript:[^"']*\1/gi, 'href="#"')
+  return clean
+}
+
 export function sanitizeArticleInput(data) {
   const errors = []
 
@@ -49,31 +61,37 @@ export function sanitizeArticleInput(data) {
   }
 
   const organization = sanitizeString(data.organization, 150)
-  if (!organization) {
-    errors.push('Organization is required.')
-  }
-
   const jobType = sanitizeString(data.jobType || data.job_type, 100) || 'Full Time'
   const location = sanitizeString(data.location, 100)
   const qualification = sanitizeString(data.qualification, 200)
   const salary = sanitizeString(data.salary, 100)
+  const experience = sanitizeString(data.experience, 100)
+  const positions = sanitizeString(data.positions, 100)
   const lastDate = sanitizeString(data.lastDate || data.last_date, 20)
-  const publishDate = sanitizeString(data.publishDate || data.publish_date, 20)
+  const noDeadline = Boolean(data.noDeadline || data.no_deadline)
+  const publishDate = sanitizeString(data.publishDate || data.publish_date, 30)
   const officialLink = sanitizeString(data.officialLink || data.official_link, 500)
+  const applyLink = sanitizeString(data.applyLink || data.apply_link, 500)
+  const isVerified = Boolean(data.isVerified || data.is_verified)
 
   if (!validateUrl(officialLink)) {
     errors.push('Official link must be a valid http:// or https:// URL.')
+  }
+  if (!validateUrl(applyLink)) {
+    errors.push('Apply link must be a valid http:// or https:// URL.')
   }
 
   const featured = Boolean(data.featured)
   const logoInitial = sanitizeString(data.logoInitial || data.logo_initial, 10).toUpperCase()
   const excerpt = sanitizeString(data.excerpt, 500)
+  const featuredImage = sanitizeString(data.featuredImage || data.featured_image, 1000)
+  const imageAlt = sanitizeString(data.imageAlt || data.image_alt, 200)
 
   let content = data.content
   if (Array.isArray(content)) {
-    content = content.map((p) => sanitizeString(p, 5000)).filter(Boolean)
+    content = content.map((p) => sanitizeHtml(p)).filter(Boolean)
   } else if (typeof content === 'string') {
-    content = [sanitizeString(content, 10000)]
+    content = [sanitizeHtml(content)]
   } else {
     content = []
   }
@@ -84,6 +102,10 @@ export function sanitizeArticleInput(data) {
 
   const seoTitle = sanitizeString(data.seoTitle || data.seo_title, 200) || title
   const metaDescription = sanitizeString(data.metaDescription || data.meta_description, 300) || excerpt
+  const focusKeyword = sanitizeString(data.focusKeyword || data.focus_keyword, 100)
+  const canonicalUrl = sanitizeString(data.canonicalUrl || data.canonical_url, 300)
+  const ogTitle = sanitizeString(data.ogTitle || data.og_title, 200) || seoTitle
+  const ogDescription = sanitizeString(data.ogDescription || data.og_description, 300) || metaDescription
   const status = data.status === 'draft' ? 'draft' : 'published'
 
   return {
@@ -98,15 +120,26 @@ export function sanitizeArticleInput(data) {
       location,
       qualification,
       salary,
+      experience,
+      positions,
       lastDate,
+      noDeadline,
       publishDate,
       officialLink,
+      applyLink,
+      isVerified,
       featured,
       logoInitial,
+      featuredImage,
+      imageAlt,
       excerpt,
       content,
       seoTitle,
       metaDescription,
+      focusKeyword,
+      canonicalUrl,
+      ogTitle,
+      ogDescription,
       status,
     },
   }
@@ -178,13 +211,24 @@ export function sanitizeUpdateInput(data) {
   const featuredImage = sanitizeString(data.featuredImage || data.featured_image, 1000)
   const imageAlt = sanitizeString(data.imageAlt || data.image_alt, 200)
   const deadline = sanitizeString(data.deadline, 30)
+  const noDeadline = Boolean(data.noDeadline || data.no_deadline)
   const publishDate = sanitizeString(data.publishDate || data.publish_date, 40) || new Date().toISOString()
+
+  const organization = sanitizeString(data.organization, 150)
+  const location = sanitizeString(data.location, 100)
+  const qualification = sanitizeString(data.qualification, 200)
+  const experience = sanitizeString(data.experience, 100)
+  const positions = sanitizeString(data.positions, 100)
+  const jobType = sanitizeString(data.jobType || data.job_type, 100)
+  const salary = sanitizeString(data.salary, 100)
+  const isVerified = Boolean(data.isVerified || data.is_verified)
+  const featured = Boolean(data.featured)
 
   let content = data.content
   if (Array.isArray(content)) {
-    content = content.map((p) => sanitizeString(p, 5000)).filter(Boolean)
+    content = content.map((p) => sanitizeHtml(p)).filter(Boolean)
   } else if (typeof content === 'string') {
-    content = [sanitizeString(content, 10000)]
+    content = [sanitizeHtml(content)]
   } else {
     content = []
   }
@@ -195,6 +239,10 @@ export function sanitizeUpdateInput(data) {
 
   const seoTitle = sanitizeString(data.seoTitle || data.seo_title, 200) || title
   const metaDescription = sanitizeString(data.metaDescription || data.meta_description, 300) || shortDescription
+  const focusKeyword = sanitizeString(data.focusKeyword || data.focus_keyword, 100)
+  const canonicalUrl = sanitizeString(data.canonicalUrl || data.canonical_url, 300)
+  const ogTitle = sanitizeString(data.ogTitle || data.og_title, 200) || seoTitle
+  const ogDescription = sanitizeString(data.ogDescription || data.og_description, 300) || metaDescription
   const status = data.status === 'draft' ? 'draft' : 'published'
 
   return {
@@ -211,9 +259,23 @@ export function sanitizeUpdateInput(data) {
       officialLink,
       applyLink,
       deadline,
+      noDeadline,
       publishDate,
+      organization,
+      location,
+      qualification,
+      experience,
+      positions,
+      jobType,
+      salary,
+      isVerified,
+      featured,
       seoTitle,
       metaDescription,
+      focusKeyword,
+      canonicalUrl,
+      ogTitle,
+      ogDescription,
       status,
     },
   }

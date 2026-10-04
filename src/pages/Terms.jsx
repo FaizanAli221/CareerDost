@@ -11,7 +11,7 @@ export default function Terms() {
   return (
     <SimplePage title="Terms &amp; Conditions" updated="26 September 2026">
       <p>
-        By accessing or using careerdost.pk, you agree to the following terms. If you do not agree
+        By accessing or using careerdost.blog, you agree to the following terms. If you do not agree
         with any part of these terms, please discontinue use of the site.
       </p>
       <h2>Use of the site</h2>

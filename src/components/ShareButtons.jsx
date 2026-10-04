@@ -10,10 +10,12 @@ export default function ShareButtons({
   const [copied, setCopied] = useState(false)
   const [hasNativeShare, setHasNativeShare] = useState(false)
 
-  // Determine full absolute URL dynamically
-  const shareUrl = typeof window !== 'undefined'
-    ? (url ? getAbsoluteUrl(url) : window.location.href)
-    : getAbsoluteUrl(url)
+  // Determine full absolute URL dynamically using canonical domain
+  const shareUrl = url
+    ? getAbsoluteUrl(url)
+    : (typeof window !== 'undefined'
+        ? getAbsoluteUrl(window.location.pathname + window.location.search)
+        : getAbsoluteUrl('/'))
 
   useEffect(() => {
     if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {

@@ -1,343 +1,661 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://careerdost.pages.dev/</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/daily-updates</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/daily-updates</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/about</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/about</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/contact</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/contact</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/privacy-policy</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/privacy-policy</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/disclaimer</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/disclaimer</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/terms-and-conditions</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/terms-and-conditions</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/category/government-jobs</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/category/government-jobs</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/category/private-jobs</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/category/private-jobs</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/category/bank-jobs</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/category/bank-jobs</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/category/it-jobs</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/category/it-jobs</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/category/scholarships</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/category/scholarships</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/category/internships</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/category/internships</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/category/admissions</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/category/admissions</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/category/government-schemes</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/category/government-schemes</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/category/results</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/category/results</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/category/career-guides</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://careerdost.blog/category/career-guides</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/gwadar-shipyard-cfo-accounts-officer-jobs-2026</loc>
+    <loc>https://careerdost.blog/jobs/nust-net-2027-registration-series-1</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/uajk-admissions-2026-deadline-extended</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/punjab-auqaf-department-jobs-2026</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/sbbu-affiliated-colleges-admissions-2026</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/cadet-college-kohat-admissions-2026-63rd-entry</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/sessi-internship-programme-2026</loc>
+    <lastmod>2026-10-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/hec-jobs-2026</loc>
+    <lastmod>2026-10-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/pidcl-site-engineer-jobs-2026</loc>
+    <lastmod>2026-10-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/hec-outstanding-research-awards-2026-27</loc>
+    <lastmod>2026-10-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/fuuast-examination-forms-2026</loc>
+    <lastmod>2026-10-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/cbd-punjab-paid-internship-2026-youth-career-program</loc>
+    <lastmod>2026-10-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/phsa-kp-bs-nursing-admissions-2026</loc>
+    <lastmod>2026-10-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/commonwealth-scholarships-2027-28-pakistan-hec-csc-uk</loc>
+    <lastmod>2026-10-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/shaikh-ayaz-university-spring-2027-admissions-apply-online</loc>
+    <lastmod>2026-10-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/ntisb-cyber-security-jobs-2026-national-job-portal</loc>
+    <lastmod>2026-10-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/pm-fuel-relief-scheme-2026-registration-eligibility</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/alkhidmat-foundation-jobs-2026-latest-vacancies-apply-online</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/teach-in-usa-bridgeusa-j1-teacher-program-eligibility-guide</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/sindh-pink-scooty-scheme-2026-online-registration-eligibility</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/uoh-haripur-admissions-2026-deadline-today</loc>
+    <lastmod>2026-09-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/virtual-university-admissions-2026-deadline-tomorrow</loc>
+    <lastmod>2026-09-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/hec-peridot-research-program-phase-13-2026</loc>
+    <lastmod>2026-09-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/punjab-cbd-youth-career-program-2026-internship</loc>
+    <lastmod>2026-09-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/pec-graduate-engineer-training-get-program-2026</loc>
+    <lastmod>2026-09-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/petrol-price-reduced-pakistan-september-2026</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/uhs-mdcat-2026-result-recount-review-portal</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/hec-usat-hat-registration-2026-etc-hec</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/sbbu-admissions-2026-deadline-extended</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/sbbu-fully-funded-scholarship-2026</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/uet-lahore-jobs-2026-faculty-research</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/sindh-govt-electric-scooty-scheme-2026-women</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/gwadar-shipyard-assistant-jobs-2026</loc>
+    <loc>https://careerdost.blog/jobs/punjab-university-jobs-faculty-staff-2026</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/imarat-finance-intern-jobs-2026</loc>
+    <loc>https://careerdost.blog/jobs/comsats-university-jobs-faculty-staff-2026</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/karachi-shipyard-technical-assistant-jobs-2026</loc>
+    <loc>https://careerdost.blog/jobs/university-of-chakwal-uoc-jobs-2026</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/bank-of-punjab-relationship-officer-transaction-banking-2026</loc>
+    <loc>https://careerdost.blog/jobs/air-university-islamabad-jobs-2026</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/bank-of-punjab-relationship-manager-officer-cfc-jobs-2026</loc>
+    <loc>https://careerdost.blog/jobs/bahria-university-jobs-2026</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/askari-bank-sr-officer-artificial-intelligence-jobs-2026</loc>
+    <loc>https://careerdost.blog/jobs/sarhad-university-suit-peshawar-jobs-2026</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/lums-lahore-jobs-advancement-it-staff-2026</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/times-university-multan-tum-jobs-2026</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/maju-karachi-jobs-faculty-staff-2026</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/university-of-lahore-uol-jobs-2026</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/gwadar-shipyard-cfo-accounts-officer-jobs-2026</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/gwadar-shipyard-assistant-jobs-2026</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/imarat-finance-intern-jobs-2026</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/karachi-shipyard-technical-assistant-jobs-2026</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/bank-of-punjab-relationship-officer-transaction-banking-2026</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/bank-of-punjab-relationship-manager-officer-cfc-jobs-2026</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/jobs/askari-bank-sr-officer-artificial-intelligence-jobs-2026</loc>
     <lastmod>2026-09-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/navttc-assistant-private-secretary-jobs-2026</loc>
+    <loc>https://careerdost.blog/jobs/navttc-assistant-private-secretary-jobs-2026</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/navttc-assistant-bps15-jobs-2026</loc>
+    <loc>https://careerdost.blog/jobs/navttc-assistant-bps15-jobs-2026</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/navttc-director-bps18-jobs-2026</loc>
+    <loc>https://careerdost.blog/jobs/navttc-director-bps18-jobs-2026</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/hec-uk-commonwealth-scholarships-2027-28</loc>
+    <loc>https://careerdost.blog/jobs/hec-uk-commonwealth-scholarships-2027-28</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/punjab-university-phase2-admissions-2026-27</loc>
+    <loc>https://careerdost.blog/jobs/punjab-university-phase2-admissions-2026-27</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/nts-latest-results-answer-keys-2026</loc>
+    <loc>https://careerdost.blog/jobs/nts-latest-results-answer-keys-2026</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/fpsc-latest-updates-adv3-2026-schedule</loc>
+    <loc>https://careerdost.blog/jobs/fpsc-latest-updates-adv3-2026-schedule</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/comsats-active-scholarships-international-opportunities-2026</loc>
+    <loc>https://careerdost.blog/jobs/comsats-active-scholarships-international-opportunities-2026</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/fpsc-assistant-director-2026</loc>
+    <loc>https://careerdost.blog/jobs/fpsc-assistant-director-2026</loc>
     <lastmod>2026-09-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/punjab-police-constable-recruitment-2026</loc>
+    <loc>https://careerdost.blog/jobs/punjab-police-constable-recruitment-2026</loc>
     <lastmod>2026-09-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/nadra-data-entry-operator-2026</loc>
+    <loc>https://careerdost.blog/jobs/nadra-data-entry-operator-2026</loc>
     <lastmod>2026-09-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/systems-limited-hiring-software-engineers</loc>
+    <loc>https://careerdost.blog/jobs/systems-limited-hiring-software-engineers</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/devsinc-remote-qa-engineer</loc>
+    <loc>https://careerdost.blog/jobs/devsinc-remote-qa-engineer</loc>
     <lastmod>2026-09-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/hbl-management-trainee-officer-2026</loc>
+    <loc>https://careerdost.blog/jobs/hbl-management-trainee-officer-2026</loc>
     <lastmod>2026-09-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/meezan-bank-teller-2026</loc>
+    <loc>https://careerdost.blog/jobs/meezan-bank-teller-2026</loc>
     <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/phec-phd-scholarship-2026</loc>
+    <loc>https://careerdost.blog/jobs/phec-phd-scholarship-2026</loc>
     <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/turkiye-burslari-scholarship-2026</loc>
+    <loc>https://careerdost.blog/jobs/turkiye-burslari-scholarship-2026</loc>
     <lastmod>2026-09-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/ufone-summer-internship-2026</loc>
+    <loc>https://careerdost.blog/jobs/ufone-summer-internship-2026</loc>
     <lastmod>2026-09-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/planning-commission-internship-2026</loc>
+    <loc>https://careerdost.blog/jobs/planning-commission-internship-2026</loc>
     <lastmod>2026-09-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/nust-undergraduate-admissions-fall-2026</loc>
+    <loc>https://careerdost.blog/jobs/nust-undergraduate-admissions-fall-2026</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/punjab-medical-university-admissions-2026</loc>
+    <loc>https://careerdost.blog/jobs/punjab-medical-university-admissions-2026</loc>
     <lastmod>2026-09-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/benazir-income-support-programme-2026</loc>
+    <loc>https://careerdost.blog/jobs/benazir-income-support-programme-2026</loc>
     <lastmod>2026-09-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/punjab-rozgar-scheme-2026</loc>
+    <loc>https://careerdost.blog/jobs/punjab-rozgar-scheme-2026</loc>
     <lastmod>2026-09-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/bise-lahore-matric-result-2026</loc>
+    <loc>https://careerdost.blog/jobs/bise-lahore-matric-result-2026</loc>
     <lastmod>2026-09-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/nts-nat-result-september-2026</loc>
+    <loc>https://careerdost.blog/jobs/nts-nat-result-september-2026</loc>
     <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/wapda-junior-engineer-2026</loc>
+    <loc>https://careerdost.blog/jobs/wapda-junior-engineer-2026</loc>
     <lastmod>2026-09-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/engro-management-trainee-2026</loc>
+    <loc>https://careerdost.blog/jobs/engro-management-trainee-2026</loc>
     <lastmod>2026-09-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/jobs/unilever-future-leaders-2026</loc>
+    <loc>https://careerdost.blog/jobs/unilever-future-leaders-2026</loc>
     <lastmod>2026-09-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/daily-updates/fpsc-consolidated-advertisement-09-2026-announced</loc>
+    <loc>https://careerdost.blog/daily-updates/uoh-haripur-admissions-2026-deadline-today</loc>
+    <lastmod>2026-09-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/daily-updates/virtual-university-admissions-2026-deadline-tomorrow</loc>
+    <lastmod>2026-09-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/daily-updates/hec-peridot-research-program-phase-13-2026</loc>
+    <lastmod>2026-09-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/daily-updates/punjab-cbd-youth-career-program-2026-internship</loc>
+    <lastmod>2026-09-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/daily-updates/pec-graduate-engineer-training-get-program-2026</loc>
+    <lastmod>2026-09-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/daily-updates/petrol-price-reduced-pakistan-september-2026</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/daily-updates/uhs-mdcat-2026-result-recount-review-portal</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/daily-updates/hec-usat-hat-registration-2026-etc-hec</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/daily-updates/sbbu-admissions-2026-deadline-extended</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/daily-updates/sbbu-fully-funded-scholarship-2026</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/daily-updates/uet-lahore-jobs-2026-faculty-research</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/daily-updates/sindh-govt-electric-scooty-scheme-2026-women</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/daily-updates/hec-fully-funded-phd-scholarships-2026-open</loc>
+    <loc>https://careerdost.blog/daily-updates/fpsc-consolidated-advertisement-09-2026-announced</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/daily-updates/state-bank-officer-training-scheme-sbots-batch-27</loc>
+    <loc>https://careerdost.blog/daily-updates/hec-fully-funded-phd-scholarships-2026-open</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/daily-updates/nts-nat-2026-october-test-roll-number-slips-uploaded</loc>
+    <loc>https://careerdost.blog/daily-updates/state-bank-officer-training-scheme-sbots-batch-27</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careerdost.pages.dev/daily-updates/pm-youth-laptop-scheme-phase-4-registration-alert</loc>
+    <loc>https://careerdost.blog/daily-updates/nts-nat-2026-october-test-roll-number-slips-uploaded</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careerdost.blog/daily-updates/pm-youth-laptop-scheme-phase-4-registration-alert</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>

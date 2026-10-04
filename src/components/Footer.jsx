@@ -12,7 +12,6 @@ export default function Footer() {
         <div className="space-y-3">
           <Link to="/" className="flex items-baseline gap-1">
             <span className="font-serif text-2xl font-bold text-ink">CareerDost</span>
-            <span className="text-xs font-semibold text-green">.pk</span>
           </Link>
           <p className="text-xs text-inksoft leading-relaxed">
             Pakistan&rsquo;s trusted opportunity portal for government vacancies, private jobs, bank jobs, scholarships, internships, schemes and admissions. Updated daily from verified official sources.
@@ -88,7 +87,7 @@ export default function Footer() {
       {/* Copyright Bar */}
       <div className="border-t border-line bg-paper">
         <div className="container-x py-4 text-xs text-inksoft flex flex-col sm:flex-row gap-2 sm:gap-0 sm:justify-between items-center">
-          <span>© {year} CareerDost.pk — All rights reserved.</span>
+          <span>© {year} CareerDost — All rights reserved.</span>
           <span>Informational portal only — verify all details on official recruitment websites.</span>
         </div>
       </div>

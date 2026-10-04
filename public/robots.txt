@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /api/
 
-Sitemap: https://careerdost.pages.dev/sitemap.xml
+Sitemap: https://careerdost.blog/sitemap.xml

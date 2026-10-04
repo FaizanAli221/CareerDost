@@ -40,3 +40,60 @@ export function deadlineLabel(iso) {
   if (days <= 5) return { text: `${days} Days Left`, urgent: true, closed: false, days }
   return { text: `${days} Days Left`, urgent: false, closed: false, days }
 }
+
+export function getOpportunityStatus(iso, noDeadline = false) {
+  if (noDeadline || !iso || String(iso).trim() === '') {
+    return {
+      status: 'OPEN',
+      label: 'NO DEADLINE',
+      badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+      isExpired: false,
+      days: 999,
+    }
+  }
+
+  const days = daysRemaining(iso)
+  if (days === null) {
+    return {
+      status: 'OPEN',
+      label: 'OPEN',
+      badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+      isExpired: false,
+      days: 999,
+    }
+  }
+  if (days < 0) {
+    return {
+      status: 'EXPIRED',
+      label: 'EXPIRED',
+      badgeClass: 'bg-slate-200 text-slate-700 border-slate-300',
+      isExpired: true,
+      days,
+    }
+  }
+  if (days === 0) {
+    return {
+      status: 'CLOSES TODAY',
+      label: 'CLOSES TODAY',
+      badgeClass: 'bg-red-100 text-red-800 border-red-300 font-bold animate-pulse',
+      isExpired: false,
+      days: 0,
+    }
+  }
+  if (days <= 3) {
+    return {
+      status: 'CLOSING SOON',
+      label: `CLOSING SOON (${days}d left)`,
+      badgeClass: 'bg-amber-100 text-amber-800 border-amber-300 font-bold',
+      isExpired: false,
+      days,
+    }
+  }
+  return {
+    status: 'OPEN',
+    label: `${days} Days Left`,
+    badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+    isExpired: false,
+    days,
+  }
+}

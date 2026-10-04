@@ -23,7 +23,7 @@ app.use('*', async (c, next) => {
   c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
   c.header(
     'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://www.googletagmanager.com https://cdn.zanderio.ai https://*.zanderio.ai; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.zanderio.ai https://*.zanderio.ai; font-src 'self' https://fonts.gstatic.com https://cdn.zanderio.ai https://*.zanderio.ai; img-src 'self' data: https: https://www.googletagmanager.com https://*.google-analytics.com https://www.google-analytics.com https://cdn.zanderio.ai https://*.zanderio.ai; connect-src 'self' https://challenges.cloudflare.com https://*.google-analytics.com https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://cdn.zanderio.ai https://*.zanderio.ai wss://*.zanderio.ai; frame-src 'self' https://challenges.cloudflare.com https://cdn.zanderio.ai https://*.zanderio.ai; base-uri 'self'; form-action 'self';"
   )
 })
 
@@ -34,15 +34,16 @@ app.use(
     origin: (origin) => {
       if (!origin) return '*'
       if (
+        origin.endsWith('.careerdost.blog') ||
+        origin === 'https://careerdost.blog' ||
         origin.endsWith('.careerdost.pages.dev') ||
         origin === 'https://careerdost.pages.dev' ||
-        origin === 'https://careerdost.pk' ||
         origin.includes('localhost') ||
         origin.includes('127.0.0.1')
       ) {
         return origin
       }
-      return 'https://careerdost.pages.dev'
+      return 'https://careerdost.blog'
     },
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],

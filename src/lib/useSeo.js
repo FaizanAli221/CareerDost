@@ -65,11 +65,8 @@ export function useSeo(options = {}) {
     setMetaTag('name', 'robots', noIndex ? 'noindex, nofollow' : 'index, follow')
 
     // 4. Canonical URL
-    const currentUrl = typeof window !== 'undefined' && window.location ? window.location.href : SITE_URL
     const pathname = typeof window !== 'undefined' && window.location ? window.location.pathname : '/'
-    const canonicalUrl = canonical
-      ? getAbsoluteUrl(canonical)
-      : (currentUrl.includes('localhost') ? currentUrl : getAbsoluteUrl(pathname))
+    const canonicalUrl = getAbsoluteUrl(canonical || pathname)
 
     setLinkCanonical(canonicalUrl)
 

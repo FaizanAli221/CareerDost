@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="100%" stop-color="#172554" />
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="675" fill="url(#bgGrad)"/>
+  <rect width="1200" height="675" fill="url(#grid)"/>
+
+  <!-- Top Bar -->
+  <g transform="translate(60, 60)">
+    <text font-family="'Segoe UI', system-ui, sans-serif" font-weight="800" font-size="32" fill="#ffffff">
+      CareerDost
+    </text>
+    
+    <!-- Category Pill -->
+    <rect x="840" y="-22" width="240" height="42" rx="21" fill="#2563eb"/>
+    <text x="960" y="5" font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="16" fill="#ffffff" text-anchor="middle">
+      Internships
+    </text>
+  </g>
+
+  <!-- Center Content -->
+  <g transform="translate(60, 190)">
+    <!-- Organization -->
+    <text font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="22" fill="#60a5fa" letter-spacing="1">
+      PUNJAB CBD DEVELOPMENT AUTHORITY (PCBDDA)
+    </text>
+
+    <!-- Title -->
+    <text y="80" font-family="'Georgia', serif" font-weight="800" font-size="44" fill="#ffffff">
+      CBD Punjab Paid Internship
+    </text>
+
+    <!-- Subtitle Badge -->
+    <rect y="135" width="620" height="48" rx="8" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.2)"/>
+    <text x="24" y="166" font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="20" fill="#ffffff">
+      Youth Career Program 2026 • Fresh Graduates
+    </text>
+  </g>
+
+  <!-- Bottom Details Bar -->
+  <g transform="translate(60, 560)">
+    <line x1="0" y1="0" x2="1080" y2="0" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+    
+    <text y="42" font-family="'Segoe UI', system-ui, sans-serif" font-weight="600" font-size="18" fill="rgba(255,255,255,0.85)">
+      Verified Official Listing • CareerDost
+    </text>
+    
+    <text x="1080" y="42" font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="18" fill="#60a5fa" text-anchor="end">
+      Status: 12 October 2026
+    </text>
+  </g>
+</svg>

@@ -81,7 +81,7 @@ export default function CategoryFallbackImage({ category, title, className = '' 
       {/* Top Header */}
       <div className="flex items-center justify-between z-10">
         <span className="font-serif text-sm font-bold tracking-tight text-white/90">
-          CareerDost<span className="text-emerald-400">.pk</span>
+          CareerDost
         </span>
         <span className={`text-xs px-2.5 py-1 rounded-full font-sans font-semibold ${theme.tagBg}`}>
           {category}

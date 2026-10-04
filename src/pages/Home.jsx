@@ -14,6 +14,7 @@ import UpdateCard from '../components/UpdateCard'
 import OpportunityCard from '../components/OpportunityCard'
 import WhatsAppCTA from '../components/WhatsAppCTA'
 import { useSeo } from '../lib/useSeo'
+import { SITE_URL } from '../lib/config'
 
 const QUICK_CATEGORIES = [
   { label: 'Government Jobs', path: '/category/government-jobs', icon: '🏛️', count: 'FPSC, PPSC, NTS' },
@@ -46,10 +47,10 @@ export default function Home() {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
       name: 'CareerDost',
-      url: 'https://careerdost.pk',
+      url: SITE_URL,
       potentialAction: {
         '@type': 'SearchAction',
-        target: 'https://careerdost.pk/search?q={search_term_string}',
+        target: `${SITE_URL}/search?q={search_term_string}`,
         'query-input': 'required name=search_term_string',
       },
     },

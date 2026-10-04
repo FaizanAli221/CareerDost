@@ -5,8 +5,11 @@ import CategoryFallbackImage from '../components/CategoryFallbackImage'
 import UpdateCard from '../components/UpdateCard'
 import WhatsAppCTA from '../components/WhatsAppCTA'
 import ShareButtons from '../components/ShareButtons'
+import SafeContent from '../components/SafeContent'
 import { useSeo } from '../lib/useSeo'
 import { getAbsoluteUrl } from '../lib/config'
+import { getOpportunityStatus } from '../lib/format'
+import { trackApplyNowClick, trackOfficialSourceClick } from '../lib/analytics'
 
 function formatDate(dateStr) {
   if (!dateStr) return ''
@@ -28,7 +31,7 @@ export default function UpdateDetailPage() {
   useSeo({
     title: updateItem ? `${updateItem.seoTitle || updateItem.title} — CareerDost` : 'Daily Update — CareerDost',
     description: updateItem ? updateItem.metaDescription || updateItem.shortDescription : 'Verified Pakistan daily update.',
-    canonical: `/daily-updates/${slug}`,
+    canonical: updateItem?.canonicalUrl || `/daily-updates/${slug}`,
     ogImage: updateItem?.featuredImage ? getAbsoluteUrl(updateItem.featuredImage) : getAbsoluteUrl('/images/hec-commonwealth-scholarship-2027.jpg'),
     jsonLd: updateItem
       ? {
@@ -75,7 +78,7 @@ export default function UpdateDetailPage() {
 
   if (loading) {
     return (
-      <div className="container-x py-12 max-w-4xl">
+      <div className="container-x py-12 max-w-4xl font-sans">
         <div className="animate-pulse space-y-4">
           <div className="h-6 bg-line/60 w-1/4 rounded"></div>
           <div className="h-10 bg-line/60 w-3/4 rounded"></div>
@@ -99,14 +102,12 @@ export default function UpdateDetailPage() {
   }
 
   const hasImage = updateItem.featuredImage && updateItem.featuredImage.trim().length > 0
-  const contentArray = Array.isArray(updateItem.content)
-    ? updateItem.content
-    : (typeof updateItem.content === 'string' ? updateItem.content.split('\n\n') : [])
+  const oppStatus = getOpportunityStatus(updateItem.deadline, updateItem.noDeadline)
 
   return (
-    <article className="container-x py-8 sm:py-12 max-w-4xl">
+    <article className="container-x py-8 sm:py-12 max-w-4xl font-sans">
       {/* Breadcrumbs */}
-      <nav className="text-xs font-sans text-inksoft mb-6 flex items-center gap-1.5 flex-wrap">
+      <nav className="text-xs text-inksoft mb-6 flex items-center gap-1.5 flex-wrap">
         <Link to="/" className="hover:text-green">Home</Link>
         <span>/</span>
         <Link to="/daily-updates" className="hover:text-green">Daily Updates</Link>
@@ -116,10 +117,15 @@ export default function UpdateDetailPage() {
 
       {/* Header Info */}
       <header className="mb-6">
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
           <span className="bg-green/10 text-green text-xs font-sans font-bold px-3 py-1 rounded-full border border-green/20">
             {updateItem.category}
           </span>
+          {updateItem.isVerified && (
+            <span className="bg-emerald-100 text-emerald-800 text-xs font-sans font-bold px-3 py-1 rounded-full border border-emerald-300">
+              ✓ Official Source Verified
+            </span>
+          )}
           <span className="text-xs font-sans text-inksoft">
             Published: {formatDate(updateItem.publishDate)}
           </span>
@@ -132,6 +138,16 @@ export default function UpdateDetailPage() {
         <p className="font-sans text-base sm:text-lg text-inksoft leading-relaxed border-l-4 border-green pl-4 py-1 bg-paper mb-6">
           {updateItem.shortDescription}
         </p>
+
+        {/* Key Specs Bar if present */}
+        {(updateItem.organization || updateItem.qualification || updateItem.location || updateItem.experience || updateItem.positions) && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-paper border border-line mb-6 text-xs">
+            {updateItem.organization && <div><span className="text-inksoft block">Organization</span><strong className="text-ink">{updateItem.organization}</strong></div>}
+            {updateItem.location && <div><span className="text-inksoft block">Location</span><strong className="text-ink">{updateItem.location}</strong></div>}
+            {updateItem.qualification && <div><span className="text-inksoft block">Qualification</span><strong className="text-ink">{updateItem.qualification}</strong></div>}
+            {updateItem.positions && <div><span className="text-inksoft block">Vacancies</span><strong className="text-ink">{updateItem.positions}</strong></div>}
+          </div>
+        )}
 
         {/* Social Share Buttons */}
         <ShareButtons title={updateItem.title} url={`/daily-updates/${updateItem.slug}`} className="my-4" />
@@ -151,13 +167,15 @@ export default function UpdateDetailPage() {
       </div>
 
       {/* Deadline Alert Card if present */}
-      {updateItem.deadline && (
-        <div className="border border-amber-300 bg-amber-50 p-4 mb-8 rounded-xs font-sans flex items-center justify-between gap-4">
+      {(updateItem.deadline || updateItem.noDeadline) && (
+        <div className={`border p-4 mb-8 rounded-xs font-sans flex items-center justify-between gap-4 ${oppStatus.badgeClass}`}>
           <div className="flex items-center gap-3">
             <span className="text-2xl">⏰</span>
             <div>
-              <strong className="text-slate-900 text-sm block font-bold">Closing Deadline Notice</strong>
-              <span className="text-xs text-amber-900">Application / Registration deadline: <strong>{updateItem.deadline}</strong></span>
+              <strong className="text-slate-900 text-sm block font-bold">Opportunity Status: {oppStatus.status}</strong>
+              <span className="text-xs text-amber-900">
+                {updateItem.noDeadline ? 'No strict deadline specified.' : `Application deadline: ${updateItem.deadline} (${oppStatus.label})`}
+              </span>
             </div>
           </div>
           {updateItem.applyLink && (
@@ -165,6 +183,14 @@ export default function UpdateDetailPage() {
               href={updateItem.applyLink}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() =>
+                trackApplyNowClick({
+                  jobTitle: updateItem.title,
+                  organization: updateItem.organization || 'CareerDost',
+                  officialLink: updateItem.applyLink,
+                  category: updateItem.category,
+                })
+              }
               className="bg-amber-600 text-white text-xs font-bold px-4 py-2 rounded-xs hover:bg-amber-700 whitespace-nowrap"
             >
               Apply Now →
@@ -173,11 +199,9 @@ export default function UpdateDetailPage() {
         </div>
       )}
 
-      {/* Main Content Paragraphs */}
+      {/* Main Content Paragraphs (Safe HTML Sanitized) */}
       <div className="font-sans text-ink text-base leading-relaxed space-y-5 mb-10 border-b border-line pb-8">
-        {contentArray.map((paragraph, idx) => (
-          <p key={idx}>{paragraph}</p>
-        ))}
+        <SafeContent content={updateItem.content} />
       </div>
 
       {/* Source Links & Action Buttons */}
@@ -193,6 +217,14 @@ export default function UpdateDetailPage() {
               href={updateItem.officialLink}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() =>
+                trackOfficialSourceClick({
+                  title: updateItem.title,
+                  organization: 'CareerDost',
+                  officialLink: updateItem.officialLink,
+                  category: updateItem.category,
+                })
+              }
               className="border border-line bg-white text-ink px-4 py-2 text-xs font-semibold hover:border-green hover:text-green transition-colors"
             >
               Official Website / Gazette ↗
@@ -203,6 +235,14 @@ export default function UpdateDetailPage() {
               href={updateItem.applyLink}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() =>
+                trackApplyNowClick({
+                  jobTitle: updateItem.title,
+                  organization: 'CareerDost',
+                  officialLink: updateItem.applyLink,
+                  category: updateItem.category,
+                })
+              }
               className="bg-green text-white px-5 py-2 text-xs font-semibold hover:bg-green-dark transition-colors shadow-xs"
             >
               Apply Online →

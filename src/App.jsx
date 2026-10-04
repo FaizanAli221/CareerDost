@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
+import { trackPageView } from './lib/analytics'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import ErrorBoundary from './components/ErrorBoundary'
@@ -18,10 +19,11 @@ import AdminPage from './pages/AdminPage'
 import NotFound from './pages/NotFound'
 
 function ScrollToTop() {
-  const { pathname } = useLocation()
+  const location = useLocation()
   useEffect(() => {
     window.scrollTo(0, 0)
-  }, [pathname])
+    trackPageView(location.pathname + location.search)
+  }, [location])
   return null
 }
 

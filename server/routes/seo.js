@@ -6,7 +6,7 @@ import { DailyUpdateModel } from '../models/DailyUpdate.js'
 
 const app = new Hono()
 
-const SITE_URL = 'https://careerdost.pages.dev'
+const SITE_URL = 'https://careerdost.blog'
 
 app.get('/robots.txt', (c) => {
   const content = `User-agent: *

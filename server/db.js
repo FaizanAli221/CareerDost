@@ -90,18 +90,52 @@ async function getLocalDb() {
           );
         `)
 
-        // 2. Ensure status, featured_image, image_alt columns exist in existing tables
+        // 2. Ensure all CMS columns exist in existing tables (Auto-migration)
         try {
-          const pragma = db.prepare("PRAGMA table_info('articles')").all()
-          const colNames = pragma.map((col) => col.name)
-          if (!colNames.includes('status')) {
-            db.exec("ALTER TABLE articles ADD COLUMN status TEXT NOT NULL DEFAULT 'published'")
+          const pragmaArticles = db.prepare("PRAGMA table_info('articles')").all()
+          const artCols = pragmaArticles.map((col) => col.name)
+          const newArtCols = [
+            { name: 'status', type: "TEXT NOT NULL DEFAULT 'published'" },
+            { name: 'featured_image', type: 'TEXT' },
+            { name: 'image_alt', type: 'TEXT' },
+            { name: 'experience', type: 'TEXT' },
+            { name: 'positions', type: 'TEXT' },
+            { name: 'apply_link', type: 'TEXT' },
+            { name: 'is_verified', type: 'INTEGER DEFAULT 0' },
+            { name: 'focus_keyword', type: 'TEXT' },
+            { name: 'canonical_url', type: 'TEXT' },
+            { name: 'og_title', type: 'TEXT' },
+            { name: 'og_description', type: 'TEXT' },
+            { name: 'no_deadline', type: 'INTEGER DEFAULT 0' },
+          ]
+          for (const col of newArtCols) {
+            if (!artCols.includes(col.name)) {
+              db.exec(`ALTER TABLE articles ADD COLUMN ${col.name} ${col.type}`)
+            }
           }
-          if (!colNames.includes('featured_image')) {
-            db.exec("ALTER TABLE articles ADD COLUMN featured_image TEXT")
-          }
-          if (!colNames.includes('image_alt')) {
-            db.exec("ALTER TABLE articles ADD COLUMN image_alt TEXT")
+
+          const pragmaUpdates = db.prepare("PRAGMA table_info('daily_updates')").all()
+          const updCols = pragmaUpdates.map((col) => col.name)
+          const newUpdCols = [
+            { name: 'organization', type: 'TEXT' },
+            { name: 'location', type: 'TEXT' },
+            { name: 'qualification', type: 'TEXT' },
+            { name: 'experience', type: 'TEXT' },
+            { name: 'positions', type: 'TEXT' },
+            { name: 'job_type', type: 'TEXT' },
+            { name: 'salary', type: 'TEXT' },
+            { name: 'is_verified', type: 'INTEGER DEFAULT 0' },
+            { name: 'focus_keyword', type: 'TEXT' },
+            { name: 'canonical_url', type: 'TEXT' },
+            { name: 'og_title', type: 'TEXT' },
+            { name: 'og_description', type: 'TEXT' },
+            { name: 'no_deadline', type: 'INTEGER DEFAULT 0' },
+            { name: 'featured', type: 'INTEGER DEFAULT 0' },
+          ]
+          for (const col of newUpdCols) {
+            if (!updCols.includes(col.name)) {
+              db.exec(`ALTER TABLE daily_updates ADD COLUMN ${col.name} ${col.type}`)
+            }
           }
         } catch (err) {
           console.warn('Migration check warning:', err.message)

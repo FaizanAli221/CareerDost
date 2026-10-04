@@ -5,14 +5,16 @@ import { categoryBySlug as defaultCategoryBySlug } from '../data/categories'
 import { getArticleBySlugFromDb, getArticlesByCategoryFromDb, getCategoriesFromDb } from '../api/client'
 import CategoryTag from '../components/CategoryTag'
 import ListingRow from '../components/ListingRow'
-import { deadlineLabel, formatDate } from '../lib/format'
+import { deadlineLabel, formatDate, getOpportunityStatus } from '../lib/format'
 import { safeUrl } from '../lib/security'
 import { useSeo } from '../lib/useSeo'
 import { getAbsoluteUrl } from '../lib/config'
+import { trackApplyNowClick } from '../lib/analytics'
 
 import CategoryFallbackImage from '../components/CategoryFallbackImage'
 import WhatsAppCTA from '../components/WhatsAppCTA'
 import ShareButtons from '../components/ShareButtons'
+import SafeContent from '../components/SafeContent'
 
 function DetailRow({ label, value }) {
   if (!value || value === 'N/A') return null
@@ -86,6 +88,31 @@ export default function ArticlePage() {
   // JobPosting / Article Structured Data Schema
   const jsonLdSchema = useMemo(() => {
     if (!listing) return null
+    if (listing.schemaType === 'Article' || listing.category === 'government-schemes') {
+      return {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: listing.title || 'Opportunity',
+        description: listing.metaDescription || listing.excerpt || (Array.isArray(listing.content) ? listing.content.join(' ') : String(listing.content || '')),
+        datePublished: listing.publishDate || undefined,
+        dateModified: listing.publishDate || undefined,
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': getAbsoluteUrl(`/jobs/${slug}`),
+        },
+        author: {
+          '@type': 'Organization',
+          name: 'CareerDost',
+          url: getAbsoluteUrl('/'),
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: 'CareerDost',
+          url: getAbsoluteUrl('/'),
+        },
+        image: listing.featuredImage ? getAbsoluteUrl(listing.featuredImage) : undefined,
+      }
+    }
     const jobTypeStr = String(listing.jobType || '').toLowerCase()
     return {
       '@context': 'https://schema.org',
@@ -119,7 +146,7 @@ export default function ArticlePage() {
           }
         : undefined,
     }
-  }, [listing])
+  }, [listing, slug])
 
   useSeo({
     title: listing?.seoTitle || (listing ? `${listing.title} — CareerDost` : 'Opportunity — CareerDost'),
@@ -168,9 +195,9 @@ export default function ArticlePage() {
       label: listing.category || 'General',
     }
 
-  const dl = deadlineLabel(listing.lastDate)
-  const contentArray = Array.isArray(listing.content) ? listing.content : [listing.content || '']
+  const oppStatus = getOpportunityStatus(listing.lastDate, listing.noDeadline)
   const hasImage = listing.featuredImage && listing.featuredImage.trim().length > 0
+  const applyDestination = listing.applyLink || listing.officialLink
 
   return (
     <div className="container-x py-8">
@@ -185,8 +212,13 @@ export default function ArticlePage() {
 
       <div className="grid lg:grid-cols-[1fr_320px] gap-10">
         <article>
-          <div className="mb-3">
+          <div className="mb-3 flex items-center gap-2 flex-wrap">
             <CategoryTag slug={listing.category} />
+            {listing.isVerified && (
+              <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-[11px] font-sans font-bold px-2.5 py-0.5 rounded-full border border-emerald-300">
+                ✓ Official Source Verified
+              </span>
+            )}
           </div>
 
           <h1 className="font-serif text-2xl sm:text-4xl font-bold leading-tight text-ink mb-3">
@@ -195,8 +227,12 @@ export default function ArticlePage() {
 
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-sans text-inksoft mb-4 pb-4 border-b border-line">
             <span>Posted: <strong className="text-ink">{formatDate(listing.publishDate)}</strong></span>
-            <span>•</span>
-            <span>Organization: <strong className="text-ink">{listing.organization}</strong></span>
+            {listing.organization && (
+              <>
+                <span>•</span>
+                <span>Organization: <strong className="text-ink">{listing.organization}</strong></span>
+              </>
+            )}
             {listing.location && (
               <>
                 <span>•</span>
@@ -221,36 +257,28 @@ export default function ArticlePage() {
             )}
           </div>
 
-          {/* Deadline Alert Box */}
-          <div
-            className={`border p-4 mb-8 font-sans text-sm ${
-              dl.closed
-                ? 'border-line bg-white text-inksoft'
-                : dl.urgent
-                ? 'border-brick/30 bg-brick-light text-brick'
-                : 'border-green/30 bg-green-light text-green'
-            }`}
-          >
-            <div className="font-semibold mb-1">
-              {dl.closed ? '⚠️ Applications Closed' : dl.urgent ? '🚨 Closing Soon!' : '✅ Accepting Applications'}
+          {/* Status Alert Box */}
+          <div className={`border p-4 mb-8 font-sans text-sm ${oppStatus.badgeClass}`}>
+            <div className="font-bold mb-1">
+              ⏰ Status: {oppStatus.status}
             </div>
-            {dl.closed
+            {listing.noDeadline
+              ? 'This opportunity does not have a strict closing deadline.'
+              : oppStatus.isExpired
               ? `Applications for this vacancy officially closed on ${formatDate(listing.lastDate)}.`
-              : `The last date to submit online applications is ${formatDate(listing.lastDate)} (${dl.text}).`}
+              : `The last date to submit online applications is ${formatDate(listing.lastDate)} (${oppStatus.label}).`}
           </div>
 
           {/* Detailed Content / Overview */}
           <div className="prose-content font-sans text-ink space-y-4 leading-relaxed text-sm sm:text-base">
-            <h2 className="font-serif text-xl text-ink font-bold border-b border-line pb-2 mt-6">
+            <h2 className="font-serif text-xl text-ink font-bold border-b border-line pb-2 mt-6 mb-4">
               Overview &amp; Description
             </h2>
-            {contentArray.map((para, i) => (
-              <p key={i}>{para}</p>
-            ))}
+            <SafeContent content={listing.content} />
           </div>
 
           {/* How to Apply Section */}
-          <div className="mt-8 border border-line bg-paper p-6 font-sans">
+          <div className="mt-8 border border-line bg-paper p-6 font-sans rounded-xs">
             <h2 className="font-serif text-xl text-ink font-bold mb-3">
               How to Apply
             </h2>
@@ -261,16 +289,36 @@ export default function ArticlePage() {
               <li>Submit the application fee (if applicable) at the designated bank branch before the closing date.</li>
             </ol>
 
-            {listing.officialLink && (
-              <a
-                href={safeUrl(listing.officialLink)}
-                target="_blank"
-                rel="noopener noreferrer nofollow"
-                className="inline-block mt-5 border border-green bg-green text-white px-6 py-3 font-sans text-sm font-semibold hover:bg-green-dark transition-colors shadow-xs"
-              >
-                Visit Official Portal / Apply Online →
-              </a>
-            )}
+            <div className="flex flex-wrap items-center gap-3 mt-6">
+              {applyDestination && (
+                <a
+                  href={safeUrl(applyDestination)}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  onClick={() =>
+                    trackApplyNowClick({
+                      jobTitle: listing.title,
+                      organization: listing.organization,
+                      officialLink: applyDestination,
+                      category: listing.category,
+                    })
+                  }
+                  className="inline-block border border-green bg-green text-white px-6 py-3 font-sans text-sm font-bold hover:bg-green-dark transition-colors shadow-xs"
+                >
+                  Visit Official Portal / Apply Online →
+                </a>
+              )}
+              {listing.officialLink && listing.officialLink !== applyDestination && (
+                <a
+                  href={safeUrl(listing.officialLink)}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="inline-block border border-line bg-white text-ink px-5 py-3 font-sans text-sm font-semibold hover:border-green hover:text-green transition-colors"
+                >
+                  Official Gazette / Source ↗
+                </a>
+              )}
+            </div>
           </div>
 
           {/* Frequently Asked Questions (FAQ) */}
@@ -284,7 +332,9 @@ export default function ArticlePage() {
                   What is the last date to apply for {listing.title}?
                 </h3>
                 <p className="text-xs text-inksoft">
-                  The last date to submit your application is <strong>{formatDate(listing.lastDate)}</strong>.
+                  {listing.noDeadline
+                    ? 'No specific deadline has been announced for this vacancy.'
+                    : `The last date to submit your application is ${formatDate(listing.lastDate)}.`}
                 </p>
               </div>
 
@@ -293,7 +343,7 @@ export default function ArticlePage() {
                   What qualification is required for this position?
                 </h3>
                 <p className="text-xs text-inksoft">
-                  {listing.qualification || 'Please refer to the official advertisement for exact qualification and degree discipline requirements.'}
+                  {listing.qualification || 'Please refer to the official advertisement for exact qualification requirements.'}
                 </p>
               </div>
 
@@ -325,9 +375,12 @@ export default function ArticlePage() {
             <DetailRow label="Employment Type" value={listing.jobType} />
             <DetailRow label="Location" value={listing.location} />
             <DetailRow label="Qualification" value={listing.qualification} />
+            <DetailRow label="Experience" value={listing.experience} />
+            <DetailRow label="Vacancies" value={listing.positions} />
             <DetailRow label="Salary / Scale" value={listing.salary} />
             <DetailRow label="Posted Date" value={formatDate(listing.publishDate)} />
-            <DetailRow label="Application Deadline" value={formatDate(listing.lastDate)} />
+            <DetailRow label="Application Deadline" value={listing.noDeadline ? 'No Deadline' : formatDate(listing.lastDate)} />
+            <DetailRow label="Source Verification" value={listing.isVerified ? '✓ Official Verified' : 'Standard'} />
           </div>
 
           <WhatsAppCTA variant="sidebar" />

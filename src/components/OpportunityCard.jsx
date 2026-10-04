@@ -1,12 +1,12 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { formatDate, deadlineLabel } from '../lib/format'
+import { formatDate, getOpportunityStatus } from '../lib/format'
 import CategoryFallbackImage from './CategoryFallbackImage'
 
 export default function OpportunityCard({ opportunity, showDeadlineBadge = true }) {
   if (!opportunity) return null
 
-  const deadlineInfo = deadlineLabel(opportunity.lastDate)
+  const oppStatus = getOpportunityStatus(opportunity.lastDate, opportunity.noDeadline)
   const hasImage = opportunity.featuredImage && opportunity.featuredImage.trim().length > 0
 
   return (
@@ -30,10 +30,15 @@ export default function OpportunityCard({ opportunity, showDeadlineBadge = true 
           )}
 
           {/* Badges */}
-          <div className="absolute top-2 left-2 flex items-center gap-1.5 z-10">
+          <div className="absolute top-2 left-2 flex items-center gap-1.5 z-10 flex-wrap">
             {opportunity.featured && (
               <span className="bg-gold text-slate-950 text-[10px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
                 ⭐ Featured
+              </span>
+            )}
+            {opportunity.isVerified && (
+              <span className="bg-emerald-600 text-white text-[10px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
+                ✓ Verified
               </span>
             )}
             <span className="bg-slate-950/80 backdrop-blur-xs text-white text-[11px] font-sans font-medium px-2.5 py-0.5 rounded-xs border border-white/20 capitalize">
@@ -41,16 +46,12 @@ export default function OpportunityCard({ opportunity, showDeadlineBadge = true 
             </span>
           </div>
 
-          {/* Dynamic Deadline Badge */}
-          {showDeadlineBadge && deadlineInfo && !deadlineInfo.closed && (
+          {/* Dynamic Deadline / Status Badge */}
+          {showDeadlineBadge && (
             <div
-              className={`absolute bottom-2 right-2 text-[10px] font-sans font-bold px-2.5 py-1 rounded-xs shadow-xs z-10 ${
-                deadlineInfo.urgent
-                  ? 'bg-red-600 text-white animate-pulse'
-                  : 'bg-amber-500 text-slate-950'
-              }`}
+              className={`absolute bottom-2 right-2 text-[10px] font-sans font-bold px-2.5 py-1 rounded-xs shadow-xs z-10 border ${oppStatus.badgeClass}`}
             >
-              ⏰ {deadlineInfo.text}
+              ⏰ {oppStatus.label}
             </div>
           )}
         </div>

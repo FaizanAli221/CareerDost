@@ -3,9 +3,21 @@ import path from 'path'
 import { listings } from '../src/data/listings.js'
 import { categories } from '../src/data/categories.js'
 
-const SITE_URL = process.env.SITE_URL || 'https://careerdost.pages.dev'
+const SITE_URL = process.env.SITE_URL || 'https://careerdost.blog'
 
 const sampleDailyUpdates = [
+  { slug: 'uoh-haripur-admissions-2026-deadline-today', date: '2026-09-29' },
+  { slug: 'virtual-university-admissions-2026-deadline-tomorrow', date: '2026-09-29' },
+  { slug: 'hec-peridot-research-program-phase-13-2026', date: '2026-09-29' },
+  { slug: 'punjab-cbd-youth-career-program-2026-internship', date: '2026-09-29' },
+  { slug: 'pec-graduate-engineer-training-get-program-2026', date: '2026-09-29' },
+  { slug: 'petrol-price-reduced-pakistan-september-2026', date: '2026-09-28' },
+  { slug: 'uhs-mdcat-2026-result-recount-review-portal', date: '2026-09-28' },
+  { slug: 'hec-usat-hat-registration-2026-etc-hec', date: '2026-09-28' },
+  { slug: 'sbbu-admissions-2026-deadline-extended', date: '2026-09-28' },
+  { slug: 'sbbu-fully-funded-scholarship-2026', date: '2026-09-28' },
+  { slug: 'uet-lahore-jobs-2026-faculty-research', date: '2026-09-28' },
+  { slug: 'sindh-govt-electric-scooty-scheme-2026-women', date: '2026-09-27' },
   { slug: 'fpsc-consolidated-advertisement-09-2026-announced', date: '2026-09-27' },
   { slug: 'hec-fully-funded-phd-scholarships-2026-open', date: '2026-09-27' },
   { slug: 'state-bank-officer-training-scheme-sbots-batch-27', date: '2026-09-27' },

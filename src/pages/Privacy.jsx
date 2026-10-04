@@ -12,7 +12,7 @@ export default function Privacy() {
     <SimplePage title="Privacy Policy" updated="26 September 2026">
       <p>
         This Privacy Policy explains how CareerDost (&ldquo;we&rdquo;, &ldquo;us&rdquo;) handles
-        information when you visit careerdost.pk. We built this site to be useful without asking
+        information when you visit careerdost.blog. We built this site to be useful without asking
         for more from you than necessary.
       </p>
       <h2>Information we collect</h2>

@@ -18,9 +18,14 @@ function formatArticle(row) {
     location: row.location,
     qualification: row.qualification,
     salary: row.salary,
+    experience: row.experience || '',
+    positions: row.positions || '',
     lastDate: row.last_date,
+    noDeadline: Boolean(row.no_deadline),
     publishDate: row.publish_date,
     officialLink: row.official_link,
+    applyLink: row.apply_link || '',
+    isVerified: Boolean(row.is_verified),
     featured: Boolean(row.featured),
     logoInitial: row.logo_initial,
     featuredImage: row.featured_image || '',
@@ -29,6 +34,10 @@ function formatArticle(row) {
     content: Array.isArray(content) ? content : [content],
     seoTitle: row.seo_title,
     metaDescription: row.meta_description,
+    focusKeyword: row.focus_keyword || '',
+    canonicalUrl: row.canonical_url || '',
+    ogTitle: row.og_title || '',
+    ogDescription: row.og_description || '',
     status: row.status || 'published',
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -104,7 +113,7 @@ export class ArticleModel {
 
   static async getClosingSoon(db, limit = 6, statusOnly = null) {
     const todayStr = new Date().toISOString().split('T')[0]
-    let sql = "SELECT * FROM articles WHERE last_date IS NOT NULL AND last_date != '' AND last_date >= ?"
+    let sql = "SELECT * FROM articles WHERE (no_deadline IS NULL OR no_deadline = 0) AND last_date IS NOT NULL AND last_date != '' AND last_date >= ?"
     const params = [todayStr]
 
     if (statusOnly) {
@@ -145,9 +154,10 @@ export class ArticleModel {
       .prepare(
         `INSERT INTO articles (
           slug, title, category_slug, organization, job_type, location,
-          qualification, salary, last_date, publish_date, official_link,
-          featured, logo_initial, featured_image, image_alt, excerpt, content, seo_title, meta_description, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          qualification, salary, experience, positions, last_date, no_deadline, publish_date, official_link, apply_link,
+          is_verified, featured, logo_initial, featured_image, image_alt, excerpt, content, seo_title, meta_description,
+          focus_keyword, canonical_url, og_title, og_description, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .bind(
         data.slug,
@@ -158,9 +168,14 @@ export class ArticleModel {
         data.location || '',
         data.qualification || '',
         data.salary || '',
+        data.experience || '',
+        data.positions || '',
         data.lastDate || data.last_date || '',
+        data.noDeadline ? 1 : 0,
         data.publishDate || data.publish_date || new Date().toISOString().split('T')[0],
         data.officialLink || data.official_link || '',
+        data.applyLink || data.apply_link || '',
+        data.isVerified ? 1 : 0,
         data.featured ? 1 : 0,
         data.logoInitial || data.logo_initial || '',
         data.featuredImage || data.featured_image || '',
@@ -169,6 +184,10 @@ export class ArticleModel {
         contentJson,
         data.seoTitle || data.seo_title || data.title,
         data.metaDescription || data.meta_description || data.excerpt || '',
+        data.focusKeyword || data.focus_keyword || '',
+        data.canonicalUrl || data.canonical_url || '',
+        data.ogTitle || data.og_title || data.title,
+        data.ogDescription || data.og_description || data.metaDescription || '',
         status
       )
       .run()
@@ -188,9 +207,9 @@ export class ArticleModel {
       .prepare(
         `UPDATE articles SET
           slug = ?, title = ?, category_slug = ?, organization = ?, job_type = ?,
-          location = ?, qualification = ?, salary = ?, last_date = ?, publish_date = ?,
-          official_link = ?, featured = ?, logo_initial = ?, featured_image = ?, image_alt = ?, excerpt = ?, content = ?,
-          seo_title = ?, meta_description = ?, status = ?, updated_at = CURRENT_TIMESTAMP
+          location = ?, qualification = ?, salary = ?, experience = ?, positions = ?, last_date = ?, no_deadline = ?, publish_date = ?,
+          official_link = ?, apply_link = ?, is_verified = ?, featured = ?, logo_initial = ?, featured_image = ?, image_alt = ?, excerpt = ?, content = ?,
+          seo_title = ?, meta_description = ?, focus_keyword = ?, canonical_url = ?, og_title = ?, og_description = ?, status = ?, updated_at = CURRENT_TIMESTAMP
         WHERE slug = ?`
       )
       .bind(
@@ -202,9 +221,14 @@ export class ArticleModel {
         data.location || '',
         data.qualification || '',
         data.salary || '',
+        data.experience || '',
+        data.positions || '',
         data.lastDate || data.last_date || '',
+        data.noDeadline ? 1 : 0,
         data.publishDate || data.publish_date || '',
         data.officialLink || data.official_link || '',
+        data.applyLink || data.apply_link || '',
+        data.isVerified ? 1 : 0,
         data.featured ? 1 : 0,
         data.logoInitial || data.logo_initial || '',
         data.featuredImage || data.featured_image || '',
@@ -213,6 +237,10 @@ export class ArticleModel {
         contentJson,
         data.seoTitle || data.seo_title || data.title,
         data.metaDescription || data.meta_description || data.excerpt || '',
+        data.focusKeyword || data.focus_keyword || '',
+        data.canonicalUrl || data.canonical_url || '',
+        data.ogTitle || data.og_title || data.title,
+        data.ogDescription || data.og_description || data.metaDescription || '',
         status,
         slug
       )

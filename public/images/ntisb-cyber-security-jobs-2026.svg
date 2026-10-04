@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f766e" />
+      <stop offset="100%" stop-color="#134e4a" />
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="675" fill="url(#bgGrad)"/>
+  <rect width="1200" height="675" fill="url(#grid)"/>
+
+  <!-- Top Bar -->
+  <g transform="translate(60, 60)">
+    <text font-family="'Segoe UI', system-ui, sans-serif" font-weight="800" font-size="32" fill="#ffffff">
+      CareerDost
+    </text>
+    
+    <!-- Category Pill -->
+    <rect x="860" y="-22" width="220" height="42" rx="21" fill="#0d9488"/>
+    <text x="970" y="5" font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="16" fill="#ffffff" text-anchor="middle">
+      Government Jobs
+    </text>
+  </g>
+
+  <!-- Center Content -->
+  <g transform="translate(60, 190)">
+    <!-- Organization -->
+    <text font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="22" fill="#2dd4bf" letter-spacing="1">
+      NATIONAL TELECOMMUNICATION &AMP; INFO SECURITY BOARD
+    </text>
+
+    <!-- Title -->
+    <text y="80" font-family="'Georgia', serif" font-weight="800" font-size="44" fill="#ffffff">
+      Government Cyber Security Jobs 2026
+    </text>
+
+    <!-- Subtitle Badge -->
+    <rect y="135" width="600" height="48" rx="8" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.2)"/>
+    <text x="24" y="166" font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="20" fill="#ffffff">
+      NTISB – Multiple Vacancies • Apply Online
+    </text>
+  </g>
+
+  <!-- Bottom Details Bar -->
+  <g transform="translate(60, 560)">
+    <line x1="0" y1="0" x2="1080" y2="0" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+    
+    <text y="42" font-family="'Segoe UI', system-ui, sans-serif" font-weight="600" font-size="18" fill="rgba(255,255,255,0.85)">
+      Verified Official Listing • CareerDost
+    </text>
+    
+    <text x="1080" y="42" font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="18" fill="#2dd4bf" text-anchor="end">
+      Last Date: 12 October 2026
+    </text>
+  </g>
+</svg>

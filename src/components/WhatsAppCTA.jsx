@@ -1,4 +1,5 @@
 import React from 'react'
+import { trackWhatsAppChannelClick } from '../lib/analytics'
 
 export const WHATSAPP_CHANNEL_URL = 'https://whatsapp.com/channel/0029VbDnzwFF1YlIkJax2P1o'
 
@@ -27,6 +28,7 @@ export default function WhatsAppCTA({ variant = 'banner', className = '' }) {
               href={WHATSAPP_CHANNEL_URL}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackWhatsAppChannelClick(variant)}
               className="inline-flex items-center space-x-2 mt-3 px-4 py-2 bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold rounded tracking-wide transition-all shadow hover:shadow-md"
             >
               <WhatsAppIcon className="w-4 h-4" />
@@ -44,6 +46,7 @@ export default function WhatsAppCTA({ variant = 'banner', className = '' }) {
         href={WHATSAPP_CHANNEL_URL}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => trackWhatsAppChannelClick(variant)}
         className={`inline-flex items-center space-x-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-sans font-bold px-3.5 py-1.5 rounded text-xs transition-colors shadow-xs ${className}`}
       >
         <WhatsAppIcon className="w-4 h-4" />
@@ -82,6 +85,7 @@ export default function WhatsAppCTA({ variant = 'banner', className = '' }) {
             href={WHATSAPP_CHANNEL_URL}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackWhatsAppChannelClick(variant)}
             className="w-full md:w-auto inline-flex items-center justify-center space-x-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold px-6 py-3 rounded-md text-sm transition-all shadow-lg hover:shadow-emerald-500/20 active:scale-98"
           >
             <WhatsAppIcon className="w-5 h-5" />

@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155" />
+      <stop offset="50%" stop-color="#475569" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="expiredGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#dc2626" />
+      <stop offset="100%" stop-color="#991b1b" />
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="675" fill="url(#bgGrad)"/>
+  <rect width="1200" height="675" fill="url(#grid)"/>
+
+  <!-- Top Header Bar -->
+  <g transform="translate(60, 55)">
+    <text font-family="'Segoe UI', system-ui, sans-serif" font-weight="800" font-size="32" fill="#ffffff">
+      CareerDost
+    </text>
+    
+    <!-- Category Pill -->
+    <rect x="890" y="-22" width="190" height="40" rx="20" fill="#64748b"/>
+    <text x="985" y="4" font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="15" fill="#ffffff" text-anchor="middle">
+      ENGINEERING JOBS
+    </text>
+  </g>
+
+  <!-- Expired Status Badge -->
+  <g transform="translate(60, 135)">
+    <rect width="560" height="48" rx="8" fill="url(#expiredGrad)"/>
+    <text x="280" y="31" font-family="'Segoe UI', system-ui, sans-serif" font-weight="900" font-size="20" fill="#ffffff" text-anchor="middle" letter-spacing="1">
+      ⚠️ APPLICATION STATUS: EXPIRED / CLOSED
+    </text>
+  </g>
+
+  <!-- Center Content -->
+  <g transform="translate(60, 230)">
+    <text font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="24" fill="#cbd5e1" letter-spacing="1">
+      PAKISTAN ENGINEERING COUNCIL (PEC)
+    </text>
+
+    <text y="70" font-family="'Georgia', serif" font-weight="800" font-size="40" fill="#ffffff">
+      Graduate Engineer Training (GET) Program
+    </text>
+
+    <rect y="120" width="620" height="48" rx="8" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.2)"/>
+    <text x="25" y="150" font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="18" fill="#cbd5e1">
+      6-Month Funded Industry Training for Fresh Engineers
+    </text>
+  </g>
+
+  <!-- Bottom Details Bar -->
+  <g transform="translate(60, 575)">
+    <line x1="0" y1="0" x2="1080" y2="0" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+    <text y="42" font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="18" fill="#fca5a5">
+      Previous Batch Concluded • Awaiting Next Cycle Announcement
+    </text>
+    <text x="1080" y="42" font-family="'Segoe UI', system-ui, sans-serif" font-weight="600" font-size="16" fill="rgba(255,255,255,0.8)" text-anchor="end">
+      Verified Official Notice • CareerDost
+    </text>
+  </g>
+</svg>

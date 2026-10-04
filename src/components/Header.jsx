@@ -50,7 +50,7 @@ export default function Header() {
       <div className="bg-slate-dark text-white text-xs font-sans py-1.5 px-4 hidden sm:block">
         <div className="container-x flex items-center justify-between">
           <div>
-            <span className="font-medium text-gold mr-2">CareerDost.pk:</span>
+            <span className="font-medium text-gold mr-2">CareerDost:</span>
             Official Pakistan Government &amp; Private Vacancies, Scholarships &amp; Admissions — Updated Daily
           </div>
           <a
@@ -72,7 +72,6 @@ export default function Header() {
             <span className="font-serif text-2xl sm:text-3xl font-bold text-ink group-hover:text-green transition-colors">
               CareerDost
             </span>
-            <span className="text-xs font-sans font-semibold text-green tracking-wide">.pk</span>
           </Link>
 
           {/* Search Form */}
