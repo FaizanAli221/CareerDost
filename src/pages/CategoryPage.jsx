@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { categoryBySlug as defaultCategoryBySlug, categories as defaultCategories } from '../data/categories'
 import { getListingsByCategory as defaultGetByCategory } from '../data/listings'
 import { getCategoryBySlugFromDb, getCategoriesFromDb } from '../api/client'
 import ListingRow from '../components/ListingRow'
 import { useSeo } from '../lib/useSeo'
+import { getAbsoluteUrl } from '../lib/config'
 
 export default function CategoryPage() {
   const { slug } = useParams()
@@ -70,10 +71,33 @@ export default function CategoryPage() {
     }
   }, [slug])
 
+  const breadcrumbSchema = useMemo(() => {
+    if (!cat) return null
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: getAbsoluteUrl('/'),
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: cat.label,
+          item: getAbsoluteUrl(`/category/${slug}`),
+        },
+      ],
+    }
+  }, [cat, slug])
+
   useSeo({
     title: cat ? `${cat.label} in Pakistan 2026 — CareerDost` : 'Category — CareerDost',
     description: cat ? cat.description : 'Browse the latest verified jobs, admissions, and scholarships on CareerDost.',
     canonical: `/category/${slug}`,
+    jsonLd: breadcrumbSchema,
   })
 
   if (loading) {

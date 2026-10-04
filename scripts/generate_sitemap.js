@@ -5,24 +5,40 @@ import { categories } from '../src/data/categories.js'
 
 const SITE_URL = process.env.SITE_URL || 'https://careerdost.blog'
 
-const sampleDailyUpdates = [
+const publishedDailyUpdates = [
   { slug: 'uoh-haripur-admissions-2026-deadline-today', date: '2026-09-29' },
   { slug: 'virtual-university-admissions-2026-deadline-tomorrow', date: '2026-09-29' },
   { slug: 'hec-peridot-research-program-phase-13-2026', date: '2026-09-29' },
   { slug: 'punjab-cbd-youth-career-program-2026-internship', date: '2026-09-29' },
   { slug: 'pec-graduate-engineer-training-get-program-2026', date: '2026-09-29' },
-  { slug: 'petrol-price-reduced-pakistan-september-2026', date: '2026-09-28' },
   { slug: 'uhs-mdcat-2026-result-recount-review-portal', date: '2026-09-28' },
   { slug: 'hec-usat-hat-registration-2026-etc-hec', date: '2026-09-28' },
   { slug: 'sbbu-admissions-2026-deadline-extended', date: '2026-09-28' },
   { slug: 'sbbu-fully-funded-scholarship-2026', date: '2026-09-28' },
   { slug: 'uet-lahore-jobs-2026-faculty-research', date: '2026-09-28' },
+  { slug: 'petrol-price-reduced-pakistan-september-2026', date: '2026-09-28' },
   { slug: 'sindh-govt-electric-scooty-scheme-2026-women', date: '2026-09-27' },
-  { slug: 'fpsc-consolidated-advertisement-09-2026-announced', date: '2026-09-27' },
-  { slug: 'hec-fully-funded-phd-scholarships-2026-open', date: '2026-09-27' },
-  { slug: 'state-bank-officer-training-scheme-sbots-batch-27', date: '2026-09-27' },
-  { slug: 'nts-nat-2026-october-test-roll-number-slips-uploaded', date: '2026-09-27' },
-  { slug: 'pm-youth-laptop-scheme-phase-4-registration-alert', date: '2026-09-27' }
+  { slug: 'hec-uk-commonwealth-scholarships-2027-28', date: '2026-09-27' },
+  { slug: 'punjab-university-phase2-admissions-2026-27', date: '2026-09-27' },
+  { slug: 'nts-latest-results-answer-keys-2026', date: '2026-09-27' },
+  { slug: 'fpsc-latest-updates-adv3-2026-schedule', date: '2026-09-27' },
+  { slug: 'comsats-active-scholarships-international-opportunities-2026', date: '2026-09-27' },
+  { slug: 'punjab-university-jobs-faculty-staff-2026', date: '2026-09-27' },
+  { slug: 'comsats-university-jobs-faculty-staff-2026', date: '2026-09-27' },
+  { slug: 'university-of-chakwal-uoc-jobs-2026', date: '2026-09-27' },
+  { slug: 'air-university-islamabad-jobs-2026', date: '2026-09-27' },
+  { slug: 'bahria-university-jobs-2026', date: '2026-09-27' },
+  { slug: 'sarhad-university-suit-peshawar-jobs-2026', date: '2026-09-27' },
+  { slug: 'lums-lahore-jobs-advancement-it-staff-2026', date: '2026-09-27' },
+  { slug: 'times-university-multan-tum-jobs-2026', date: '2026-09-27' },
+  { slug: 'maju-karachi-jobs-faculty-staff-2026', date: '2026-09-27' },
+  { slug: 'university-of-lahore-uol-jobs-2026', date: '2026-09-27' },
+  { slug: 'fpsc-consolidated-advertisement-09-2026-announced', date: '2026-09-26' },
+  { slug: 'hec-fully-funded-phd-scholarships-2026-open', date: '2026-09-26' },
+  { slug: 'state-bank-officer-training-scheme-sbots-batch-27', date: '2026-09-26' },
+  { slug: 'nts-nat-2026-october-test-roll-number-slips-uploaded', date: '2026-09-26' },
+  { slug: 'pm-youth-laptop-scheme-phase-4-registration-alert', date: '2026-09-25' },
+  { slug: 'engro-management-trainee-2026', date: '2026-09-18' }
 ]
 
 function formatLastModDate(dateStr) {
@@ -63,7 +79,7 @@ function generateSitemap() {
     lastmod: formatLastModDate(l.publishDate)
   }))
 
-  const updateUrls = sampleDailyUpdates.map(u => ({
+  const updateUrls = publishedDailyUpdates.map(u => ({
     loc: `/daily-updates/${u.slug}`,
     priority: '0.9',
     changefreq: 'daily',

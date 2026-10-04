@@ -85,15 +85,63 @@ export default function ArticlePage() {
     }
   }, [slug])
 
-  // JobPosting / Article Structured Data Schema
+  const cat =
+    categoriesList.find((c) => c.slug === listing?.category) ||
+    defaultCategoryBySlug(listing?.category) || {
+      slug: listing?.category || 'general',
+      label: listing?.category || 'General',
+    }
+
+  // Structured Data Schema: JobPosting for genuine jobs, Article for others + BreadcrumbList
   const jsonLdSchema = useMemo(() => {
     if (!listing) return null
-    if (listing.schemaType === 'Article' || listing.category === 'government-schemes') {
-      return {
-        '@context': 'https://schema.org',
+
+    const categoryLabel = cat.label || listing.category || 'Opportunities'
+    const breadcrumbSchema = {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: getAbsoluteUrl('/'),
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: categoryLabel,
+          item: getAbsoluteUrl(`/category/${listing.category}`),
+        },
+        {
+          '@type': 'ListItem',
+          position: 3,
+          name: listing.title || 'Opportunity',
+          item: getAbsoluteUrl(`/jobs/${slug}`),
+        },
+      ],
+    }
+
+    const genuineJobCategories = [
+      'government-jobs',
+      'private-jobs',
+      'bank-jobs',
+      'it-jobs',
+      'internships',
+    ]
+
+    const qualifiesForJobPosting =
+      genuineJobCategories.includes(listing.category) &&
+      listing.schemaType !== 'Article'
+
+    let mainSchema
+    if (!qualifiesForJobPosting) {
+      mainSchema = {
         '@type': 'Article',
         headline: listing.title || 'Opportunity',
-        description: listing.metaDescription || listing.excerpt || (Array.isArray(listing.content) ? listing.content.join(' ') : String(listing.content || '')),
+        description:
+          listing.metaDescription ||
+          listing.excerpt ||
+          (Array.isArray(listing.content) ? listing.content.join(' ') : String(listing.content || '')),
         datePublished: listing.publishDate || undefined,
         dateModified: listing.publishDate || undefined,
         mainEntityOfPage: {
@@ -112,41 +160,55 @@ export default function ArticlePage() {
         },
         image: listing.featuredImage ? getAbsoluteUrl(listing.featuredImage) : undefined,
       }
+    } else {
+      const jobTypeStr = String(listing.jobType || '').toLowerCase()
+      const isInternship = listing.category === 'internships' || jobTypeStr.includes('intern')
+      mainSchema = {
+        '@type': 'JobPosting',
+        title: listing.title || 'Opportunity',
+        description:
+          listing.metaDescription ||
+          (Array.isArray(listing.content) ? listing.content.join(' ') : String(listing.content || '')),
+        datePosted: listing.publishDate || undefined,
+        validThrough: listing.lastDate || undefined,
+        employmentType: isInternship
+          ? 'INTERN'
+          : jobTypeStr.includes('part')
+          ? 'PART_TIME'
+          : 'FULL_TIME',
+        hiringOrganization: listing.organization
+          ? {
+              '@type': 'Organization',
+              name: listing.organization,
+              sameAs: listing.officialLink ? safeUrl(listing.officialLink) : undefined,
+            }
+          : undefined,
+        jobLocation: {
+          '@type': 'Place',
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: listing.location || 'Pakistan',
+            addressCountry: 'PK',
+          },
+        },
+        baseSalary: listing.salary
+          ? {
+              '@type': 'MonetaryAmount',
+              currency: 'PKR',
+              value: {
+                '@type': 'QuantitativeValue',
+                value: listing.salary,
+              },
+            }
+          : undefined,
+      }
     }
-    const jobTypeStr = String(listing.jobType || '').toLowerCase()
+
     return {
       '@context': 'https://schema.org',
-      '@type': 'JobPosting',
-      title: listing.title || 'Opportunity',
-      description: listing.metaDescription || (Array.isArray(listing.content) ? listing.content.join(' ') : String(listing.content || '')),
-      datePosted: listing.publishDate || undefined,
-      validThrough: listing.lastDate || undefined,
-      employmentType: jobTypeStr.includes('part') ? 'PART_TIME' : 'FULL_TIME',
-      hiringOrganization: {
-        '@type': 'Organization',
-        name: listing.organization || 'CareerDost',
-        sameAs: listing.officialLink ? safeUrl(listing.officialLink) : undefined,
-      },
-      jobLocation: {
-        '@type': 'Place',
-        address: {
-          '@type': 'PostalAddress',
-          addressLocality: listing.location || 'Pakistan',
-          addressCountry: 'PK',
-        },
-      },
-      baseSalary: listing.salary
-        ? {
-            '@type': 'MonetaryAmount',
-            currency: 'PKR',
-            value: {
-              '@type': 'QuantitativeValue',
-              value: listing.salary,
-            },
-          }
-        : undefined,
+      '@graph': [mainSchema, breadcrumbSchema],
     }
-  }, [listing, slug])
+  }, [listing, slug, cat])
 
   useSeo({
     title: listing?.seoTitle || (listing ? `${listing.title} — CareerDost` : 'Opportunity — CareerDost'),
@@ -187,13 +249,6 @@ export default function ArticlePage() {
       </div>
     )
   }
-
-  const cat =
-    categoriesList.find((c) => c.slug === listing.category) ||
-    defaultCategoryBySlug(listing.category) || {
-      slug: listing.category || 'general',
-      label: listing.category || 'General',
-    }
 
   const oppStatus = getOpportunityStatus(listing.lastDate, listing.noDeadline)
   const hasImage = listing.featuredImage && listing.featuredImage.trim().length > 0
@@ -356,6 +411,20 @@ export default function ArticlePage() {
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* Contextual Category Internal Link CTA */}
+          <div className="mt-8 p-4 bg-paper border border-line rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-sans text-xs">
+            <div>
+              <span className="text-inksoft block">Explore more verified opportunities:</span>
+              <strong className="text-ink text-sm">Looking for more openings in {cat.label}?</strong>
+            </div>
+            <Link
+              to={`/category/${cat.slug}`}
+              className="inline-flex items-center gap-1 font-bold text-green hover:text-green-dark transition-colors self-start sm:self-auto"
+            >
+              Browse all {cat.label} in Pakistan →
+            </Link>
           </div>
 
           {/* Social Share Buttons (Bottom) */}

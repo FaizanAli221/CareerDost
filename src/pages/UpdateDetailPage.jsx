@@ -28,25 +28,60 @@ export default function UpdateDetailPage() {
   const [related, setRelated] = useState([])
   const [loading, setLoading] = useState(true)
 
-  useSeo({
-    title: updateItem ? `${updateItem.seoTitle || updateItem.title} — CareerDost` : 'Daily Update — CareerDost',
-    description: updateItem ? updateItem.metaDescription || updateItem.shortDescription : 'Verified Pakistan daily update.',
-    canonical: updateItem?.canonicalUrl || `/daily-updates/${slug}`,
-    ogImage: updateItem?.featuredImage ? getAbsoluteUrl(updateItem.featuredImage) : getAbsoluteUrl('/images/hec-commonwealth-scholarship-2027.jpg'),
-    jsonLd: updateItem
-      ? {
-          '@context': 'https://schema.org',
+  const jsonLdSchema = React.useMemo(() => {
+    if (!updateItem) return null
+    return {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
           '@type': 'NewsArticle',
           headline: updateItem.title,
           description: updateItem.shortDescription,
           datePublished: updateItem.publishDate,
+          mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': getAbsoluteUrl(`/daily-updates/${slug}`),
+          },
           publisher: {
             '@type': 'Organization',
             name: 'CareerDost',
             url: getAbsoluteUrl('/'),
           },
-        }
-      : null,
+          image: updateItem.featuredImage ? getAbsoluteUrl(updateItem.featuredImage) : undefined,
+        },
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            {
+              '@type': 'ListItem',
+              position: 1,
+              name: 'Home',
+              item: getAbsoluteUrl('/'),
+            },
+            {
+              '@type': 'ListItem',
+              position: 2,
+              name: 'Daily Updates',
+              item: getAbsoluteUrl('/daily-updates'),
+            },
+            {
+              '@type': 'ListItem',
+              position: 3,
+              name: updateItem.title,
+              item: getAbsoluteUrl(`/daily-updates/${slug}`),
+            },
+          ],
+        },
+      ],
+    }
+  }, [updateItem, slug])
+
+  useSeo({
+    title: updateItem ? `${updateItem.seoTitle || updateItem.title} — CareerDost` : 'Daily Update — CareerDost',
+    description: updateItem ? updateItem.metaDescription || updateItem.shortDescription : 'Verified Pakistan daily update.',
+    canonical: updateItem?.canonicalUrl || `/daily-updates/${slug}`,
+    ogImage: updateItem?.featuredImage ? getAbsoluteUrl(updateItem.featuredImage) : getAbsoluteUrl('/images/hec-commonwealth-scholarship-2027.jpg'),
+    jsonLd: jsonLdSchema,
   })
 
   useEffect(() => {
@@ -92,7 +127,7 @@ export default function UpdateDetailPage() {
   if (!updateItem) {
     return (
       <div className="container-x py-16 text-center font-sans">
-        <h2 className="font-serif text-2xl font-bold text-ink mb-2">Daily Update Not Found</h2>
+        <h1 className="font-serif text-2xl font-bold text-ink mb-2">Daily Update Not Found</h1>
         <p className="text-sm text-inksoft mb-6">The update you are looking for may have been removed or updated.</p>
         <Link to="/daily-updates" className="border border-green bg-green text-white px-5 py-2.5 text-xs font-semibold hover:bg-green-dark">
           ← Back to Daily Updates
@@ -118,9 +153,12 @@ export default function UpdateDetailPage() {
       {/* Header Info */}
       <header className="mb-6">
         <div className="flex items-center gap-2 mb-3 flex-wrap">
-          <span className="bg-green/10 text-green text-xs font-sans font-bold px-3 py-1 rounded-full border border-green/20">
+          <Link
+            to="/daily-updates"
+            className="bg-green/10 hover:bg-green/20 text-green text-xs font-sans font-bold px-3 py-1 rounded-full border border-green/20 transition-colors"
+          >
             {updateItem.category}
-          </span>
+          </Link>
           {updateItem.isVerified && (
             <span className="bg-emerald-100 text-emerald-800 text-xs font-sans font-bold px-3 py-1 rounded-full border border-emerald-300">
               ✓ Official Source Verified

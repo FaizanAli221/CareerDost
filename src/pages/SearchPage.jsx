@@ -14,7 +14,8 @@ export default function SearchPage() {
   useSeo({
     title: q ? `Search: "${q}" — CareerDost` : 'Search Jobs & Admissions — CareerDost',
     description: 'Search government jobs, private jobs, bank jobs, scholarships, internships and results on CareerDost.',
-    canonical: q ? `/search?q=${encodeURIComponent(q)}` : '/search',
+    canonical: '/search',
+    noIndex: true,
   })
 
   useEffect(() => {

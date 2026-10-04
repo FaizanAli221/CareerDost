@@ -37,5 +37,12 @@ export async function onRequest(context) {
     }
   }
 
+  // Ensure HTTPS enforcement on primary domain
+  if (url.protocol === 'http:' && host === 'careerdost.blog') {
+    const targetUrl = new URL(context.request.url)
+    targetUrl.protocol = 'https:'
+    return Response.redirect(targetUrl.toString(), 301)
+  }
+
   return await context.next()
 }
