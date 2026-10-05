@@ -6,10 +6,13 @@ import { categories } from '../src/data/categories.js'
 const SITE_URL = process.env.SITE_URL || 'https://careerdost.blog'
 
 const publishedDailyUpdates = [
+  { slug: 'sessi-internship-programme-2026', date: '2026-10-05' },
+  { slug: 'uet-reciprocal-admissions-2026', date: '2026-10-05' },
+  { slug: 'virtual-university-fall-2026-admissions', date: '2026-10-05' },
+  { slug: 'punjab-cbd-youth-career-program-2026-internship', date: '2026-10-05' },
+  { slug: 'swiss-government-excellence-scholarships-2027-pakistan', date: '2026-10-05' },
   { slug: 'uoh-haripur-admissions-2026-deadline-today', date: '2026-09-29' },
-  { slug: 'virtual-university-admissions-2026-deadline-tomorrow', date: '2026-09-29' },
   { slug: 'hec-peridot-research-program-phase-13-2026', date: '2026-09-29' },
-  { slug: 'punjab-cbd-youth-career-program-2026-internship', date: '2026-09-29' },
   { slug: 'pec-graduate-engineer-training-get-program-2026', date: '2026-09-29' },
   { slug: 'uhs-mdcat-2026-result-recount-review-portal', date: '2026-09-28' },
   { slug: 'hec-usat-hat-registration-2026-etc-hec', date: '2026-09-28' },

@@ -159,6 +159,8 @@ export async function seedDatabase(db) {
       const existing = await ArticleModel.getBySlug(db, item.slug)
       if (!existing) {
         await ArticleModel.create(db, item)
+      } else {
+        await ArticleModel.update(db, item.slug, item)
       }
     }
   } catch (err) {
