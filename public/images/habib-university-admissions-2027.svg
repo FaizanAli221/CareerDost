@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
   <defs>
-    <linearGradient id="bgGrad_hec-outstanding-research-awards-2026-27" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#701a75" />
-      <stop offset="100%" stop-color="#4a044e" />
+    <linearGradient id="bgGrad_habib-university-admissions-2027" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a044e" />
+      <stop offset="100%" stop-color="#2e1065" />
     </linearGradient>
-    <pattern id="grid_hec-outstanding-research-awards-2026-27" width="40" height="40" patternUnits="userSpaceOnUse">
+    <pattern id="grid_habib-university-admissions-2027" width="40" height="40" patternUnits="userSpaceOnUse">
       <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
     </pattern>
   </defs>
 
   <!-- Background -->
-  <rect width="1200" height="675" fill="url(#bgGrad_hec-outstanding-research-awards-2026-27)"/>
-  <rect width="1200" height="675" fill="url(#grid_hec-outstanding-research-awards-2026-27)"/>
+  <rect width="1200" height="675" fill="url(#bgGrad_habib-university-admissions-2027)"/>
+  <rect width="1200" height="675" fill="url(#grid_habib-university-admissions-2027)"/>
 
   <!-- Top Decorative Bar -->
   <g transform="translate(60, 60)">
@@ -22,26 +22,26 @@
     <!-- Category Pill -->
     <rect x="840" y="-22" width="240" height="44" rx="22" fill="#a21caf"/>
     <text x="960" y="6" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="16" fill="#ffffff" text-anchor="middle">
-      Research Awards
+      Admissions
     </text>
   </g>
 
   <!-- Center Content -->
   <g transform="translate(60, 195)">
     <!-- Organization -->
-    <text font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="20" fill="#f0abfc" letter-spacing="1.5">
-      HIGHER EDUCATION COMMISSION (HEC) PAKISTAN
+    <text font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="20" fill="#f472b6" letter-spacing="1.5">
+      HABIB UNIVERSITY KARACHI
     </text>
 
     <!-- Title -->
     <text y="75" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="800" font-size="44" fill="#ffffff">
-      HEC Research Awards 2026–27
+      Habib University Admissions 2027
     </text>
 
     <!-- Subtitle Badge -->
     <rect y="125" width="760" height="52" rx="10" fill="rgba(255, 255, 255, 0.12)" stroke="rgba(255, 255, 255, 0.25)" stroke-width="1.5"/>
     <text x="24" y="158" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="20" fill="#ffffff">
-      Awards Up to Rs1 Million • Best Publication &amp; Researchers
+      October Series • Engineering, CS &amp; Social Sciences
     </text>
   </g>
 
@@ -50,11 +50,11 @@
     <line x1="0" y1="0" x2="1080" y2="0" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
     
     <text y="42" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="600" font-size="18" fill="rgba(255,255,255,0.85)">
-      National Research Excellence Grants • Open for Faculty &amp; Scholars
+      Undergraduate Intake • Scholarships &amp; Need-Based Aid Available
     </text>
     
-    <text x="1080" y="42" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="18" fill="#f0abfc" text-anchor="end">
-      Deadline: 31 October 2026
+    <text x="1080" y="42" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="18" fill="#f472b6" text-anchor="end">
+      Deadline: 21 October 2026
     </text>
   </g>
 </svg>

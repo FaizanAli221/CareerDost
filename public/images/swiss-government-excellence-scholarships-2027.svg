@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
   <defs>
-    <linearGradient id="bgGrad_hec-outstanding-research-awards-2026-27" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#701a75" />
-      <stop offset="100%" stop-color="#4a044e" />
+    <linearGradient id="bgGrad_swiss-government-excellence-scholarships-2027" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c2d12" />
+      <stop offset="100%" stop-color="#451a03" />
     </linearGradient>
-    <pattern id="grid_hec-outstanding-research-awards-2026-27" width="40" height="40" patternUnits="userSpaceOnUse">
+    <pattern id="grid_swiss-government-excellence-scholarships-2027" width="40" height="40" patternUnits="userSpaceOnUse">
       <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
     </pattern>
   </defs>
 
   <!-- Background -->
-  <rect width="1200" height="675" fill="url(#bgGrad_hec-outstanding-research-awards-2026-27)"/>
-  <rect width="1200" height="675" fill="url(#grid_hec-outstanding-research-awards-2026-27)"/>
+  <rect width="1200" height="675" fill="url(#bgGrad_swiss-government-excellence-scholarships-2027)"/>
+  <rect width="1200" height="675" fill="url(#grid_swiss-government-excellence-scholarships-2027)"/>
 
   <!-- Top Decorative Bar -->
   <g transform="translate(60, 60)">
@@ -20,28 +20,28 @@
     </text>
     
     <!-- Category Pill -->
-    <rect x="840" y="-22" width="240" height="44" rx="22" fill="#a21caf"/>
+    <rect x="840" y="-22" width="240" height="44" rx="22" fill="#ea580c"/>
     <text x="960" y="6" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="16" fill="#ffffff" text-anchor="middle">
-      Research Awards
+      Scholarships
     </text>
   </g>
 
   <!-- Center Content -->
   <g transform="translate(60, 195)">
     <!-- Organization -->
-    <text font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="20" fill="#f0abfc" letter-spacing="1.5">
-      HIGHER EDUCATION COMMISSION (HEC) PAKISTAN
+    <text font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="20" fill="#fdba74" letter-spacing="1.5">
+      SWISS EMBASSY &amp; FCS / ESKAS SWITZERLAND
     </text>
 
     <!-- Title -->
     <text y="75" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="800" font-size="44" fill="#ffffff">
-      HEC Research Awards 2026–27
+      Swiss Govt Excellence Scholarships
     </text>
 
     <!-- Subtitle Badge -->
     <rect y="125" width="760" height="52" rx="10" fill="rgba(255, 255, 255, 0.12)" stroke="rgba(255, 255, 255, 0.25)" stroke-width="1.5"/>
     <text x="24" y="158" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="20" fill="#ffffff">
-      Awards Up to Rs1 Million • Best Publication &amp; Researchers
+      Academic Year 2027–28 • Research &amp; PhD Fellowships
     </text>
   </g>
 
@@ -50,10 +50,10 @@
     <line x1="0" y1="0" x2="1080" y2="0" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
     
     <text y="42" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="600" font-size="18" fill="rgba(255,255,255,0.85)">
-      National Research Excellence Grants • Open for Faculty &amp; Scholars
+      Full Monthly Stipend (CHF 1,920–3,500) • Mandatory Health Coverage
     </text>
     
-    <text x="1080" y="42" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="18" fill="#f0abfc" text-anchor="end">
+    <text x="1080" y="42" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="18" fill="#fdba74" text-anchor="end">
       Deadline: 31 October 2026
     </text>
   </g>

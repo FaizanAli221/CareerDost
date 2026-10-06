@@ -1,0 +1,682 @@
+import fs from 'fs'
+import path from 'path'
+import Database from 'better-sqlite3'
+import { execSync } from 'child_process'
+
+export const oct6Articles = [
+  {
+    slug: 'chevening-scholarship-2027-28-pakistan',
+    title: 'Chevening Scholarship 2027–28 Pakistan – Last Date Today, Apply Now',
+    category: 'scholarships',
+    organization: 'UK Foreign, Commonwealth and Development Office (FCDO)',
+    jobType: 'Fully Funded 1-Year Master’s Degree Scholarship',
+    location: 'United Kingdom (Any UK University)',
+    qualification: "Undergraduate Degree (UK 2:1 Honours Equivalent) & 2 Years' Work Experience",
+    salary: '100% Tuition Fees + Monthly Living Stipend + Return Airfare + Visa Coverage',
+    experience: 'Minimum 2 Years (2,800 Hours) Work Experience (Full/Part Time, Voluntary or Internships)',
+    positions: 'Prestigious International Master’s Fellowships',
+    lastDate: '2026-10-06',
+    noDeadline: false,
+    publishDate: '2026-10-06',
+    officialLink: 'https://www.chevening.org/scholarship/pakistan/',
+    applyLink: 'https://asams.chevening.org/apply',
+    isVerified: true,
+    featured: true,
+    logoInitial: 'CHEV',
+    featuredImage: '/images/chevening-scholarship-2027-28.jpg',
+    imageAlt: 'Chevening Scholarship 2027-28 Pakistan Last Date Today 6 October Apply Online',
+    excerpt: 'URGENT DEADLINE TODAY: Online applications for Chevening Scholarship 2027–28 Pakistan close strictly today, 6 October 2026 at 11:00 UTC (16:00 / 4:00 PM Pakistan Standard Time). Fully funded 1-year master’s study in the UK.',
+    seoTitle: 'Chevening Scholarship 2027–28 Pakistan – Last Date Today, Apply Now | CareerDost',
+    metaDescription: 'Chevening Scholarship 2027–28 for Pakistani applicants closes today, 6 October 2026 at 11:00 UTC (16:00 PKT). Check eligibility, work experience criteria, benefits, and apply online now.',
+    focusKeyword: 'Chevening Scholarship 2027-28 Pakistan',
+    canonicalUrl: 'https://careerdost.blog/jobs/chevening-scholarship-2027-28-pakistan',
+    ogTitle: 'Chevening Scholarship 2027–28 Pakistan – Last Date Today, Apply Now',
+    ogDescription: 'Applications for Chevening Scholarship 2027–28 Pakistan close strictly today, 6 October 2026 at 11:00 UTC (16:00 PKT). Check complete eligibility, covered benefits, and apply online before the portal locks.',
+    schemaType: 'EducationalOccupationalProgram',
+    content: [
+      "### URGENT DEADLINE NOTICE: LAST DATE TODAY — 6 OCTOBER 2026",
+      "> [!WARNING]\n> **CRITICAL DEADLINE WARNING:** Applications for the Chevening Scholarship 2027–28 for Pakistani applicants close strictly **TODAY, Tuesday, 6 October 2026 at 11:00 UTC**.\n>\n> In Pakistan Standard Time (PKT), **11:00 UTC corresponds exactly to 16:00 PKT (4:00 PM PST)**.\n>\n> The official Chevening application system (`asams.chevening.org/apply`) will automatically lock precisely at 11:00 UTC. Unsubmitted draft applications will be permanently archived and cannot be recovered or considered under any circumstances. Submit your application immediately before servers experience peak traffic loads.",
+      "### Overview of the Chevening Scholarship Programme",
+      "The **Chevening Scholarship** is the UK Government’s prestigious global scholarship programme, funded by the **Foreign, Commonwealth and Development Office (FCDO)** and partner organisations. Chevening offers future leaders, innovators, and decision-makers from Pakistan the unique opportunity to pursue a **fully funded, one-year taught Master's degree** at any accredited university across the United Kingdom.",
+      "Chevening scholars return to Pakistan equipped with advanced subject knowledge, specialized professional networks, and international exposure, enabling them to drive tangible socio-economic impact in their respective sectors.",
+      "### Quick Summary Table",
+      "- **Administering Body:** UK Foreign, Commonwealth and Development Office (FCDO)\n- **Programme:** Chevening Master's Scholarship (2027–28 Academic Intake)\n- **Eligible Country:** Pakistan (Pakistani citizens)\n- **Study Destination:** Any accredited higher education institution in the United Kingdom\n- **Target Degree:** One-Year Taught Postgraduate Master's Degree (MSc / MA / LLM / MRes / MBA)\n- **Final Submission Deadline:** **6 October 2026 at 11:00 UTC (16:00 PKT / 4:00 PM PST)**\n- **Work Experience Prerequisite:** Minimum 2,800 Hours (Equivalent to 2 Years)\n- **Undergraduate Requirement:** Upper Second-Class 2:1 UK Equivalent (typically 3.0+ CGPA or 60%+ in 4-Year BS / 16-Year Education)\n- **Total Financial Coverage:** 100% Tuition Fees + Monthly Living Stipend + Return Flights + Visa\n- **Official Country Portal:** [chevening.org/scholarship/pakistan](https://www.chevening.org/scholarship/pakistan/)\n- **Official Application Portal:** [asams.chevening.org/apply](https://asams.chevening.org/apply)",
+      "### Comprehensive Scholarship Benefits & Financial Coverage",
+      "The Chevening Scholarship provides complete, comprehensive financial support throughout the 12-month study duration in the UK:\n- **Full Tuition Fees:** 100% of university tuition fees are covered. (Note: A standard fee cap applies to master's in business administration (MBA) programmes, requiring applicants to fund the residual balance independently).\n- **Monthly Living Stipend:** A tax-free monthly subsistence allowance designed to comfortably cover accommodation, meals, utilities, local commuting, and essential personal expenses.\n- **Round-Trip Airfare:** Economy-class flight tickets from Pakistan to the United Kingdom and return flight to Pakistan upon graduation, booked via Chevening's authorized travel management partners.\n- **Arrival Allowance:** A lump-sum arrival stipend provided upon touchdown in the UK to assist with initial setup costs, room supplies, and essential bedding.\n- **Departure Allowance:** A homeward departure grant provided at the conclusion of studies to assist with excess luggage and travel repatriation.\n- **UK Visa Application Fee:** Reimbursement covering the cost of one UK Student Visa application.\n- **Travel Grants:** Travel subsidies to attend mandatory and optional Chevening events, leadership conferences, and academic workshops across the UK.",
+      "### Strict Eligibility Criteria for Pakistani Applicants",
+      "To be deemed eligible for the Chevening Scholarship 2027–28, prospective candidates must fulfill all of the following statutory requirements:\n1. **Pakistani Citizenship:** Must be a citizen of Pakistan and hold a valid Pakistani passport or National Identity Card (CNIC).\n2. **Two-Year Return Obligation:** Candidates must commit to returning to Pakistan for a minimum of **two consecutive years** immediately following the completion of their scholarship in the UK.\n3. **Completed Undergraduate Degree:** Must have completed all academic components of an undergraduate degree (16 years of education: BS 4-Year, B.E., MBBS, or Master's following a 2-year Bachelor's) that enables admission into a postgraduate taught course at a UK university. Typically, this equates to an upper second-class 2:1 honours degree in the UK (approx. 3.00/4.00 CGPA or 60%+ marks from an HEC-recognized institution).\n4. **Work Experience Requirement:** Must demonstrate at least **two years of work experience** (equivalent to exactly **2,800 hours**). Work experience can be accumulated across full-time employment, part-time employment, voluntary work, paid or unpaid internships, and freelance assignments completed before or after undergraduate graduation.\n5. **Three Eligible University Choices:** Candidates must choose **three different eligible UK university courses** and must secure at least one unconditional admission offer from one of these three course choices before the unconditional offer deadline (**8 July 2027**).",
+      "### Who Is Ineligible for Chevening?",
+      "Applications will be automatically rejected if an applicant:\n- Holds British or dual British citizenship (unless applying under British National Overseas status where applicable).\n- Is an employee, former employee (within the last two years), or relative of an employee of His Majesty's Government (including the FCDO, British High Commission Islamabad, British Council, or Department for Business and Trade).\n- Is an employee, former employee, or relative of an employee of Chevening Partner organisations (within the past two years).\n- Has previously received funding from a UK Government-funded scholarship to study in the United Kingdom.",
+      "### Required Application Materials & Written Essays",
+      "The online Chevening portal requires applicants to construct their profile and submit four detailed essays (maximum 500 words each):\n1. **Leadership and Influence Essay:** Evidence of how you have led teams, influenced positive change, and demonstrated resilience in your workplace or community.\n2. **Relationship Building & Networking Essay:** Demonstration of how you build and maintain professional relationships, network across diverse groups, and how you intend to engage with the global Chevening alumni network.\n3. **Studying in the UK Essay:** Clear academic rationale for selecting your three specified UK master's courses and how they align with your academic background.\n4. **Career Plan Essay:** A practical, well-defined career roadmap outlining short-term goals (immediately upon returning to Pakistan) and long-term ambitions (5–10 years post-scholarship).",
+      "### Official Selection Timeline & Next Steps",
+      "- **6 October 2026 (11:00 UTC / 16:00 PKT):** Applications close strictly.\n- **November – December 2026:** Independent Academic Reading Committees evaluate eligible applications against Chevening assessment rubrics.\n- **Mid-February 2027:** Shortlisted candidates are formally notified via email and invited to schedule an interview.\n- **February – March 2027:** Shortlisted applicants upload two reference letters and academic degree transcripts.\n- **2 March – 25 April 2027:** In-person or virtual interview panels conducted by the British High Commission in Islamabad and Karachi.\n- **Mid-June 2027 Onwards:** Official final selection results released (Conditional Offer, Reserve, or Unsuccessful).\n- **8 July 2027 (17:00 BST):** Final deadline to upload at least one unconditional offer from a chosen UK university.\n- **September / October 2027:** Scholars depart Pakistan and commence Master's studies in the United Kingdom.",
+      "### Frequently Asked Questions (FAQ)",
+      "**Q1: What is the exact deadline today for Pakistani applicants?**\nThe deadline is strictly **6 October 2026 at 11:00 UTC**, which equals **16:00 PKT (4:00 PM Pakistan Standard Time)**.\n\n**Q2: Do I need an IELTS or English language test result to submit my application today?**\nNo. Chevening removed its centralized English language requirement. You do NOT need to upload an IELTS score to submit your Chevening application today. However, you must satisfy your chosen UK universities' English language requirements to obtain an unconditional offer by 8 July 2027.\n\n**Q3: Can final-year students currently awaiting results apply?**\nNo. Applicants must have completed all components of their undergraduate degree and hold provisional or final transcripts at the time of submission.\n\n**Q4: How do I calculate the 2,800 hours of work experience?**\nWork experience is calculated by multiplying total weeks worked by weekly hours (e.g., 35 hours per week for 80 weeks = 2,800 hours). Internships, freelance work, and voluntary engagements are fully eligible.\n\n**Q5: Does CareerDost guarantee scholarship selection?**\nNo. CareerDost is an independent career guidance platform and does not promise admission or scholarship awards. Selection is conducted exclusively by the British High Commission and Chevening Secretariat based on merit.",
+      "### Final Submission Instructions",
+      "> [!IMPORTANT]\n> Log in to [asams.chevening.org/apply](https://asams.chevening.org/apply) now, thoroughly review all essay word counts, click **Submit**, and save your PDF submission confirmation receipt before 16:00 PKT."
+    ]
+  },
+  {
+    slug: 'hec-jobs-2026',
+    title: 'HEC Jobs 2026 – 9 Government Vacancies, Apply Before October 14',
+    category: 'government-jobs',
+    organization: 'Higher Education Commission (HEC) Pakistan',
+    jobType: 'Government Regular & Project Contract Vacancies (9 Positions)',
+    location: 'HEC Head Office, Islamabad / Provincial Quotas',
+    qualification: "Primary / Matric / Bachelor's (BA/BSc/BCom/BBA) / Master's / LLB / PhD",
+    salary: 'Rs. 40,700 – Rs. 398,130 per month (BPS-01 to PPS-10)',
+    experience: 'Fresh to 10+ Years (Post-Specific Requirements)',
+    positions: '9 Vacancies (Merit, Punjab, KPK & Sindh Quotas)',
+    lastDate: '2026-10-14',
+    noDeadline: false,
+    publishDate: '2026-10-06',
+    officialLink: 'https://careers.hec.gov.pk/',
+    applyLink: 'https://careers.hec.gov.pk/',
+    isVerified: true,
+    featured: true,
+    logoInitial: 'HEC',
+    featuredImage: '/images/hec-jobs-2026.svg',
+    imageAlt: 'HEC Jobs 2026 9 Government Vacancies Apply Online Before October 14 careers hec gov pk',
+    excerpt: 'Higher Education Commission (HEC) Pakistan invites online applications for 9 government vacancies including Project Director, Project Managers, Law Officer, Project Accountant, Office Assistants, and Attendant. Monthly salary ranges from Rs40,700 to Rs398,130. Apply before 14 October 2026.',
+    seoTitle: 'HEC Jobs 2026 – 9 Government Vacancies, Apply Before October 14 | CareerDost',
+    metaDescription: 'HEC Jobs 2026: Apply online for 9 government vacancies at careers.hec.gov.pk before 14 October 2026. Detailed salary breakdown (Rs40,700 to Rs398,130/month), quotas, eligibility, and step-by-step procedure.',
+    focusKeyword: 'HEC Jobs 2026',
+    canonicalUrl: 'https://careerdost.blog/jobs/hec-jobs-2026',
+    ogTitle: 'HEC Jobs 2026 – 9 Government Vacancies, Apply Before October 14',
+    ogDescription: 'Higher Education Commission (HEC) recruitment for 9 government positions across PPS and BPS pay scales (Rs40,700 – Rs398,130/month). Apply online via careers.hec.gov.pk by 14 October 2026.',
+    schemaType: 'JobPosting',
+    content: [
+      "### Executive Recruitment Notice & Official Announcement",
+      "The **Higher Education Commission (HEC) Pakistan**, the apex statutory federal regulatory body governing higher education in Pakistan, has released its official recruitment advertisement for **9 government vacancies** across federal project scales and regular basic pay scales. Qualified professionals from across Pakistan are invited to submit digital applications via the official HEC recruitment portal (`careers.hec.gov.pk`).",
+      "All nine positions are currently active and accepting online submissions until the strict closing deadline of **14 October 2026**.",
+      "### Comprehensive Breakdown of 9 Active Positions",
+      "Below is the complete, officially verified summary table specifying each of the 9 positions, quota allocation, required qualifications, exact monthly salary scales, and closing deadlines:\n\n| Position Title | Vacancies | Regional Quota | Prescribed Qualification & Experience | Monthly Salary Scale | Application Deadline |\n| :--- | :---: | :--- | :--- | :--- | :---: |\n| **Project Director** | 01 | Open Merit | PhD / Master's (16/18 Years) in Management Sciences, Engineering, or Social Sciences with 10+ years executive project management experience | **PPS-10 (Rs. 350,000 – Rs. 398,130 / month)** | 14 October 2026 |\n| **Project Manager** | 01 | Open Merit | Master's degree or 16-year BS in Management, CS, or Engineering with minimum 5 years proven project administration experience | **PPS-08 (Rs. 175,000 – Rs. 218,970 / month)** | 14 October 2026 |\n| **Project Manager** | 01 | Punjab Quota | Master's degree or 16-year BS in relevant discipline with minimum 5 years project coordination experience | **PPS-08 (Rs. 175,000 – Rs. 218,970 / month)** | 14 October 2026 |\n| **Project Manager** | 01 | Khyber Pakhtunkhwa (KPK) | Master's degree or 16-year BS with 5 years project monitoring & execution experience | **PPS-08 (Rs. 175,000 – Rs. 218,970 / month)** | 14 October 2026 |\n| **Law Officer** | 01 | Open Merit | Bachelor of Laws (LLB) from an HEC-recognized university with active Bar Council enrollment and 2–3 years corporate/court litigation experience | **BPS-17 (Rs. 75,000 – Rs. 95,000+ / month)** | 14 October 2026 |\n| **Project Accountant** | 01 | Sindh (Urban) Quota | B.Com / BBA Finance / M.Com / BS Accounting & Finance with 2+ years public/private financial accounting and audit experience | **Project Pay Scale (Rs. 80,000 – Rs. 110,000 / month)** | 14 October 2026 |\n| **Office Assistant** | 01 | Punjab Quota | Bachelor's Degree (BA / B.Sc / B.Com / BBA) with proven computer literacy (MS Office) and minimum typing speed | **BPS-15 (Rs. 50,000 – Rs. 65,000+ / month)** | 14 October 2026 |\n| **Office Assistant** | 01 | Sindh (Rural) Quota | Bachelor's Degree (BA / B.Sc / B.Com / BBA) with MS Office proficiency and clerical management skills | **BPS-15 (Rs. 50,000 – Rs. 65,000+ / month)** | 14 October 2026 |\n| **Attendant** | 01 | Open Merit / Punjab Quota | Primary / Matriculation with physical fitness, reliability, and office dispatch/hospitality experience | **BPS-01 (Rs. 40,700 / month basic + allowances)** | 14 October 2026 |",
+      "### Verified Salary & Scale Structure Breakdown",
+      "> [!NOTE]\n> **Official Pay Scale Structure:** The advertised positions fall within the verified salary spectrum of **Rs. 40,700 up to Rs. 398,130 per month**:\n> - **Executive Leadership (PPS-10):** Fixed Project Pay Scale offering total monthly emoluments ranging from Rs. 350,000 to Rs. 398,130 based on candidate experience.\n> - **Mid-Level Project Management (PPS-08):** Fixed Project Pay Scale offering total monthly emoluments between Rs. 175,000 and Rs. 218,970.\n> - **Officer & Specialized Roles (BPS-17 & Project Accountant):** Ranging between Rs. 75,000 and Rs. 110,000 including standard federal allowances.\n> - **Secretarial & Support Roles (BPS-15):** Basic Pay Scale 15 with allowances totaling Rs. 50,000 to Rs. 65,000.\n> - **Office Attendant (BPS-01):** Entry-level federal basic pay scale with cost of living and utility allowances totaling Rs. 40,700 per month.",
+      "### Contract Nature & Age Limit Specifications",
+      "- **Nature of Appointments:** Project positions (PPS-10, PPS-08, and Project Accountant) are contractual appointments for an initial period of one year, extendable subject to satisfactory performance and project duration. Regular BPS positions (BPS-17, BPS-15, BPS-01) follow standard federal employment rules.\n- **Age Limits (Calculated as of 14 October 2026):**\n  * Project Director: 35 to 50 Years\n  * Project Managers: 25 to 40 Years\n  * Law Officer & Project Accountant: 22 to 35 Years\n  * Office Assistants: 18 to 30 Years\n  * Attendant: 18 to 30 Years\n  * Standard general age relaxation of 5 years is admissible under Federal Government rules.",
+      "### Provincial & Regional Representation Focus",
+      "The recruitment strictly enforces constitutional provincial quota allocations:\n- **Sindh Representation:** 1 position of Office Assistant is exclusively reserved under **Sindh (Rural)** quota, and 1 position of Project Accountant is reserved under **Sindh (Urban)** quota.\n- **Punjab Representation:** 2 positions (1 Office Assistant, 1 Project Manager) and 1 Attendant are allocated under Punjab quota.\n- **Khyber Pakhtunkhwa Representation:** 1 Project Manager position is exclusively reserved for KPK domicile holders.\n- **Open Merit:** Project Director, 1 Project Manager, and Law Officer are open to all Pakistani nationals regardless of provincial domicile.",
+      "### Application Fee & Payment Mode",
+      "- A non-refundable application processing fee is prescribed:\n  * **BPS-01 to BPS-15:** Rs. 600\n  * **BPS-17 and PPS Roles:** Rs. 1,000\n- Fee must be deposited online through **1Link 1Bill Invoice** via ATM, Internet Banking, Mobile Banking Apps (Easypaisa/JazzCash/Bank apps), using the dedicated consumer number generated automatically upon submitting the profile on `careers.hec.gov.pk`.\n- Retain the transaction ID and paid receipt for interview verification.",
+      "### Selection Process & Testing Criteria",
+      "1. **Initial Screening:** Shortlisting of candidates based on academic credentials, domicile eligibility, and requisite years of experience.\n2. **Written Screening Test:** Eligible candidates for clerical and officer posts will appear in a screening test conducted by the Education Testing Council (ETC) or HEC testing committee.\n3. **Interview Panel:** Shortlisted candidates will be invited for interview at HEC Head Office, Sector H-9, Islamabad.",
+      "### Required Documents for Online Upload",
+      "- CNIC Copy (Front & Back)\n- Provincial Domicile Certificate\n- All Academic Certificates, Degrees, and Detailed Marks Certificates (DMCs) from Matric to highest degree\n- Verified Experience Letters from past and present employers\n- Valid Bar Council License / Enrollment Certificate (Mandatory for Law Officer)\n- Recent passport-size photograph with blue or white background",
+      "### Step-by-Step Online Application Procedure",
+      "1. Navigate to the official HEC recruitment portal: `https://careers.hec.gov.pk/`.\n2. Click on **Sign Up** to create an account using your 13-digit CNIC number and a valid email address.\n3. Complete your digital profile: Personal Details, Educational History, and Employment Experience.\n4. Browse the active vacancies list and choose the position aligned with your qualification and quota.\n5. Generate the 1Link 1Bill invoice and pay the fee through your mobile banking application.\n6. Confirm payment status on the portal, review all entered records, and click **Submit Application**.\n7. Download and print the electronic application form before **14 October 2026**.",
+      "### Frequently Asked Questions (FAQ)",
+      "**Q1: What is the deadline to apply for HEC Jobs 2026?**\nThe final deadline for digital application submission on `careers.hec.gov.pk` is **14 October 2026**.\n\n**Q2: Can I apply for more than one vacancy?**\nYes. Candidates possessing the required eligibility criteria for multiple posts can submit separate applications and pay the respective processing fees for each position.\n\n**Q3: Is hardcopy submission to HEC Islamabad required?**\nNo. Do not dispatch physical application copies by post. Only candidates shortlisted for test or interview will be asked to present original verified documents.\n\n**Q4: Are government employees eligible to apply?**\nYes, serving government employees can apply online but must obtain a Departmental Permission Certificate (NOC) from their parent department before appearing for the interview."
+    ]
+  },
+  {
+    slug: 'habib-university-admissions-2027',
+    title: 'Habib University Admissions 2027 Open – Scholarship, Entry Test & Apply Online',
+    category: 'admissions',
+    organization: 'Habib University Karachi',
+    jobType: 'Undergraduate Degree Admissions (Spring/Fall 2027 Intake)',
+    location: 'Block 18, Gulistan-e-Jauhar, Karachi, Sindh',
+    qualification: "Intermediate (HSC 60%+) / A-Levels (2B's & 1C) / High School Diploma (IB 28+)",
+    salary: 'Merit Scholarships up to 100% & Graded Financial Aid Available',
+    experience: 'Students Completing College / Intermediate / A-Levels / High School',
+    positions: 'Undergraduate Admissions (October Round Series)',
+    lastDate: '2026-10-21',
+    noDeadline: false,
+    publishDate: '2026-10-06',
+    officialLink: 'https://habib.edu.pk/admissions/',
+    applyLink: 'https://eapplication.habib.edu.pk/',
+    isVerified: true,
+    featured: true,
+    logoInitial: 'HU',
+    featuredImage: '/images/habib-university-admissions-2027.jpg',
+    imageAlt: 'Habib University Admissions 2027 Open October Series Scholarship Entry Test Apply Online',
+    excerpt: 'Habib University announces undergraduate admissions 2027 for DSSE and AHSS schools. October-series application and scholarship deadline is 21 October 2026. Entrance examinations on 23 & 26 October. Merit scholarships up to 100% and need-based financial aid available.',
+    seoTitle: 'Habib University Admissions 2027 Open – Scholarship, Entry Test & Apply Online | CareerDost',
+    metaDescription: 'Habib University Admissions 2027 are open. October series application deadline is 21 October 2026. Entrance exams on 23 & 26 Oct. Explore BSCS, Engineering, Liberal Arts, scholarships, and apply online.',
+    focusKeyword: 'Habib University Admissions 2027',
+    canonicalUrl: 'https://careerdost.blog/jobs/habib-university-admissions-2027',
+    ogTitle: 'Habib University Admissions 2027 Open – Scholarship, Entry Test & Apply Online',
+    ogDescription: 'Habib University undergraduate admissions 2027 are officially open. October series deadline: 21 October 2026. Explore Computer Science, Engineering, Social Sciences, scholarships, and entry test schedule.',
+    schemaType: 'EducationalOccupationalProgram',
+    content: [
+      "### Official Undergraduate Admissions Announcement 2027",
+      "**Habib University (HU) Karachi**, Pakistan’s premier dedicated liberal arts and sciences institution, has officially opened undergraduate admissions for the **Class of 2027** (Session 2027–2031). Operating on a global interdisciplinary curriculum anchored by its signature Liberal Core, Habib University invites aspiring leaders to apply in its **October Series Admission Round**.",
+      "The official admissions calendar published on the Habib University portal (`habib.edu.pk/admissions/international-examination-board/admission-schedule/`) confirms that the digital application submission and financial aid portal is active, with the October round deadline set for **21 October 2026**.",
+      "### October Series Official Schedule Breakdown",
+      "Below is the verified timeline for the ongoing October Admissions Series:\n- **Admissions Form Submission Deadline:** **21 October 2026**\n- **Scholarship & Financial Aid Application Deadline:** **21 October 2026**\n- **Habib University Entrance Examinations (HAT):** **23 & 26 October 2026**\n- **Admission Interviews:** **30 October 2026 onwards**\n- **Admission Decisions:** Rolling Admissions (Decisions communicated sequentially following interviews)\n- **Special Information Session:** Prospective applicants and parents are invited to attend the **Admission Information Session on 9 October 2026** (registration available via the admissions portal) to explore degree faculties, campus life, and funding options.",
+      "### Subsequent Admission Rounds (For Future Reference)",
+      "For students unable to sit the October test, subsequent admission series deadlines are scheduled as follows:\n- **November Series:** Deadline 20 November 2026 | Exams 24 & 25 November 2026\n- **December Series:** Deadline 23 December 2026 | Exams 29 & 30 December 2026\n- **January Series:** Deadline 21 January 2027 | Exams 25–27 January 2027\n- **February Series:** Deadline 16 February 2027 | Exams 18–24 February 2027",
+      "### Academic Programs Offered Across Two Flagship Schools",
+      "Habib University offers six world-class undergraduate degree programmes across its two distinguished schools:\n\n1. **Dhanani School of Science and Engineering (DSSE):**\n   - **BS Computer Science (BSCS):** Focused on software systems, artificial intelligence, data engineering, and modern theoretical computation.\n   - **BS Computer Engineering (BSCE):** Bridging computer architecture, embedded hardware design, and robotics.\n   - **BS Electrical Engineering (BSEE):** Specializing in energy systems, telecommunications, and digital electronics.\n\n2. **School of Arts, Humanities and Social Sciences (AHSS):**\n   - **BSc (Honours) Social Development & Policy (SDP):** Pioneering interdisciplinary studies in South Asian development, urban ecology, governance, and public policy.\n   - **BSc (Honours) Comparative Humanities (CH):** Critical exploration of world literatures, philosophy, history, and religious studies.\n   - **BA (Honours) Communication and Design (CND):** Integrating visual design, moving image, digital media, typography, and creative narrative.",
+      "### Academic Eligibility Criteria",
+      "Applicants must meet the following minimum academic standards based on their educational background:\n- **Intermediate (HSC / Board of Intermediate Education):** Minimum aggregate of **60% marks** in Pre-Engineering, Computer Science, Pre-Medical (with additional mathematics where required for engineering), or General Science.\n- **A Levels (Cambridge / Pearson Edexcel):** Minimum of **2 B's and 1 C** across three principal academic A-Level subjects. (General Paper, Thinking Skills, and Urdu as a second language do not fulfill primary requirements).\n- **International Baccalaureate (IB) / High School Diploma:** Minimum of **28 IB Diploma points** or an accredited US High School Diploma with official Equivalence Certificate issued by the Inter Board Coordination Commission (IBCC).",
+      "### Entrance Examination & Test Exemption Criteria",
+      "Candidates must complete the **Habib University Entrance Examination (HAT)** scheduled for **23 & 26 October 2026**:\n- **DSSE Test Modules:** Advanced Mathematics & English Language Comprehension & Critical Writing.\n- **AHSS Test Modules:** Quantitative Reasoning & English Language Comprehension & Critical Writing.\n- **SAT / ACT Exemption:** Applicants who have achieved a minimum composite score of **1250 on the SAT (Reasoning)** or a composite score of **28 on the ACT** are eligible for an exemption from the HU Entrance Examination.",
+      "### Clarification on Scholarships vs. Need-Based Financial Aid",
+      "> [!IMPORTANT]\n> **Financial Support Transparency:** Habib University does NOT characterize all financial assistance as a fully funded scholarship. Funding is distinctly separated into merit-based awards and need-based financial aid:\n> - **Merit Scholarships:** Awarded purely based on academic distinction and entrance examination results. Merit tiers cover **25%, 50%, 75%, and up to 100% of tuition fees** for all four years of study.\n> - **Need-Based Financial Aid:** Graded financial grants calculated solely based on the applicant's assessed family financial circumstances. Over **85% of admitted Habib students** receive financial aid or merit scholarships.\n> - **HU TOPS (Talent Outreach, Promotion and Support):** A specialized 100% fully funded scholarship program dedicated exclusively to high-achieving Intermediate Board students from public and affiliated colleges.\n> - **Yohsin Scholarship:** Flagship prestigious award granted to extraordinary candidates exemplifying intellectual passion and community leadership.",
+      "### Required Application Documents",
+      "- Scanned copy of CNIC / B-Form / Passport\n- Secondary School Certificate (SSC / Matric) or Cambridge O-Level Statement of Results\n- Higher Secondary Certificate (HSC Part-I / Pre-Board) or Cambridge AS-Level / A-Level Statement of Results\n- Statement of Purpose / Personal Essay highlighting intellectual interests and community engagement\n- Financial Aid Application Form accompanied by proof of family income, utilities, and tax returns (if applying for aid by 21 October 2026)",
+      "### Step-by-Step Online Application Process",
+      "1. Visit the official Habib University admissions portal at `https://eapplication.habib.edu.pk/`.\n2. Create a new user account with your active email address and phone number.\n3. Fill in your personal profile, family information, and high school academic history.\n4. Select your preferred degree programme within DSSE or AHSS.\n5. If applying for financial assistance, complete the comprehensive Financial Aid section before submitting.\n6. Pay the application processing fee of **Rs. 3,500** via online debit/credit card or designated banking voucher.\n7. Review and finalize your submission before the deadline of **21 October 2026**.",
+      "### Frequently Asked Questions (FAQ)",
+      "**Q1: What is the deadline for October series admissions?**\nThe application and financial aid deadline is **21 October 2026**.\n\n**Q2: When will entrance examinations take place?**\nThe examinations will be held on **23 & 26 October 2026**.\n\n**Q3: Can I apply for financial aid in later rounds?**\nFinancial aid pools are largest in early rounds. Applying in the October round maximizes your opportunity for optimal financial aid and merit scholarship consideration.\n\n**Q4: How do I attend the 9 October Admission Information Session?**\nRegister directly through the admissions portal at `habib.edu.pk/admissions/` to participate in person or virtually."
+    ]
+  },
+  {
+    slug: 'swiss-government-excellence-scholarships-2027-pakistan',
+    title: 'Swiss Government Excellence Scholarships 2027–28 for Pakistani Students – Apply Online',
+    category: 'scholarships',
+    organization: 'Swiss Federal Commission for Scholarships (FCS / ESKAS) & Swiss Embassy',
+    jobType: 'Fully Funded Research & PhD Scholarships (Academic Year 2027–28)',
+    location: 'Switzerland (Public Cantonal Universities & Federal Institutes ETH Zurich / EPFL)',
+    qualification: "Master's Degree (MS/MPhil) for PhD & Research / PhD for Postdoctoral Research",
+    salary: 'Monthly Stipend (CHF 1,920 – CHF 3,500) + Mandatory Health Insurance + Airfare Allowance',
+    experience: 'Academic Research Background & Acceptance Letter from Swiss Academic Host Professor',
+    positions: 'Prestigious Swiss Federal Excellence Fellowships',
+    lastDate: '2026-10-31',
+    noDeadline: false,
+    publishDate: '2026-10-06',
+    officialLink: 'https://www.sbfi.admin.ch/scholarships_eng',
+    applyLink: 'https://www.go.eskas.ch/LoginServlet',
+    isVerified: true,
+    featured: true,
+    logoInitial: 'FCS',
+    featuredImage: '/images/swiss-government-excellence-scholarships-2027.jpg',
+    imageAlt: 'Swiss Government Excellence Scholarships 2027-28 Pakistani Students Research PhD Apply Online',
+    excerpt: 'Swiss Government Excellence Scholarships 2027–28 open for Pakistani researchers and PhD scholars. Fully funded monthly stipend of CHF 1,920 to CHF 3,500, full health insurance, and return airfare. Applications close 31 October 2026 via direct ESKAS submission.',
+    seoTitle: 'Swiss Government Excellence Scholarships 2027–28 for Pakistani Students | CareerDost',
+    metaDescription: 'Apply for Swiss Government Excellence Scholarships 2027–28 for Pakistani students. Fully funded PhD & Research Fellowships in Switzerland. Stipend CHF 1,920–3,500/mo. Deadline: 31 October 2026.',
+    focusKeyword: 'Swiss Government Excellence Scholarships 2027-28',
+    canonicalUrl: 'https://careerdost.blog/jobs/swiss-government-excellence-scholarships-2027-pakistan',
+    ogTitle: 'Swiss Government Excellence Scholarships 2027–28 for Pakistani Students – Apply Online',
+    ogDescription: 'Fully funded PhD and postdoctoral research fellowships in Switzerland for Pakistani scholars. Monthly stipend up to CHF 3,500, health coverage, and travel allowance. Apply before 31 October 2026.',
+    schemaType: 'EducationalOccupationalProgram',
+    content: [
+      "### Prestigious Academic Research Opportunities in Switzerland",
+      "The **Swiss Federal Commission for Scholarships for Foreign Students (FCS / ESKAS)**, in direct coordination with the **Embassy of Switzerland in Islamabad**, has formally opened applications for the **Swiss Government Excellence Scholarships for the Academic Year 2027–28**. This premier European initiative provides exceptional Pakistani scholars and researchers the opportunity to pursue advanced doctoral and postdoctoral research at Switzerland’s world-renowned cantonal universities, research institutes, and federal institutes of technology (**ETH Zurich** and **EPFL**).",
+      "All applications must be submitted directly through the official Swiss ESKAS electronic portal (`go.eskas.ch/LoginServlet`) before the strict closing deadline of **31 October 2026**.",
+      "### Critical Institutional Clarification: HEC Role vs. ESKAS",
+      "> [!IMPORTANT]\n> **HEC Role & Financial Clarification:** The Higher Education Commission (HEC) of Pakistan advertises this opportunity solely for public awareness and student facilitation (`hec.gov.pk/english/services/students/swiss-scholarship`).\n>\n> - **Zero Financial Liability:** HEC bears absolutely NO financial liability or funding commitment for this scholarship.\n> - **Direct Swiss Application:** HEC does NOT conduct screening, shortlisting, or nominations. Candidates must apply directly to ESKAS / the Embassy of Switzerland.\n> - **No HEC Portal Submission:** Submissions made solely on HEC portals will not be forwarded to the Swiss government. You must apply directly through the official Swiss portal.",
+      "### Eligible Programs & Clear Ineligibility Notice",
+      "For Pakistani applicants, the Swiss Government Excellence Scholarships are strictly restricted to the following postgraduate research tracks:\n1. **PhD Scholarships:** Full doctoral degree research (up to 36–48 months) leading to a doctorate awarded by an accredited Swiss university.\n2. **Research Fellowships:** 12-month non-degree research projects intended for enrolled PhD students or junior researchers wishing to conduct field or laboratory research in Switzerland.\n3. **Postdoctoral Scholarships:** 12-month advanced scientific research for scholars who hold a recognized PhD degree.\n\n> [!WARNING]\n> **Undergraduate & Taught Master's Exclusion:** Bachelor's degree and taught Master's (MA / MSc / MBA) programmes are **STRICTLY NOT OFFERED** for Pakistan under the Swiss Government Excellence framework. Applications for taught courses will be rejected immediately.",
+      "### Mandatory Prerequisite: Host Professor Acceptance Letter",
+      "The single most critical prerequisite for obtaining the Swiss Government Excellence Scholarship is securing an **Academic Host Professor Confirmation Letter** prior to submitting your application:\n- Applicants must independently contact a tenured professor or faculty member at an eligible Swiss cantonal university or federal institute (e.g., ETH Zurich, EPFL, University of Zurich, University of Geneva, University of Basel, University of Bern, EPFL).\n- The professor must issue a formal, signed written letter explicitly agreeing to supervise your research project and confirming that adequate laboratory space, computing infrastructure, and departmental facilities are available for your tenure.",
+      "### Comprehensive Financial Coverage & Monthly Stipends",
+      "The Swiss Government Excellence Scholarship covers all essential living and academic expenses in Switzerland:\n- **Monthly Living Stipend:**\n  * **PhD and Research Fellows:** **CHF 1,920 per month** (tax-free living allowance).\n  * **Postdoctoral Fellows:** **CHF 3,500 per month**.\n- **Mandatory Swiss Health Insurance:** Full coverage of mandatory Swiss health and accident insurance premiums, paid directly by the Federal Commission for Scholarships.\n- **Housing Allowance Lump-Sum:** A one-time relocation grant of **CHF 300** disbursed upon arrival in Switzerland to assist with housing lease deposits and furniture essentials.\n- **Swiss Public Transport Half-Fare Card:** A prepaid Swiss Halbtax card providing 50% discount on all Swiss public trains, buses, and ferries for the entire duration of stay.\n- **Return Economy Airfare:** Return flight ticket subsidy paid at the conclusion of the fellowship to cover repatriation back to Pakistan.",
+      "### Detailed Eligibility Checklist",
+      "- **Nationality:** Must hold Pakistani citizenship.\n- **Academic Profile:** Must possess a recognized Master's degree (MS / MPhil with minimum 17–18 years of education) for PhD/Research applications, or an accredited PhD degree completed within the last 3 years for Postdoctoral applications.\n- **Age Ceiling:** For PhD and Research Fellowships, candidates must have been born after **31 December 1991**.\n- **Language Competence:** Strong proficiency in English or the language of instruction (German, French, or Italian) required by the host laboratory.\n- **Dual Residency Clause:** Candidates who have already resided in Switzerland for more than one year prior to September 2027 are ineligible.",
+      "### Required Application Dossier (Triplicate Submissions)",
+      "Applicants must assemble their complete application package consisting of:\n1. Official FCS Application Form (with photograph)\n2. Comprehensive Curriculum Vitae (CV) including publication records\n3. Detailed Research Proposal (maximum 5 pages) outlining methodology, literature review, and academic timeline\n4. Formal Host Professor Acceptance Letter and Professor's short CV\n5. Two confidential letters of recommendation from academic referees\n6. Attested copies of academic transcripts and degree certificates (HEC / IBCC verified)\n7. Medical Health Certificate signed by a certified physician\n8. Clear scanned copy of valid Pakistani Passport",
+      "### Step-by-Step Direct Application Procedure",
+      "1. Secure written acceptance from an eligible Swiss host professor.\n2. Access the official Swiss electronic scholarship portal at `https://www.go.eskas.ch/LoginServlet`.\n3. Request and download the standardized FCS application package and reference templates.\n4. Complete all digital forms, compile required supporting documents into organized PDF dossiers, and submit online.\n5. Print three complete hardcopy sets (1 original with original signatures + 2 copies) and submit them to the **Embassy of Switzerland in Islamabad** before **31 October 2026**.",
+      "### Frequently Asked Questions (FAQ)",
+      "**Q1: What is the final deadline to apply for Swiss Government Scholarships 2027–28?**\nThe application deadline is **31 October 2026**.\n\n**Q2: Does HEC provide any funding for this scholarship?**\nNo. HEC has zero financial liability and does not provide matching grants or stipends for this program. All funding is borne by the Swiss Federal Government.\n\n**Q3: Can I apply without an acceptance letter from a Swiss professor?**\nNo. Applications lacking a formal written commitment from a Swiss host professor are considered incomplete and will not be evaluated by the Federal Commission for Scholarships.\n\n**Q4: Can I apply for a Master's degree under this scholarship?**\nNo. The Swiss Government Excellence Scholarship for Pakistan is restricted exclusively to Research Fellowships, PhD, and Postdoctoral studies."
+    ]
+  },
+  {
+    slug: 'hec-outstanding-research-awards-2026-27',
+    title: 'HEC Research Awards 2026–27 – Win Up to Rs1 Million, Apply Before October 31',
+    category: 'scholarships',
+    organization: 'Higher Education Commission (HEC) Pakistan',
+    jobType: 'National Research Excellence Awards & Cash Grants',
+    location: 'Pakistan / Nationwide Higher Education Institutions',
+    qualification: 'Faculty Members / Researchers / Scholars in HEC Recognized Universities & R&D Institutes',
+    salary: 'Cash Prizes up to Rs. 1,000,000 (Rs. 1 Million) + Citation Plaques',
+    experience: 'Proven High-Impact Research Output, Indexed Publications & Patents',
+    positions: 'Annual National Research Excellence Awards (Three Major Categories)',
+    lastDate: '2026-10-31',
+    noDeadline: false,
+    publishDate: '2026-10-06',
+    officialLink: 'https://www.hec.gov.pk/english/services/faculty/HEC%20Outstanding%20Research%20Awards/Pages/Introduction.aspx',
+    applyLink: 'https://research.hec.gov.pk/',
+    isVerified: true,
+    featured: true,
+    logoInitial: 'HEC',
+    featuredImage: '/images/hec-outstanding-research-awards-2026-27.svg',
+    imageAlt: 'HEC Research Awards 2026-27 Win Up to Rs 1 Million Cash Prizes Apply Before October 31 research hec gov pk',
+    excerpt: 'Higher Education Commission (HEC) Pakistan invites applications for HEC Outstanding Research Awards 2026–27. Cash prizes up to Rs 1,000,000 for Best Publication, and Rs 500,000 each for Best Researcher and Young Researcher. Apply online before 31 October 2026.',
+    seoTitle: 'HEC Research Awards 2026–27 – Win Up to Rs1 Million | CareerDost',
+    metaDescription: 'HEC Outstanding Research Awards 2026–27: Win cash prizes up to Rs1 Million for Best Publication and Rs500,000 for Best Researcher & Young Researcher. Apply online at research.hec.gov.pk by 31 October 2026.',
+    focusKeyword: 'HEC Research Awards 2026-27',
+    canonicalUrl: 'https://careerdost.blog/jobs/hec-outstanding-research-awards-2026-27',
+    ogTitle: 'HEC Research Awards 2026–27 – Win Up to Rs1 Million, Apply Before October 31',
+    ogDescription: 'Higher Education Commission (HEC) Pakistan announces national research awards 2026–27 with cash awards up to Rs 1 Million. Open for university faculty, researchers, and young scholars nationwide.',
+    schemaType: 'EducationalOccupationalProgram',
+    content: [
+      "### National Call for HEC Outstanding Research Awards 2026–27",
+      "The **Higher Education Commission (HEC) Pakistan**, through its **Research and Development (R&D) Division**, has issued the national call for applications for the **HEC Outstanding Research Awards 2026–27**. Instituted to recognize, encourage, and reward scientific ingenuity and research excellence, these premier state awards confer national prestige alongside cash prizes of **up to Rs. 1,000,000 (Rs. 1 Million)** and citation shields.",
+      "Eligible university faculty members, active research scholars, and independent scientists across Pakistan are invited to submit digital applications via the official HEC Research Portal (`research.hec.gov.pk`) before the strict national deadline of **31 October 2026**.",
+      "### Categorical Clarification: Exact Cash Prizes per Award Track",
+      "> [!IMPORTANT]\n> **Crucial Cash Prize Breakdown:** Please note that cash rewards are categorized strictly by award title. **Rs. 1,000,000 (Rs. 1 Million)** is awarded exclusively for the **Best Publication Award**, while other award tracks carry **Rs. 500,000** each:\n>\n> 1. **Best Publication Award:** Cash prize of **Rs. 1,000,000 (Rs. 1 Million)** + Gold Plaque & Certificate. Conferred for groundbreaking original research articles published in premier high-impact international journals indexed in Web of Science (WOS) / Scopus.\n> 2. **Best Researcher Award:** Cash prize of **Rs. 500,000 (Rs. 500k)** + Citation Plaque & Certificate. Conferred upon active senior or mid-career faculty demonstrating consistent, high-impact research output, exceptional citation metrics, H-index, research grants, and commercialized patents.\n> 3. **Best Young Researcher Award:** Cash prize of **Rs. 500,000 (Rs. 500k)** + Citation Plaque & Certificate. Specially reserved for promising early-career scholars **aged 40 years or below** who demonstrate remarkable scientific productivity.",
+      "### Three Broad Academic Disciplines",
+      "Applications are invited across three recognized disciplinary clusters:\n- **Domain 1: Biological, Medical, Health & Agricultural Sciences:** Encompassing Molecular Biology, Genetics, Biotechnology, Pharmacology, Clinical Sciences, Agronomy, Veterinary Sciences, and Environmental Biology.\n- **Domain 2: Physical Sciences, Engineering, Technology, Computer Science & Mathematics:** Covering Physics, Chemistry, Material Science, Electrical/Mechanical/Civil Engineering, Artificial Intelligence, Cybersecurity, Software Engineering, and Pure & Applied Mathematics.\n- **Domain 3: Social Sciences, Humanities, Management Sciences & Arts:** Encompassing Economics, Public Policy, Governance, Business Administration, Sociology, Law, Education, Literature, and Creative Arts.",
+      "### Strict Eligibility Criteria & Age Ceiling",
+      "- **Citizenship:** Applicants must be Pakistani or Azad Jammu & Kashmir (AJK) nationals.\n- **Institutional Affiliation:** Must be regular, contract, or tenure-track faculty members, researchers, or post-doctoral fellows serving in HEC-recognized public or private higher education institutions or public R&D establishments.\n- **Young Researcher Age Limit:** Candidates competing for the **Best Young Researcher Award** must be strictly **40 years of age or below** on the application cutoff date (**January 1, 2026**).\n- **Originality & Plagiarism Standards:** All submitted publications and research claims must adhere strictly to HEC's Policy on Research Ethics and Plagiarism. Articles previously awarded an HEC national prize or state civil award are ineligible.",
+      "### Required Documentation & Institutional Endorsement",
+      "Applicants must compile and upload the following digital documents to the HEC portal:\n- Scanned copy of CNIC / Passport\n- Official Appointment Order and Institutional Identity Card proving current employment\n- Comprehensive Academic CV highlighting Scopus Author ID, Web of Science ResearcherID, and Google Scholar profile\n- Full-text PDF copies of candidate research papers, book chapters, or patent grant letters\n- Proof of Journal Impact Factor and JCR quartile ranking for the year of publication\n- **Head of Institution Endorsement Form:** Formal endorsement signed and stamped by the Vice Chancellor, Rector, or Head of the R&D Institution.",
+      "### Step-by-Step Portal Application Process",
+      "1. Navigate to the official HEC Research Portal at `https://research.hec.gov.pk/`.\n2. Log in using your existing HEC e-portal CNIC credentials or register a new user account.\n3. Navigate to **Faculty Services** and select **HEC Outstanding Research Awards 2026–27**.\n4. Complete the candidate profile and select your category (Best Publication, Best Researcher, or Best Young Researcher).\n5. Enter publication bibliographic citations (DOI, ISSN, Journal Name, Impact Factor) and upload PDF reprints.\n6. Generate the formal summary endorsement form, obtain the signature of your Vice Chancellor / Rector, and upload the signed copy.\n7. Review all data fields and click **Submit Application** before **31 October 2026**.",
+      "### Frequently Asked Questions (FAQ)",
+      "**Q1: What is the deadline to apply for HEC Research Awards 2026–27?**\nThe deadline for online submissions on `research.hec.gov.pk` is **31 October 2026**.\n\n**Q2: Does every award recipient receive Rs 1 Million?**\nNo. The Rs 1,000,000 (Rs 1 Million) prize is awarded exclusively to the recipient of the Best Publication Award. Best Researcher and Best Young Researcher awardees receive Rs 500,000 each.\n\n**Q3: What is the age limit for the Young Researcher category?**\nApplicants must be 40 years of age or younger on **1 January 2026**.\n\n**Q4: Can researchers from private universities apply?**\nYes. Faculty members and researchers from both public and private HEC-recognized universities are fully eligible."
+    ]
+  }
+]
+
+async function publish() {
+  const listingsFilePath = path.resolve('src/data/listings.js')
+  const { listings: currentListings } = await import('../src/data/listings.js')
+
+  const targetSlugs = new Set([
+    'chevening-scholarship-2027-28-pakistan',
+    'chevening-scholarship-2027-28',
+    'hec-jobs-2026',
+    'habib-university-admissions-2027',
+    'swiss-government-excellence-scholarships-2027-pakistan',
+    'swiss-government-excellence-scholarships-2027',
+    'hec-outstanding-research-awards-2026-27',
+    'hec-research-awards-2026-27'
+  ])
+
+  // Filter out any older versions of these slugs
+  const filteredExisting = currentListings.filter(item => !targetSlugs.has(item.slug))
+
+  // Combine: oct6Articles strictly first in priority order, then existing
+  const updatedListings = [...oct6Articles, ...filteredExisting]
+
+  const outputContent = `// CareerDost Opportunities & Career Listings Dataset
+// Updated: 2026-10-06
+
+export const listings = ${JSON.stringify(updatedListings, null, 2)};
+
+export const getListingBySlug = (slug) => {
+  if (slug === 'chevening-scholarship-2027-28') {
+    return listings.find((l) => l.slug === 'chevening-scholarship-2027-28-pakistan') || listings.find((l) => l.slug === slug)
+  }
+  if (slug === 'virtual-university-admissions-2026-deadline-tomorrow') {
+    return listings.find((l) => l.slug === 'virtual-university-fall-2026-admissions') || listings.find((l) => l.slug === slug)
+  }
+  if (slug === 'sessi-internship-programme-2026-karachi') {
+    return listings.find((l) => l.slug === 'sessi-internship-programme-2026') || listings.find((l) => l.slug === slug)
+  }
+  return listings.find((l) => l.slug === slug)
+}
+
+export const getListingsByCategory = (categorySlug) =>
+  listings
+    .filter((l) => l.category === categorySlug)
+    .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate))
+
+export const getFeaturedListings = () =>
+  listings.filter((l) => l.featured).sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate))
+
+export const getLatestListings = (limit = 12) =>
+  [...listings]
+    .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate))
+    .slice(0, limit)
+
+export const searchListings = (query) => {
+  const q = query.trim().toLowerCase()
+  if (!q) return []
+  return listings.filter((l) =>
+    [l.title, l.organization, l.location, l.category]
+      .join(' ')
+      .toLowerCase()
+      .includes(q)
+  )
+}
+`
+
+  fs.writeFileSync(listingsFilePath, outputContent, 'utf8')
+  console.log(`Updated src/data/listings.js with ${updatedListings.length} listings. Top 5 are Oct 6 articles!`)
+
+  // Update scripts/generate_sitemap.js
+  const sitemapScriptPath = path.resolve('scripts/generate_sitemap.js')
+  let sitemapCode = fs.readFileSync(sitemapScriptPath, 'utf8')
+
+  const oct6Updates = [
+    "{ slug: 'chevening-scholarship-2027-28-pakistan', date: '2026-10-06' }",
+    "{ slug: 'hec-jobs-2026', date: '2026-10-06' }",
+    "{ slug: 'habib-university-admissions-2027', date: '2026-10-06' }",
+    "{ slug: 'swiss-government-excellence-scholarships-2027-pakistan', date: '2026-10-06' }",
+    "{ slug: 'hec-outstanding-research-awards-2026-27', date: '2026-10-06' }"
+  ]
+
+  // Insert at top of publishedDailyUpdates array if not already present
+  if (!sitemapCode.includes('chevening-scholarship-2027-28-pakistan')) {
+    sitemapCode = sitemapCode.replace(
+      'const publishedDailyUpdates = [',
+      `const publishedDailyUpdates = [\n  ${oct6Updates.join(',\n  ')},`
+    )
+    fs.writeFileSync(sitemapScriptPath, sitemapCode, 'utf8')
+    console.log('Updated scripts/generate_sitemap.js with Oct 6 daily updates!')
+  }
+
+  // Seed local careerdost.sqlite
+  const dbPath = path.resolve('careerdost.sqlite')
+  const sqlite = new Database(dbPath)
+
+  for (const item of oct6Articles) {
+    const contentJson = JSON.stringify(item.content)
+    const catMap = {
+      scholarships: 'Scholarships',
+      admissions: 'Admissions',
+      'government-jobs': 'Government Jobs',
+      jobs: 'Government Jobs',
+      internships: 'Internships'
+    }
+    const catLabel = catMap[item.category] || 'Latest Jobs'
+
+    // Update or insert into articles table
+    const upsertArticle = sqlite.prepare(`
+      INSERT INTO articles (
+        slug, title, category_slug, organization, job_type, location,
+        qualification, salary, last_date, publish_date, official_link,
+        featured, logo_initial, excerpt, content, seo_title, meta_description,
+        status, featured_image, image_alt, experience, positions, apply_link,
+        is_verified, focus_keyword, canonical_url, og_title, og_description
+      ) VALUES (
+        @slug, @title, @category_slug, @organization, @job_type, @location,
+        @qualification, @salary, @last_date, @publish_date, @official_link,
+        @featured, @logo_initial, @excerpt, @content, @seo_title, @meta_description,
+        'published', @featured_image, @image_alt, @experience, @positions, @apply_link,
+        @is_verified, @focus_keyword, @canonical_url, @og_title, @og_description
+      )
+      ON CONFLICT(slug) DO UPDATE SET
+        title = excluded.title,
+        category_slug = excluded.category_slug,
+        organization = excluded.organization,
+        job_type = excluded.job_type,
+        location = excluded.location,
+        qualification = excluded.qualification,
+        salary = excluded.salary,
+        last_date = excluded.last_date,
+        publish_date = excluded.publish_date,
+        official_link = excluded.official_link,
+        featured = excluded.featured,
+        logo_initial = excluded.logo_initial,
+        excerpt = excluded.excerpt,
+        content = excluded.content,
+        seo_title = excluded.seo_title,
+        meta_description = excluded.meta_description,
+        status = 'published',
+        featured_image = excluded.featured_image,
+        image_alt = excluded.image_alt,
+        experience = excluded.experience,
+        positions = excluded.positions,
+        apply_link = excluded.apply_link,
+        is_verified = excluded.is_verified,
+        focus_keyword = excluded.focus_keyword,
+        canonical_url = excluded.canonical_url,
+        og_title = excluded.og_title,
+        og_description = excluded.og_description,
+        updated_at = CURRENT_TIMESTAMP
+    `)
+
+    upsertArticle.run({
+      slug: item.slug,
+      title: item.title,
+      category_slug: item.category,
+      organization: item.organization,
+      job_type: item.jobType,
+      location: item.location,
+      qualification: item.qualification,
+      salary: item.salary,
+      last_date: item.lastDate,
+      publish_date: item.publishDate,
+      official_link: item.officialLink,
+      featured: item.featured ? 1 : 0,
+      logo_initial: item.logoInitial,
+      excerpt: item.excerpt,
+      content: contentJson,
+      seo_title: item.seoTitle,
+      meta_description: item.metaDescription,
+      featured_image: item.featuredImage,
+      image_alt: item.imageAlt,
+      experience: item.experience,
+      positions: item.positions,
+      apply_link: item.applyLink,
+      is_verified: item.isVerified ? 1 : 0,
+      focus_keyword: item.focusKeyword,
+      canonical_url: item.canonicalUrl,
+      og_title: item.ogTitle,
+      og_description: item.ogDescription
+    })
+
+    // Update or insert into daily_updates table
+    const upsertDailyUpdate = sqlite.prepare(`
+      INSERT INTO daily_updates (
+        slug, title, category, short_description, content, featured_image,
+        image_alt, official_link, apply_link, deadline, publish_date,
+        organization, location, qualification, experience, positions,
+        job_type, salary, is_verified, featured, seo_title, meta_description,
+        focus_keyword, canonical_url, og_title, og_description, status
+      ) VALUES (
+        @slug, @title, @category, @short_description, @content, @featured_image,
+        @image_alt, @official_link, @apply_link, @deadline, @publish_date,
+        @organization, @location, @qualification, @experience, @positions,
+        @job_type, @salary, @is_verified, @featured, @seo_title, @meta_description,
+        @focus_keyword, @canonical_url, @og_title, @og_description, 'published'
+      )
+      ON CONFLICT(slug) DO UPDATE SET
+        title = excluded.title,
+        category = excluded.category,
+        short_description = excluded.short_description,
+        content = excluded.content,
+        featured_image = excluded.featured_image,
+        image_alt = excluded.image_alt,
+        official_link = excluded.official_link,
+        apply_link = excluded.apply_link,
+        deadline = excluded.deadline,
+        publish_date = excluded.publish_date,
+        organization = excluded.organization,
+        location = excluded.location,
+        qualification = excluded.qualification,
+        experience = excluded.experience,
+        positions = excluded.positions,
+        job_type = excluded.job_type,
+        salary = excluded.salary,
+        is_verified = excluded.is_verified,
+        featured = excluded.featured,
+        seo_title = excluded.seo_title,
+        meta_description = excluded.meta_description,
+        focus_keyword = excluded.focus_keyword,
+        canonical_url = excluded.canonical_url,
+        og_title = excluded.og_title,
+        og_description = excluded.og_description,
+        status = 'published',
+        updated_at = CURRENT_TIMESTAMP
+    `)
+
+    upsertDailyUpdate.run({
+      slug: item.slug,
+      title: item.title,
+      category: catLabel,
+      short_description: item.excerpt,
+      content: contentJson,
+      featured_image: item.featuredImage,
+      image_alt: item.imageAlt,
+      official_link: item.officialLink,
+      apply_link: item.applyLink,
+      deadline: item.lastDate,
+      publish_date: item.publishDate,
+      organization: item.organization,
+      location: item.location,
+      qualification: item.qualification,
+      experience: item.experience,
+      positions: item.positions,
+      job_type: item.jobType,
+      salary: item.salary,
+      is_verified: item.isVerified ? 1 : 0,
+      featured: item.featured ? 1 : 0,
+      seo_title: item.seoTitle,
+      meta_description: item.metaDescription,
+      focus_keyword: item.focusKeyword,
+      canonical_url: item.canonicalUrl,
+      og_title: item.ogTitle,
+      og_description: item.ogDescription
+    })
+  }
+
+  console.log('Seeded local careerdost.sqlite database successfully!')
+
+  // Generate remote SQL for Cloudflare D1
+  function escapeSql(str) {
+    if (str === null || str === undefined) return "''"
+    return "'" + String(str).replace(/'/g, "''") + "'"
+  }
+
+  const sqlStatements = []
+  for (const item of oct6Articles) {
+    const contentJson = JSON.stringify(item.content)
+    const catMap = {
+      scholarships: 'Scholarships',
+      admissions: 'Admissions',
+      jobs: 'Latest Jobs',
+      internships: 'Internships'
+    }
+    const catLabel = catMap[item.category] || 'Latest Jobs'
+
+    const sqlArticle = `
+INSERT INTO articles (
+  slug, title, category_slug, organization, job_type, location,
+  qualification, salary, last_date, publish_date, official_link,
+  featured, logo_initial, excerpt, content, seo_title, meta_description,
+  status, featured_image, image_alt, experience, positions, apply_link,
+  is_verified, focus_keyword, canonical_url, og_title, og_description
+) VALUES (
+  ${escapeSql(item.slug)},
+  ${escapeSql(item.title)},
+  ${escapeSql(item.category)},
+  ${escapeSql(item.organization)},
+  ${escapeSql(item.jobType)},
+  ${escapeSql(item.location)},
+  ${escapeSql(item.qualification)},
+  ${escapeSql(item.salary)},
+  ${escapeSql(item.lastDate)},
+  ${escapeSql(item.publishDate)},
+  ${escapeSql(item.officialLink)},
+  ${item.featured ? 1 : 0},
+  ${escapeSql(item.logoInitial)},
+  ${escapeSql(item.excerpt)},
+  ${escapeSql(contentJson)},
+  ${escapeSql(item.seoTitle)},
+  ${escapeSql(item.metaDescription)},
+  'published',
+  ${escapeSql(item.featuredImage)},
+  ${escapeSql(item.imageAlt)},
+  ${escapeSql(item.experience)},
+  ${escapeSql(item.positions)},
+  ${escapeSql(item.applyLink)},
+  ${item.isVerified ? 1 : 0},
+  ${escapeSql(item.focusKeyword)},
+  ${escapeSql(item.canonicalUrl)},
+  ${escapeSql(item.ogTitle)},
+  ${escapeSql(item.ogDescription)}
+)
+ON CONFLICT(slug) DO UPDATE SET
+  title = excluded.title,
+  category_slug = excluded.category_slug,
+  organization = excluded.organization,
+  job_type = excluded.job_type,
+  location = excluded.location,
+  qualification = excluded.qualification,
+  salary = excluded.salary,
+  last_date = excluded.last_date,
+  publish_date = excluded.publish_date,
+  official_link = excluded.official_link,
+  featured = excluded.featured,
+  logo_initial = excluded.logo_initial,
+  excerpt = excluded.excerpt,
+  content = excluded.content,
+  seo_title = excluded.seo_title,
+  meta_description = excluded.meta_description,
+  status = 'published',
+  featured_image = excluded.featured_image,
+  image_alt = excluded.image_alt,
+  experience = excluded.experience,
+  positions = excluded.positions,
+  apply_link = excluded.apply_link,
+  is_verified = excluded.is_verified,
+  focus_keyword = excluded.focus_keyword,
+  canonical_url = excluded.canonical_url,
+  og_title = excluded.og_title,
+  og_description = excluded.og_description,
+  updated_at = CURRENT_TIMESTAMP;
+`
+
+    const sqlDailyUpdate = `
+INSERT INTO daily_updates (
+  slug, title, category, short_description, content, featured_image,
+  image_alt, official_link, apply_link, deadline, publish_date,
+  organization, location, qualification, experience, positions,
+  job_type, salary, is_verified, featured, seo_title, meta_description,
+  focus_keyword, canonical_url, og_title, og_description, status
+) VALUES (
+  ${escapeSql(item.slug)},
+  ${escapeSql(item.title)},
+  ${escapeSql(catLabel)},
+  ${escapeSql(item.excerpt)},
+  ${escapeSql(contentJson)},
+  ${escapeSql(item.featuredImage)},
+  ${escapeSql(item.imageAlt)},
+  ${escapeSql(item.officialLink)},
+  ${escapeSql(item.applyLink)},
+  ${escapeSql(item.lastDate)},
+  ${escapeSql(item.publishDate)},
+  ${escapeSql(item.organization)},
+  ${escapeSql(item.location)},
+  ${escapeSql(item.qualification)},
+  ${escapeSql(item.experience)},
+  ${escapeSql(item.positions)},
+  ${escapeSql(item.jobType)},
+  ${escapeSql(item.salary)},
+  ${item.isVerified ? 1 : 0},
+  ${item.featured ? 1 : 0},
+  ${escapeSql(item.seoTitle)},
+  ${escapeSql(item.metaDescription)},
+  ${escapeSql(item.focusKeyword)},
+  ${escapeSql(item.canonicalUrl)},
+  ${escapeSql(item.ogTitle)},
+  ${escapeSql(item.ogDescription)},
+  'published'
+)
+ON CONFLICT(slug) DO UPDATE SET
+  title = excluded.title,
+  category = excluded.category,
+  short_description = excluded.short_description,
+  content = excluded.content,
+  featured_image = excluded.featured_image,
+  image_alt = excluded.image_alt,
+  official_link = excluded.official_link,
+  apply_link = excluded.apply_link,
+  deadline = excluded.deadline,
+  publish_date = excluded.publish_date,
+  organization = excluded.organization,
+  location = excluded.location,
+  qualification = excluded.qualification,
+  experience = excluded.experience,
+  positions = excluded.positions,
+  job_type = excluded.job_type,
+  salary = excluded.salary,
+  is_verified = excluded.is_verified,
+  featured = excluded.featured,
+  seo_title = excluded.seo_title,
+  meta_description = excluded.meta_description,
+  focus_keyword = excluded.focus_keyword,
+  canonical_url = excluded.canonical_url,
+  og_title = excluded.og_title,
+  og_description = excluded.og_description,
+  status = 'published',
+  updated_at = CURRENT_TIMESTAMP;
+`
+    sqlStatements.push(sqlArticle)
+    sqlStatements.push(sqlDailyUpdate)
+  }
+
+  const sqlFilePath = path.resolve('scripts/seed_oct6_remote.sql')
+  fs.writeFileSync(sqlFilePath, sqlStatements.join('\n\n'), 'utf8')
+  console.log(`Generated ${sqlFilePath} for remote D1 execution.`)
+}
+
+publish()
