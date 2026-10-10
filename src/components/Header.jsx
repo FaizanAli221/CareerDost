@@ -39,9 +39,9 @@ export default function Header() {
     { label: 'Bank Jobs', path: '/category/bank-jobs' },
     { label: 'Scholarships', path: '/category/scholarships' },
     { label: 'Internships', path: '/category/internships' },
-    { label: 'Schemes', path: '/category/government-schemes' },
     { label: 'Admissions', path: '/category/admissions' },
-    { label: 'Search', path: '/search' },
+    { label: 'Results', path: '/category/results' },
+    { label: 'Schemes', path: '/category/government-schemes' },
   ]
 
   return (

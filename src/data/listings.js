@@ -4159,6 +4159,8 @@ export const listings = [
   {
     "slug": "fpsc-assistant-director-2026",
     "title": "FPSC Assistant Director (BPS-17) — Multiple Departments",
+    "featuredImage": "/images/fpsc-assistant-director-2026.jpg",
+    "imageAlt": "FPSC Assistant Director (BPS-17) Jobs Federal Public Service Commission (FPSC) CareerDost",
     "category": "government-jobs",
     "organization": "Federal Public Service Commission",
     "jobType": "Full Time",
@@ -4183,6 +4185,8 @@ export const listings = [
   {
     "slug": "punjab-police-constable-recruitment-2026",
     "title": "Punjab Police Constable Recruitment 2026",
+    "featuredImage": "/images/punjab-police-constable-recruitment-2026.jpg",
+    "imageAlt": "Punjab Police Constable Recruitment 2026 Punjab Police Department CareerDost",
     "category": "government-jobs",
     "organization": "Punjab Police Department",
     "jobType": "Full Time",
@@ -4207,6 +4211,8 @@ export const listings = [
   {
     "slug": "nadra-data-entry-operator-2026",
     "title": "NADRA Data Entry Operator — Walk-in Test",
+    "featuredImage": "/images/nadra-data-entry-operator-2026.jpg",
+    "imageAlt": "NADRA Data Entry Operator Walk-in Test National Database & Registration Authority CareerDost",
     "category": "government-jobs",
     "organization": "NADRA",
     "jobType": "Contract",
@@ -4231,6 +4237,8 @@ export const listings = [
   {
     "slug": "systems-limited-hiring-software-engineers",
     "title": "Systems Limited Hiring Software Engineers (Multiple Roles)",
+    "featuredImage": "/images/systems-limited-hiring-software-engineers.jpg",
+    "imageAlt": "Systems Limited Software Engineer Hiring Systems Limited Pakistan CareerDost",
     "category": "it-jobs",
     "organization": "Systems Limited",
     "jobType": "Full Time",
@@ -4255,6 +4263,8 @@ export const listings = [
   {
     "slug": "devsinc-remote-qa-engineer",
     "title": "DevsInc Remote QA Automation Engineer",
+    "featuredImage": "/images/devsinc-remote-qa-engineer.jpg",
+    "imageAlt": "DevsInc Remote QA Automation Engineer DevsInc Pakistan CareerDost",
     "category": "it-jobs",
     "organization": "DevsInc",
     "jobType": "Remote",
@@ -4279,6 +4289,8 @@ export const listings = [
   {
     "slug": "hbl-management-trainee-officer-2026",
     "title": "HBL Management Trainee Officer Program 2026",
+    "featuredImage": "/images/hbl-management-trainee-officer-2026.jpg",
+    "imageAlt": "HBL Management Trainee Officers (MTO) 2026 Habib Bank Limited (HBL) CareerDost",
     "category": "bank-jobs",
     "organization": "Habib Bank Limited",
     "jobType": "Full Time",
@@ -4303,6 +4315,8 @@ export const listings = [
   {
     "slug": "meezan-bank-teller-2026",
     "title": "Meezan Bank Teller / Customer Service Officer",
+    "featuredImage": "/images/meezan-bank-teller-2026.jpg",
+    "imageAlt": "Meezan Bank Branch Service Officer / Teller Meezan Bank Limited CareerDost",
     "category": "bank-jobs",
     "organization": "Meezan Bank",
     "jobType": "Full Time",
@@ -4327,6 +4341,8 @@ export const listings = [
   {
     "slug": "phec-phd-scholarship-2026",
     "title": "Punjab HEC Fully Funded PhD Scholarship 2026",
+    "featuredImage": "/images/phec-phd-scholarship-2026.jpg",
+    "imageAlt": "Punjab HEC Fully Funded PhD Scholarships Punjab Higher Education Commission (PHEC) CareerDost",
     "category": "scholarships",
     "organization": "Punjab Higher Education Commission",
     "jobType": "Scholarship",
@@ -4351,6 +4367,8 @@ export const listings = [
   {
     "slug": "turkiye-burslari-scholarship-2026",
     "title": "Türkiye Burslari Scholarship 2026 for Pakistani Students",
+    "featuredImage": "/images/turkiye-burslari-scholarship-2026.jpg",
+    "imageAlt": "Türkiye Burslari Scholarships 2026 Government of Republic of Türkiye CareerDost",
     "category": "scholarships",
     "organization": "Government of Türkiye",
     "jobType": "Scholarship",
@@ -4375,6 +4393,8 @@ export const listings = [
   {
     "slug": "ufone-summer-internship-2026",
     "title": "Ufone Summer Internship Program 2026",
+    "featuredImage": "/images/ufone-summer-internship-2026.jpg",
+    "imageAlt": "Ufone Summer Internship Program 2026 PTCL & Ufone Group CareerDost",
     "category": "internships",
     "organization": "Ufone (PTCL Group)",
     "jobType": "Internship",
@@ -4399,6 +4419,8 @@ export const listings = [
   {
     "slug": "planning-commission-internship-2026",
     "title": "Planning Commission of Pakistan — Research Internship",
+    "featuredImage": "/images/planning-commission-internship-2026.jpg",
+    "imageAlt": "Planning Commission Research Internship Ministry of Planning, Development & Special Initiatives CareerDost",
     "category": "internships",
     "organization": "Planning Commission of Pakistan",
     "jobType": "Internship",
@@ -4423,6 +4445,8 @@ export const listings = [
   {
     "slug": "nust-undergraduate-admissions-fall-2026",
     "title": "NUST Undergraduate Admissions — Fall 2026",
+    "featuredImage": "/images/nust-undergraduate-admissions-fall-2026.jpg",
+    "imageAlt": "NUST Undergraduate Admissions Fall 2026 National University of Sciences & Technology (NUST) CareerDost",
     "category": "admissions",
     "organization": "National University of Sciences & Technology",
     "jobType": "Admission",
@@ -4447,6 +4471,8 @@ export const listings = [
   {
     "slug": "punjab-medical-university-admissions-2026",
     "title": "Punjab Medical Colleges MDCAT-based Admissions 2026",
+    "featuredImage": "/images/punjab-medical-university-admissions-2026.jpg",
+    "imageAlt": "Punjab Medical Colleges MBBS & BDS Admissions University of Health Sciences (UHS) Lahore CareerDost",
     "category": "admissions",
     "organization": "University of Health Sciences, Lahore",
     "jobType": "Admission",
@@ -4471,6 +4497,8 @@ export const listings = [
   {
     "slug": "benazir-income-support-programme-2026",
     "title": "Benazir Income Support Programme — New Registration Phase",
+    "featuredImage": "/images/benazir-income-support-programme-2026.jpg",
+    "imageAlt": "BISP Dynamic Registry & Kafalat Phase 2026 Benazir Income Support Programme (BISP) CareerDost",
     "category": "government-schemes",
     "organization": "BISP",
     "jobType": "Government Scheme",
@@ -4495,6 +4523,8 @@ export const listings = [
   {
     "slug": "punjab-rozgar-scheme-2026",
     "title": "Punjab Rozgar Scheme — Interest-Free Business Loans",
+    "featuredImage": "/images/punjab-rozgar-scheme-2026.jpg",
+    "imageAlt": "Punjab Rozgar Scheme Interest-Free Loans Punjab Small Industries Corporation (PSIC) CareerDost",
     "category": "government-schemes",
     "organization": "Government of Punjab",
     "jobType": "Government Scheme",
@@ -4519,6 +4549,8 @@ export const listings = [
   {
     "slug": "bise-lahore-matric-result-2026",
     "title": "BISE Lahore Matric (SSC Part-II) Result 2026 Announced",
+    "featuredImage": "/images/bise-lahore-matric-result-2026.jpg",
+    "imageAlt": "BISE Lahore Matric SSC-II Result Announced Board of Intermediate & Secondary Education Lahore CareerDost",
     "category": "results",
     "organization": "BISE Lahore",
     "jobType": "Result",
@@ -4543,6 +4575,8 @@ export const listings = [
   {
     "slug": "nts-nat-result-september-2026",
     "title": "NTS NAT-I & NAT-II Result — September 2026 Test",
+    "featuredImage": "/images/nts-nat-result-september-2026.jpg",
+    "imageAlt": "NTS NAT-I & NAT-II Result Announced National Testing Service (NTS) Pakistan CareerDost",
     "category": "results",
     "organization": "National Testing Service",
     "jobType": "Result",
@@ -4567,6 +4601,8 @@ export const listings = [
   {
     "slug": "wapda-junior-engineer-2026",
     "title": "WAPDA Junior Engineer (Civil/Electrical) Jobs 2026",
+    "featuredImage": "/images/wapda-junior-engineer-2026.jpg",
+    "imageAlt": "WAPDA Junior Engineers (Civil & Electrical) Water & Power Development Authority (WAPDA) CareerDost",
     "category": "government-jobs",
     "organization": "WAPDA",
     "jobType": "Full Time",
@@ -4618,6 +4654,8 @@ export const listings = [
   {
     "slug": "unilever-future-leaders-2026",
     "title": "Unilever Pakistan Future Leaders Programme 2026",
+    "featuredImage": "/images/unilever-future-leaders-2026.jpg",
+    "imageAlt": "Unilever Future Leaders Programme (UFLP) 2026 Unilever Pakistan Limited CareerDost",
     "category": "private-jobs",
     "organization": "Unilever Pakistan",
     "jobType": "Full Time",

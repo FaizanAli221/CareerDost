@@ -365,6 +365,38 @@ export default function AdminPage() {
     setNanoPromptBox(prompt)
   }
 
+  const handleAutoSeoSuggestions = (targetForm, setFormState, isArticle = true) => {
+    const title = (targetForm.title || '').trim()
+    const org = (targetForm.organization || '').trim()
+    const slug = (targetForm.slug || generateSlug(title)).trim()
+
+    let suggestedTitle = `${title} — CareerDost`
+    if (suggestedTitle.length > 60 && org) {
+      suggestedTitle = `${org}: ${title}`.slice(0, 48) + ' — CareerDost'
+    } else if (suggestedTitle.length > 60) {
+      suggestedTitle = title.slice(0, 47) + ' — CareerDost'
+    }
+
+    let descBase = targetForm.excerpt || targetForm.shortDescription || ''
+    if (!descBase) {
+      descBase = `Explore ${title} announced by ${org || 'official department'}. Check verified eligibility, qualifications, application process, and deadline on CareerDost.`
+    }
+    const suggestedDesc = descBase.length > 155 ? descBase.slice(0, 152) + '...' : descBase
+    const suggestedKeyword = title.split(' ').slice(0, 4).join(' ')
+    const canonicalUrl = `${SITE_PRODUCTION_URL}/${isArticle ? 'jobs' : 'daily-updates'}/${slug}`
+
+    setFormState((prev) => ({
+      ...prev,
+      seoTitle: suggestedTitle,
+      metaDescription: suggestedDesc,
+      focusKeyword: prev.focusKeyword || suggestedKeyword,
+      canonicalUrl: canonicalUrl,
+      ogTitle: suggestedTitle,
+      ogDescription: suggestedDesc,
+    }))
+    setFormMsg('✨ Automatic SEO suggestions generated based on verified content.')
+  }
+
   const handleSaveUpdate = async (targetStatus = 'published') => {
     setFormMsg('')
     try {
@@ -1550,7 +1582,16 @@ export default function AdminPage() {
 
             {/* 6. SEO METADATA SECTION */}
             <div className="border border-line p-5 rounded-xs bg-paper/30 space-y-4">
-              <h3 className="font-serif text-base font-bold text-ink border-b border-line pb-2">6. SEO Meta &amp; Social Graph</h3>
+              <div className="flex items-center justify-between border-b border-line pb-2">
+                <h3 className="font-serif text-base font-bold text-ink">6. SEO Meta &amp; Social Graph</h3>
+                <button
+                  type="button"
+                  onClick={() => handleAutoSeoSuggestions(updateForm, setUpdateForm, false)}
+                  className="bg-emerald-800 hover:bg-emerald-900 text-white px-3 py-1 text-xs font-bold rounded-xs transition-colors"
+                >
+                  ✨ Auto-Generate SEO Suggestions
+                </button>
+              </div>
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
@@ -1946,6 +1987,177 @@ export default function AdminPage() {
                 className="w-full border border-line p-3 bg-white h-56 text-xs font-mono focus:border-green"
                 required
               />
+            </div>
+
+            {/* 4. FEATURED IMAGE SYSTEM & NANO BANANA HELPER */}
+            <div className="border border-line p-5 rounded-xs bg-paper/30 space-y-4">
+              <div className="flex items-center justify-between border-b border-line pb-2">
+                <h3 className="font-serif text-base font-bold text-ink">4. Featured Image System</h3>
+                <button
+                  type="button"
+                  onClick={() => handleGenerateNanoPrompt(articleForm.title, articleForm.category)}
+                  className="bg-emerald-800 hover:bg-emerald-900 text-white px-3 py-1 text-xs font-bold rounded-xs transition-colors"
+                >
+                  ✨ Generate Nano Banana Prompt
+                </button>
+              </div>
+
+              {nanoPromptBox && (
+                <div className="p-3 bg-emerald-950 text-emerald-100 border border-emerald-700 rounded-xs text-xs space-y-2">
+                  <div className="flex items-center justify-between font-bold">
+                    <span>Banana Image Generator Prompt Template:</span>
+                    <button onClick={() => setNanoPromptBox('')} className="text-emerald-300 hover:text-white">✕</button>
+                  </div>
+                  <p className="font-mono bg-emerald-900/60 p-2 rounded select-all">{nanoPromptBox}</p>
+                  <p className="text-[11px] text-emerald-200">Copy prompt into AI image generation tool, generate visual, and upload or paste image URL below.</p>
+                </div>
+              )}
+
+              <div className="grid sm:grid-cols-2 gap-4 items-start">
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-bold text-ink mb-1">Upload Local Image (JPG, PNG, WebP — max 3MB)</label>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/jpg"
+                      onChange={(e) => handleImageFileChange(e, setArticleForm)}
+                      disabled={uploadingImage}
+                      className="w-full text-xs border border-line bg-white p-2 file:mr-3 file:py-1 file:px-3 file:border-0 file:bg-green file:text-white file:text-xs file:font-bold"
+                    />
+                    {uploadingImage && <span className="text-xs text-green font-bold block mt-1">Compressing &amp; uploading image...</span>}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-ink mb-1">Or Direct Image URL</label>
+                    <input
+                      type="url"
+                      value={articleForm.featuredImage}
+                      onChange={(e) => setArticleForm({ ...articleForm, featuredImage: e.target.value })}
+                      className="w-full border border-line p-2 bg-white text-xs focus:border-green"
+                      placeholder="https://careerdost.blog/images/... or /api/uploads/img_..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-ink mb-1">Image Alt Text (SEO)</label>
+                    <input
+                      type="text"
+                      value={articleForm.imageAlt}
+                      onChange={(e) => setArticleForm({ ...articleForm, imageAlt: e.target.value })}
+                      className="w-full border border-line p-2 bg-white text-xs focus:border-green"
+                      placeholder="Descriptive ALT text for accessibility & image search"
+                    />
+                  </div>
+
+                  {articleForm.featuredImage && (
+                    <button
+                      type="button"
+                      onClick={() => setArticleForm({ ...articleForm, featuredImage: '', imageAlt: '' })}
+                      className="text-xs text-brick hover:underline font-bold"
+                    >
+                      🗑️ Remove Image (Use Category Fallback)
+                    </button>
+                  )}
+                </div>
+
+                {/* Aspect 16:9 Image Preview */}
+                <div>
+                  <label className="block text-xs font-bold text-ink mb-1">Live Card Banner Preview (16:9)</label>
+                  <div className="relative aspect-[16/9] w-full bg-slate-900 border border-line rounded-xs overflow-hidden shadow-xs">
+                    {articleForm.featuredImage ? (
+                      <img
+                        src={articleForm.featuredImage}
+                        alt={articleForm.imageAlt || 'Featured preview'}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <CategoryFallbackImage category={articleForm.category} title={articleForm.title || 'CareerDost Opportunity'} />
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 5. SEO METADATA SECTION */}
+            <div className="border border-line p-5 rounded-xs bg-paper/30 space-y-4">
+              <div className="flex items-center justify-between border-b border-line pb-2">
+                <h3 className="font-serif text-base font-bold text-ink">5. SEO Meta &amp; Social Graph</h3>
+                <button
+                  type="button"
+                  onClick={() => handleAutoSeoSuggestions(articleForm, setArticleForm, true)}
+                  className="bg-emerald-800 hover:bg-emerald-900 text-white px-3 py-1 text-xs font-bold rounded-xs transition-colors"
+                >
+                  ✨ Auto-Generate SEO Suggestions
+                </button>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-ink font-bold">SEO Title Tag</label>
+                    <span className={`text-[10px] ${articleForm.seoTitle.length > 60 ? 'text-brick font-bold' : 'text-inksoft'}`}>
+                      {articleForm.seoTitle.length} / 60 chars
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    value={articleForm.seoTitle}
+                    onChange={(e) => setArticleForm({ ...articleForm, seoTitle: e.target.value })}
+                    className="w-full border border-line p-2 bg-white text-xs focus:border-green"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-ink font-bold">Focus Keyword</label>
+                    <span className="text-[10px] text-inksoft">e.g. FPSC Assistant Director 2026</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={articleForm.focusKeyword}
+                    onChange={(e) => setArticleForm({ ...articleForm, focusKeyword: e.target.value })}
+                    className="w-full border border-line p-2 bg-white text-xs focus:border-green"
+                    placeholder="Primary target search phrase"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-ink font-bold">Meta Description</label>
+                  <span className={`text-[10px] ${articleForm.metaDescription.length > 155 ? 'text-brick font-bold' : 'text-inksoft'}`}>
+                    {articleForm.metaDescription.length} / 155 chars
+                  </span>
+                </div>
+                <textarea
+                  value={articleForm.metaDescription}
+                  onChange={(e) => setArticleForm({ ...articleForm, metaDescription: e.target.value })}
+                  className="w-full border border-line p-2 bg-white text-xs h-16 focus:border-green"
+                  placeholder="Compelling search snippet summary"
+                />
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-ink font-bold mb-1">Canonical URL</label>
+                  <input
+                    type="url"
+                    value={articleForm.canonicalUrl}
+                    onChange={(e) => setArticleForm({ ...articleForm, canonicalUrl: e.target.value })}
+                    className="w-full border border-line p-2 bg-white text-xs focus:border-green font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-ink font-bold mb-1">OG Social Title</label>
+                  <input
+                    type="text"
+                    value={articleForm.ogTitle}
+                    onChange={(e) => setArticleForm({ ...articleForm, ogTitle: e.target.value })}
+                    className="w-full border border-line p-2 bg-white text-xs focus:border-green"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* ACTION BUTTONS */}

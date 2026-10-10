@@ -4,12 +4,14 @@ import { categoryBySlug as defaultCategoryBySlug, categories as defaultCategorie
 import { getListingsByCategory as defaultGetByCategory } from '../data/listings'
 import { getCategoryBySlugFromDb, getCategoriesFromDb } from '../api/client'
 import ListingRow from '../components/ListingRow'
+import OpportunityCard from '../components/OpportunityCard'
 import { useSeo } from '../lib/useSeo'
 import { getAbsoluteUrl } from '../lib/config'
 
 export default function CategoryPage() {
   const { slug } = useParams()
   const [sort, setSort] = useState('newest')
+  const [viewMode, setViewMode] = useState('grid')
 
   const [categoriesList, setCategoriesList] = useState(() => defaultCategories)
   const [cat, setCat] = useState(null)
@@ -163,28 +165,58 @@ export default function CategoryPage() {
         ))}
       </div>
 
-      <div className="flex items-center justify-between border-b border-line pb-2 mb-1">
-        <span className="font-sans text-sm text-inksoft">{sortedItems.length} listing{sortedItems.length === 1 ? '' : 's'}</span>
-        <div className="font-sans text-sm">
-          <label htmlFor="sort" className="text-inksoft mr-2">Sort</label>
-          <select
-            id="sort"
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            className="border border-line bg-white px-2 py-1"
-          >
-            <option value="newest">Newest first</option>
-            <option value="deadline">Closing soon</option>
-          </select>
+      <div className="flex items-center justify-between border-b border-line pb-3 mb-6 flex-wrap gap-3">
+        <span className="font-sans text-xs text-inksoft font-semibold">{sortedItems.length} verified listing{sortedItems.length === 1 ? '' : 's'}</span>
+        
+        <div className="flex items-center gap-4 font-sans text-xs">
+          <div className="flex items-center border border-line rounded-xs overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              className={`px-3 py-1 font-semibold transition-colors ${
+                viewMode === 'grid' ? 'bg-green text-white' : 'bg-paper text-ink hover:bg-white'
+              }`}
+            >
+              ▦ Grid
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('list')}
+              className={`px-3 py-1 font-semibold transition-colors ${
+                viewMode === 'list' ? 'bg-green text-white' : 'bg-paper text-ink hover:bg-white'
+              }`}
+            >
+              ☰ List
+            </button>
+          </div>
+
+          <div className="flex items-center">
+            <label htmlFor="sort" className="text-inksoft mr-1.5 font-medium">Sort:</label>
+            <select
+              id="sort"
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="border border-line bg-white px-2 py-1 text-xs"
+            >
+              <option value="newest">Newest first</option>
+              <option value="deadline">Closing soon</option>
+            </select>
+          </div>
         </div>
       </div>
 
       {sortedItems.length === 0 ? (
-        <p className="font-sans text-inksoft py-10">
+        <p className="font-sans text-inksoft py-10 text-center text-sm">
           No {cat.label.toLowerCase()} posted right now. Check back soon, or browse another category above.
         </p>
+      ) : viewMode === 'grid' ? (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {sortedItems.map((l) => (
+            <OpportunityCard key={l.slug} opportunity={l} />
+          ))}
+        </div>
       ) : (
-        <div>
+        <div className="border-t border-b border-line divide-y divide-line mb-12">
           {sortedItems.map((l) => (
             <ListingRow key={l.slug} listing={l} />
           ))}

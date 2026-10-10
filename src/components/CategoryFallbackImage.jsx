@@ -61,10 +61,21 @@ export const CATEGORY_THEMES = {
     tagBg: 'bg-green-500/20 text-green-200',
     icon: '📰',
   },
+  'government-jobs': { bg: 'from-emerald-800 to-slate-900', accent: 'border-emerald-400', tagBg: 'bg-emerald-500/20 text-emerald-200', icon: '🏛️' },
+  'private-jobs': { bg: 'from-slate-800 to-zinc-950', accent: 'border-cyan-400', tagBg: 'bg-cyan-500/20 text-cyan-200', icon: '🏢' },
+  'bank-jobs': { bg: 'from-amber-800 to-stone-900', accent: 'border-amber-400', tagBg: 'bg-amber-500/20 text-amber-200', icon: '🏦' },
+  'it-jobs': { bg: 'from-indigo-800 to-slate-950', accent: 'border-indigo-400', tagBg: 'bg-indigo-500/20 text-indigo-200', icon: '💻' },
+  'scholarships': { bg: 'from-teal-800 to-emerald-950', accent: 'border-teal-400', tagBg: 'bg-teal-500/20 text-teal-200', icon: '📜' },
+  'internships': { bg: 'from-violet-800 to-purple-950', accent: 'border-purple-400', tagBg: 'bg-purple-500/20 text-purple-200', icon: '🎓' },
+  'admissions': { bg: 'from-rose-800 to-slate-950', accent: 'border-rose-400', tagBg: 'bg-rose-500/20 text-rose-200', icon: '🏫' },
+  'results': { bg: 'from-cyan-800 to-blue-950', accent: 'border-cyan-300', tagBg: 'bg-cyan-500/20 text-cyan-200', icon: '📊' },
+  'government-schemes': { bg: 'from-emerald-900 to-slate-950', accent: 'border-emerald-400', tagBg: 'bg-emerald-500/20 text-emerald-200', icon: '🤝' },
+  'Results': { bg: 'from-cyan-800 to-blue-950', accent: 'border-cyan-300', tagBg: 'bg-cyan-500/20 text-cyan-200', icon: '📊' },
 }
 
 export default function CategoryFallbackImage({ category, title, className = '' }) {
-  const theme = CATEGORY_THEMES[category] || {
+  const normKey = (category || '').toLowerCase().trim()
+  const theme = CATEGORY_THEMES[category] || CATEGORY_THEMES[normKey] || {
     bg: 'from-slate-800 to-slate-950',
     accent: 'border-emerald-400',
     tagBg: 'bg-slate-700 text-slate-200',
