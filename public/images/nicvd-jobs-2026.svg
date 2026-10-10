@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <defs>
+    <linearGradient id="bgGrad_nicvd-jobs-2026" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b0764" />
+      <stop offset="100%" stop-color="#7f1d1d" />
+    </linearGradient>
+    <pattern id="grid_nicvd-jobs-2026" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="675" fill="url(#bgGrad_nicvd-jobs-2026)"/>
+  <rect width="1200" height="675" fill="url(#grid_nicvd-jobs-2026)"/>
+
+  <!-- Top Decorative Bar -->
+  <g transform="translate(60, 60)">
+    <text font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="900" font-size="34" fill="#ffffff" letter-spacing="-0.5">
+      CareerDost.com
+    </text>
+    
+    <!-- Category Pill -->
+    <rect x="800" y="-22" width="280" height="44" rx="22" fill="#dc2626"/>
+    <text x="940" y="6" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="16" fill="#ffffff" text-anchor="middle">
+      Healthcare Jobs
+    </text>
+  </g>
+
+  <!-- Center Content -->
+  <g transform="translate(60, 180)">
+    <!-- Organization -->
+    <text font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="19" fill="#fca5a5" letter-spacing="1.5">
+      NATIONAL INSTITUTE OF CARDIOVASCULAR DISEASES (NICVD)
+    </text>
+
+    <!-- Main Title -->
+    <text y="70" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="900" font-size="48" fill="#ffffff">
+      NICVD Jobs 2026
+    </text>
+
+    <!-- Sub Heading -->
+    <text y="130" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="32" fill="#fca5a5">
+      Healthcare Opportunities • Last Date: 11 October
+    </text>
+
+    <!-- Subtitle Badge -->
+    <rect y="170" width="840" height="54" rx="10" fill="rgba(239, 68, 68, 0.15)" stroke="rgba(239, 68, 68, 0.5)" stroke-width="1.5"/>
+    <text x="24" y="204" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="20" fill="#fee2e2">
+      Staff Nurses, Specialists, Technologists • Apply Online via NTS
+    </text>
+  </g>
+
+  <!-- Bottom Details Bar -->
+  <g transform="translate(60, 560)">
+    <line x1="0" y1="0" x2="1080" y2="0" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+    
+    <text y="42" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="600" font-size="18" fill="rgba(255,255,255,0.85)">
+      Sindh Domicile Quota • Apply Online at nts.org.pk
+    </text>
+    
+    <text x="1080" y="42" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-weight="700" font-size="18" fill="#fca5a5" text-anchor="end">
+      Deadline: 11 October 2026
+    </text>
+  </g>
+</svg>
