@@ -1,22 +1,23 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { trackPageView } from './lib/analytics'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import ErrorBoundary from './components/ErrorBoundary'
 import Home from './pages/Home'
-import DailyUpdatesPage from './pages/DailyUpdatesPage'
-import UpdateDetailPage from './pages/UpdateDetailPage'
-import CategoryPage from './pages/CategoryPage'
-import ArticlePage from './pages/ArticlePage'
-import SearchPage from './pages/SearchPage'
-import About from './pages/About'
-import Contact from './pages/Contact'
-import Privacy from './pages/Privacy'
-import Disclaimer from './pages/Disclaimer'
-import Terms from './pages/Terms'
-import AdminPage from './pages/AdminPage'
-import NotFound from './pages/NotFound'
+
+const DailyUpdatesPage = lazy(() => import('./pages/DailyUpdatesPage'))
+const UpdateDetailPage = lazy(() => import('./pages/UpdateDetailPage'))
+const CategoryPage = lazy(() => import('./pages/CategoryPage'))
+const ArticlePage = lazy(() => import('./pages/ArticlePage'))
+const SearchPage = lazy(() => import('./pages/SearchPage'))
+const About = lazy(() => import('./pages/About'))
+const Contact = lazy(() => import('./pages/Contact'))
+const Privacy = lazy(() => import('./pages/Privacy'))
+const Disclaimer = lazy(() => import('./pages/Disclaimer'))
+const Terms = lazy(() => import('./pages/Terms'))
+const AdminPage = lazy(() => import('./pages/AdminPage'))
+const NotFound = lazy(() => import('./pages/NotFound'))
 
 function ScrollToTop() {
   const location = useLocation()
@@ -34,21 +35,23 @@ export default function App() {
       <Header />
       <main className="flex-1">
         <ErrorBoundary>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/daily-updates" element={<DailyUpdatesPage />} />
-            <Route path="/daily-updates/:slug" element={<UpdateDetailPage />} />
-            <Route path="/category/:slug" element={<CategoryPage />} />
-            <Route path="/jobs/:slug" element={<ArticlePage />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/privacy-policy" element={<Privacy />} />
-            <Route path="/disclaimer" element={<Disclaimer />} />
-            <Route path="/terms-and-conditions" element={<Terms />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={<div className="container-x py-16 text-center font-sans text-sm text-inksoft">Loading page...</div>}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/daily-updates" element={<DailyUpdatesPage />} />
+              <Route path="/daily-updates/:slug" element={<UpdateDetailPage />} />
+              <Route path="/category/:slug" element={<CategoryPage />} />
+              <Route path="/jobs/:slug" element={<ArticlePage />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/privacy-policy" element={<Privacy />} />
+              <Route path="/disclaimer" element={<Disclaimer />} />
+              <Route path="/terms-and-conditions" element={<Terms />} />
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </ErrorBoundary>
       </main>
       <Footer />

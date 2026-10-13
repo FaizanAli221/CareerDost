@@ -6,7 +6,28 @@ import DOMPurify from 'dompurify'
  */
 export function parseMarkdownToHtml(md) {
   if (!md) return ''
-  const rawText = Array.isArray(md) ? md.join('\n\n') : String(md)
+  let rawText = ''
+  if (Array.isArray(md)) {
+    rawText = md.join('\n\n')
+  } else if (typeof md === 'string') {
+    const trimmed = md.trim()
+    if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+      try {
+        const parsed = JSON.parse(trimmed)
+        if (Array.isArray(parsed)) {
+          rawText = parsed.join('\n\n')
+        } else {
+          rawText = trimmed
+        }
+      } catch {
+        rawText = md
+      }
+    } else {
+      rawText = md
+    }
+  } else {
+    rawText = String(md)
+  }
   const lines = rawText.split('\n')
   const html = []
 

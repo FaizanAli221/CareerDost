@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getDailyUpdateBySlugFromDb, getLatestDailyUpdatesFromDb } from '../api/client'
 import CategoryFallbackImage from '../components/CategoryFallbackImage'
+import OptimizedImage from '../components/OptimizedImage'
 import UpdateCard from '../components/UpdateCard'
 import WhatsAppCTA from '../components/WhatsAppCTA'
 import ShareButtons from '../components/ShareButtons'
@@ -38,14 +39,24 @@ export default function UpdateDetailPage() {
           headline: updateItem.title,
           description: updateItem.shortDescription,
           datePublished: updateItem.publishDate,
+          dateModified: updateItem.updatedAt || updateItem.publishDate,
           mainEntityOfPage: {
             '@type': 'WebPage',
             '@id': getAbsoluteUrl(`/daily-updates/${slug}`),
+          },
+          author: {
+            '@type': 'Organization',
+            name: 'CareerDost',
+            url: getAbsoluteUrl('/'),
           },
           publisher: {
             '@type': 'Organization',
             name: 'CareerDost',
             url: getAbsoluteUrl('/'),
+            logo: {
+              '@type': 'ImageObject',
+              url: getAbsoluteUrl('/favicon.svg'),
+            },
           },
           image: updateItem.featuredImage ? getAbsoluteUrl(updateItem.featuredImage) : undefined,
         },
@@ -79,7 +90,7 @@ export default function UpdateDetailPage() {
   useSeo({
     title: updateItem ? `${updateItem.seoTitle || updateItem.title} — CareerDost` : 'Daily Update — CareerDost',
     description: updateItem ? updateItem.metaDescription || updateItem.shortDescription : 'Verified Pakistan daily update.',
-    canonical: updateItem?.canonicalUrl || `/daily-updates/${slug}`,
+    canonical: `/daily-updates/${slug}`,
     ogImage: updateItem?.featuredImage ? getAbsoluteUrl(updateItem.featuredImage) : getAbsoluteUrl('/images/hec-commonwealth-scholarship-2027.jpg'),
     jsonLd: jsonLdSchema,
   })
@@ -194,9 +205,12 @@ export default function UpdateDetailPage() {
       {/* Featured Image */}
       <div className="relative aspect-[16/9] w-full bg-slate-900 rounded-xs overflow-hidden mb-8 shadow-sm">
         {hasImage ? (
-          <img
+          <OptimizedImage
             src={updateItem.featuredImage}
             alt={updateItem.imageAlt || updateItem.title}
+            width={1200}
+            height={675}
+            priority={true}
             className="w-full h-full object-cover"
           />
         ) : (

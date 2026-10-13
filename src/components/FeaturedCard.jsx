@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import CategoryTag from './CategoryTag'
 import CategoryFallbackImage from './CategoryFallbackImage'
+import OptimizedImage from './OptimizedImage'
 import { deadlineLabel, formatDate } from '../lib/format'
 import { categoryBySlug, toneClasses } from '../data/categories'
 
@@ -11,7 +12,7 @@ const borderTone = {
   slate: 'border-l-slate',
 }
 
-export default function FeaturedCard({ listing }) {
+export default function FeaturedCard({ listing, priority = false }) {
   if (!listing || !listing.slug) return null
 
   const cat = categoryBySlug(listing.category) || { tone: 'slate', label: listing.category || 'General' }
@@ -26,11 +27,13 @@ export default function FeaturedCard({ listing }) {
     >
       {hasImage && (
         <div className="relative aspect-[16/9] w-full bg-slate-900 overflow-hidden">
-          <img
+          <OptimizedImage
             src={listing.featuredImage}
             alt={listing.imageAlt || listing.title}
+            width={640}
+            height={360}
+            priority={priority}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
           />
           <div className="absolute top-2 left-2 flex items-center gap-1.5 z-10">
             <span className="bg-gold text-slate-950 text-[10px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">

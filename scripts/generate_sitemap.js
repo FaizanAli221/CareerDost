@@ -1,11 +1,37 @@
 import fs from 'fs'
 import path from 'path'
+import Database from 'better-sqlite3'
 import { listings } from '../src/data/listings.js'
 import { categories } from '../src/data/categories.js'
 
 const SITE_URL = process.env.SITE_URL || 'https://careerdost.blog'
 
 const publishedDailyUpdates = [
+  { slug: 'sindh-wheat-subsidy-benazir-hari-card-2026', date: '2026-10-12' },
+  { slug: 'sindh-kisan-subsidy-2026-eligibility-payments', date: '2026-10-12' },
+  { slug: 'sindh-minimum-wage-2026-workers-salary', date: '2026-10-12' },
+  { slug: 'bisp-8171-payment-check-2026-official-guide', date: '2026-10-12' },
+  { slug: 'sindh-job-portal-2026-junior-clerk-jobs', date: '2026-10-12' },
+  { slug: 'sindh-hec-research-support-programme-2026-27', date: '2026-10-12' },
+  { slug: 'szabist-hyderabad-spring-2027-admissions', date: '2026-10-12' },
+  { slug: 'shaikh-ayaz-university-admissions-2027', date: '2026-10-12' },
+  { slug: 'gimhs-hyderabad-bsn-dpt-admissions-2026-phase-2', date: '2026-10-12' },
+  { slug: 'fjwu-paid-lab-engineer-internship-2026', date: '2026-10-12' },
+  { slug: 'isra-university-mbbs-bds-scholarship-registration-2026', date: '2026-10-12' },
+  { slug: 'isra-university-spring-2027-undergraduate-admissions', date: '2026-10-12' },
+  { slug: 'isra-university-ms-mphil-phd-spring-2027', date: '2026-10-12' },
+  { slug: 'lums-nano-physics-research-associate-jobs-2026', date: '2026-10-12' },
+  { slug: 'lums-electronic-technician-jobs-2026', date: '2026-10-12' },
+  { slug: 'spsc-jobs-2026-54-vacancies', date: '2026-10-11' },
+  { slug: 'spsc-departmental-exam-slips-2026', date: '2026-10-11' },
+  { slug: 'sindh-courts-bps-1-4-jobs-2026', date: '2026-10-11' },
+  { slug: 'quest-nawabshah-phd-me-ms-admissions-2026', date: '2026-10-11' },
+  { slug: 'quest-special-exams-timetable-2026', date: '2026-10-11' },
+  { slug: 'spsc-cce-2026-screening-test-date', date: '2026-10-11' },
+  { slug: 'sbbu-naushahro-feroze-entry-test-2027', date: '2026-10-11' },
+  { slug: 'pnsc-jobs-2026-karachi-shipping', date: '2026-10-11' },
+  { slug: 'hec-irsip-batch-60-scholarship-2026', date: '2026-10-11' },
+  { slug: 'ministry-climate-change-jobs-2026', date: '2026-10-11' },
   { slug: 'sbbu-ms-mphil-mba-merit-list-2027', date: '2026-10-10' },
   { slug: 'nts-nat-gat-roll-number-slip-2026', date: '2026-10-10' },
   { slug: 'punjab-ophthalmology-college-jobs-2026', date: '2026-10-10' },
@@ -99,21 +125,55 @@ function generateSitemap() {
     lastmod: todayStr
   }))
 
-  const jobUrls = listings.map(l => ({
+  let articleUrlsList = []
+  try {
+    if (fs.existsSync('careerdost.sqlite')) {
+      const db = new Database('careerdost.sqlite')
+      const rows = db.prepare("SELECT slug, publish_date, updated_at FROM articles WHERE status = 'published' ORDER BY publish_date DESC").all()
+      if (rows && rows.length > 0) {
+        articleUrlsList = rows.map(r => ({ slug: r.slug, date: r.publish_date || r.updated_at }))
+      }
+    }
+  } catch {}
+
+  if (articleUrlsList.length === 0) {
+    articleUrlsList = listings.map(l => ({ slug: l.slug, date: l.publishDate }))
+  }
+
+  const jobUrls = articleUrlsList.map(l => ({
     loc: `/jobs/${l.slug}`,
     priority: '0.9',
     changefreq: 'weekly',
-    lastmod: formatLastModDate(l.publishDate)
+    lastmod: formatLastModDate(l.date)
   }))
 
-  const updateUrls = publishedDailyUpdates.map(u => ({
+  let updateUrlsList = publishedDailyUpdates
+  try {
+    if (fs.existsSync('careerdost.sqlite')) {
+      const db = new Database('careerdost.sqlite')
+      const rows = db.prepare("SELECT slug, publish_date FROM daily_updates WHERE status = 'published' ORDER BY publish_date DESC").all()
+      if (rows && rows.length > 0) {
+        updateUrlsList = rows.map(r => ({ slug: r.slug, date: r.publish_date }))
+      }
+    }
+  } catch {}
+
+  const updateUrls = updateUrlsList.map(u => ({
     loc: `/daily-updates/${u.slug}`,
     priority: '0.9',
     changefreq: 'daily',
     lastmod: formatLastModDate(u.date)
   }))
 
-  const allUrls = [...staticPages, ...categoryUrls, ...jobUrls, ...updateUrls]
+  // Deduplicate all URLs by loc
+  const seenLocs = new Set()
+  const allUrls = []
+  for (const page of [...staticPages, ...categoryUrls, ...jobUrls, ...updateUrls]) {
+    if (!seenLocs.has(page.loc)) {
+      seenLocs.add(page.loc)
+      allUrls.push(page)
+    }
+  }
 
   // Build clean XML string starting strictly at char index 0 without BOM or leading spaces
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n'

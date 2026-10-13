@@ -1,5 +1,13 @@
 import { categories as fallbackCategories } from '../data/categories'
-import { listings as fallbackListings } from '../data/listings'
+
+let cachedFallbackListings = null
+async function getFallbackListings() {
+  if (!cachedFallbackListings) {
+    const mod = await import('../data/listings')
+    cachedFallbackListings = mod.listings
+  }
+  return cachedFallbackListings
+}
 
 const API_BASE = '/api'
 
@@ -61,6 +69,7 @@ export async function getCategoryBySlugFromDb(slug) {
   }
   const category = fallbackCategories.find((c) => c.slug === slug)
   if (!category) return null
+  const fallbackListings = await getFallbackListings()
   const articles = fallbackListings.filter((l) => l.category === slug)
   return { category, articles }
 }
@@ -74,6 +83,7 @@ export async function getFeaturedListingsFromDb(limit = 4) {
   } catch {
     // Fallback
   }
+  const fallbackListings = await getFallbackListings()
   return fallbackListings
     .filter((l) => l.featured)
     .slice(0, limit)
@@ -90,6 +100,7 @@ export async function getClosingSoonOpportunitiesFromDb(limit = 6) {
   }
 
   const todayStr = new Date().toISOString().split('T')[0]
+  const fallbackListings = await getFallbackListings()
   return [...fallbackListings]
     .filter((l) => l.lastDate && l.lastDate >= todayStr)
     .sort((a, b) => new Date(a.lastDate) - new Date(b.lastDate))
@@ -105,6 +116,7 @@ export async function getLatestListingsFromDb(limit = 10) {
   } catch {
     // Fallback
   }
+  const fallbackListings = await getFallbackListings()
   return [...fallbackListings]
     .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate))
     .slice(0, limit)
@@ -119,21 +131,28 @@ export async function getArticleBySlugFromDb(slug) {
   } catch {
     // Fallback
   }
+  const fallbackListings = await getFallbackListings()
   return fallbackListings.find((l) => l.slug === slug) || null
 }
 
-export async function getArticlesByCategoryFromDb(categorySlug) {
+export async function getArticlesByCategoryFromDb(categorySlug, limit = 0) {
   try {
-    const json = await apiFetch(`/articles?category=${categorySlug}`)
+    const limitQuery = limit > 0 ? `&limit=${limit}` : ''
+    const json = await apiFetch(`/articles?category=${categorySlug}${limitQuery}`)
     if (json.success && Array.isArray(json.data) && json.data.length > 0) {
       return json.data
     }
   } catch {
     // Fallback
   }
-  return fallbackListings
+  const fallbackListings = await getFallbackListings()
+  let filtered = fallbackListings
     .filter((l) => l.category === categorySlug)
     .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate))
+  if (limit > 0) {
+    filtered = filtered.slice(0, limit)
+  }
+  return filtered
 }
 
 export async function searchListingsFromDb(query) {
@@ -147,6 +166,7 @@ export async function searchListingsFromDb(query) {
     // Fallback
   }
   const q = query.trim().toLowerCase()
+  const fallbackListings = await getFallbackListings()
   return fallbackListings.filter((l) =>
     [l.title, l.organization, l.location, l.category].join(' ').toLowerCase().includes(q)
   )

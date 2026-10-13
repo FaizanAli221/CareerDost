@@ -85,7 +85,6 @@ export function sanitizeArticleInput(data) {
   const logoInitial = sanitizeString(data.logoInitial || data.logo_initial, 10).toUpperCase()
   const excerpt = sanitizeString(data.excerpt, 500)
   const featuredImage = sanitizeString(data.featuredImage || data.featured_image, 1000)
-  const imageAlt = sanitizeString(data.imageAlt || data.image_alt, 200)
 
   let content = data.content
   if (Array.isArray(content)) {
@@ -100,10 +99,34 @@ export function sanitizeArticleInput(data) {
     errors.push('Article content is required.')
   }
 
-  const seoTitle = sanitizeString(data.seoTitle || data.seo_title, 200) || title
-  const metaDescription = sanitizeString(data.metaDescription || data.meta_description, 300) || excerpt
-  const focusKeyword = sanitizeString(data.focusKeyword || data.focus_keyword, 100)
-  const canonicalUrl = sanitizeString(data.canonicalUrl || data.canonical_url, 300)
+  // Smart SEO Generation if missing or suboptimal
+  let seoTitle = sanitizeString(data.seoTitle || data.seo_title, 200)
+  if (!seoTitle || seoTitle.length < 15) {
+    seoTitle = title.includes('CareerDost') ? title : `${title} — CareerDost`
+    if (seoTitle.length > 60) {
+      seoTitle = title.slice(0, 46).trim() + ' — CareerDost'
+    }
+  }
+
+  let metaDescription = sanitizeString(data.metaDescription || data.meta_description, 300)
+  if (!metaDescription || metaDescription.length < 50) {
+    metaDescription = excerpt || `Explore verified details for ${title}${organization ? ' announced by ' + organization : ''}. Check eligibility, qualification, and apply online on CareerDost.`
+  }
+  if (metaDescription.length > 158) {
+    metaDescription = metaDescription.slice(0, 155).trim() + '...'
+  }
+
+  let imageAlt = sanitizeString(data.imageAlt || data.image_alt, 200)
+  if (!imageAlt) {
+    imageAlt = `${title}${organization ? ' — ' + organization : ''} Official Notice CareerDost`.slice(0, 150)
+  }
+
+  let canonicalUrl = sanitizeString(data.canonicalUrl || data.canonical_url, 300)
+  if (!canonicalUrl) {
+    canonicalUrl = `https://careerdost.blog/jobs/${slug}`
+  }
+
+  const focusKeyword = sanitizeString(data.focusKeyword || data.focus_keyword, 100) || title.split(' ').slice(0, 4).join(' ')
   const ogTitle = sanitizeString(data.ogTitle || data.og_title, 200) || seoTitle
   const ogDescription = sanitizeString(data.ogDescription || data.og_description, 300) || metaDescription
   const status = data.status === 'draft' ? 'draft' : 'published'
@@ -209,7 +232,6 @@ export function sanitizeUpdateInput(data) {
   }
 
   const featuredImage = sanitizeString(data.featuredImage || data.featured_image, 1000)
-  const imageAlt = sanitizeString(data.imageAlt || data.image_alt, 200)
   const deadline = sanitizeString(data.deadline, 30)
   const noDeadline = Boolean(data.noDeadline || data.no_deadline)
   const publishDate = sanitizeString(data.publishDate || data.publish_date, 40) || new Date().toISOString()
@@ -237,10 +259,34 @@ export function sanitizeUpdateInput(data) {
     errors.push('Content body is required.')
   }
 
-  const seoTitle = sanitizeString(data.seoTitle || data.seo_title, 200) || title
-  const metaDescription = sanitizeString(data.metaDescription || data.meta_description, 300) || shortDescription
-  const focusKeyword = sanitizeString(data.focusKeyword || data.focus_keyword, 100)
-  const canonicalUrl = sanitizeString(data.canonicalUrl || data.canonical_url, 300)
+  // Smart SEO Generation for Daily Updates if missing or suboptimal
+  let seoTitle = sanitizeString(data.seoTitle || data.seo_title, 200)
+  if (!seoTitle || seoTitle.length < 15) {
+    seoTitle = title.includes('CareerDost') ? title : `${title} — CareerDost`
+    if (seoTitle.length > 60) {
+      seoTitle = title.slice(0, 46).trim() + ' — CareerDost'
+    }
+  }
+
+  let metaDescription = sanitizeString(data.metaDescription || data.meta_description, 300)
+  if (!metaDescription || metaDescription.length < 50) {
+    metaDescription = shortDescription || `Check verified update: ${title}. Complete requirements, deadline, and official links on CareerDost.`
+  }
+  if (metaDescription.length > 158) {
+    metaDescription = metaDescription.slice(0, 155).trim() + '...'
+  }
+
+  let imageAlt = sanitizeString(data.imageAlt || data.image_alt, 200)
+  if (!imageAlt) {
+    imageAlt = `${title} Official Notice CareerDost`.slice(0, 150)
+  }
+
+  let canonicalUrl = sanitizeString(data.canonicalUrl || data.canonical_url, 300)
+  if (!canonicalUrl) {
+    canonicalUrl = `https://careerdost.blog/daily-updates/${slug}`
+  }
+
+  const focusKeyword = sanitizeString(data.focusKeyword || data.focus_keyword, 100) || title.split(' ').slice(0, 4).join(' ')
   const ogTitle = sanitizeString(data.ogTitle || data.og_title, 200) || seoTitle
   const ogDescription = sanitizeString(data.ogDescription || data.og_description, 300) || metaDescription
   const status = data.status === 'draft' ? 'draft' : 'published'

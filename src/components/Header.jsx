@@ -1,26 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { categories as defaultCategories } from '../data/categories'
-import { getCategoriesFromDb } from '../api/client'
 import WhatsAppCTA, { WHATSAPP_CHANNEL_URL, WhatsAppIcon } from './WhatsAppCTA'
 
 export default function Header() {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const [categoriesList, setCategoriesList] = useState(() => defaultCategories)
   const navigate = useNavigate()
-
-  useEffect(() => {
-    let isMounted = true
-    getCategoriesFromDb().then((cats) => {
-      if (isMounted && cats && cats.length > 0) {
-        setCategoriesList(cats)
-      }
-    })
-    return () => {
-      isMounted = false
-    }
-  }, [])
 
   const submitSearch = (e) => {
     e.preventDefault()
@@ -47,10 +32,10 @@ export default function Header() {
   return (
     <header className="border-b border-line bg-white sticky top-0 z-40 shadow-xs">
       {/* Top Banner Notice */}
-      <div className="bg-slate-dark text-white text-xs font-sans py-1.5 px-4 hidden sm:block">
+      <div className="bg-slate-900 text-white text-xs font-sans py-1.5 px-4 hidden sm:block">
         <div className="container-x flex items-center justify-between">
           <div>
-            <span className="font-medium text-gold mr-2">CareerDost:</span>
+            <span className="font-semibold text-amber-400 mr-2">CareerDost:</span>
             Official Pakistan Government &amp; Private Vacancies, Scholarships &amp; Admissions — Updated Daily
           </div>
           <a

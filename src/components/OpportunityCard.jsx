@@ -2,8 +2,9 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { formatDate, getOpportunityStatus } from '../lib/format'
 import CategoryFallbackImage from './CategoryFallbackImage'
+import OptimizedImage from './OptimizedImage'
 
-export default function OpportunityCard({ opportunity, showDeadlineBadge = true }) {
+export default function OpportunityCard({ opportunity, showDeadlineBadge = true, priority = false }) {
   if (!opportunity) return null
 
   const oppStatus = getOpportunityStatus(opportunity.lastDate, opportunity.noDeadline)
@@ -15,11 +16,13 @@ export default function OpportunityCard({ opportunity, showDeadlineBadge = true 
         {/* Aspect Ratio Container for Featured Image or Fallback */}
         <div className="relative aspect-[16/9] w-full bg-slate-900 overflow-hidden">
           {hasImage ? (
-            <img
+            <OptimizedImage
               src={opportunity.featuredImage}
               alt={opportunity.imageAlt || opportunity.title}
+              width={640}
+              height={360}
+              priority={priority}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              loading="lazy"
             />
           ) : (
             <CategoryFallbackImage
@@ -37,7 +40,7 @@ export default function OpportunityCard({ opportunity, showDeadlineBadge = true 
               </span>
             )}
             {opportunity.isVerified && (
-              <span className="bg-emerald-600 text-white text-[10px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
+              <span className="bg-green text-white text-[11px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
                 ✓ Verified
               </span>
             )}

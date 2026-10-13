@@ -6,6 +6,7 @@ const updatesRouter = new Hono()
 
 // GET /api/updates - List published daily updates
 updatesRouter.get('/', async (c) => {
+  c.header('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600')
   const db = getDb(c)
   const category = c.req.query('category')
   const limitQuery = c.req.query('limit')
@@ -35,6 +36,7 @@ updatesRouter.get('/', async (c) => {
 
 // GET /api/updates/latest - Get top latest published updates
 updatesRouter.get('/latest', async (c) => {
+  c.header('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600')
   const db = getDb(c)
   const limitQuery = c.req.query('limit') || '6'
   const limit = Math.min(parseInt(limitQuery, 10) || 6, 20)

@@ -7,6 +7,7 @@ const app = new Hono()
 
 // Get all categories
 app.get('/', async (c) => {
+  c.header('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400')
   const db = getDb(c)
   const categories = await CategoryModel.getAll(db)
   return c.json({ success: true, data: categories })

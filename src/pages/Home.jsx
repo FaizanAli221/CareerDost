@@ -51,10 +51,10 @@ function LoadingGrid({ count = 4, cols = 'grid sm:grid-cols-2 lg:grid-cols-4' })
   return (
     <div className={`${cols} gap-6`}>
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="border border-line bg-white h-72 animate-pulse p-4 rounded-xs">
-          <div className="aspect-[16/9] bg-line/40 rounded-xs mb-4"></div>
-          <div className="h-4 bg-line/60 w-3/4 rounded mb-2"></div>
-          <div className="h-3 bg-line/40 w-1/2 rounded"></div>
+        <div key={i} className="border border-line bg-white h-72 p-4 rounded-xs">
+          <div className="aspect-[16/9] bg-line/25 rounded-xs mb-4"></div>
+          <div className="h-4 bg-line/40 w-3/4 rounded mb-2"></div>
+          <div className="h-3 bg-line/25 w-1/2 rounded"></div>
         </div>
       ))}
     </div>
@@ -72,58 +72,134 @@ export default function Home() {
   const [internships, setInternships] = useState([])
   const [closingSoon, setClosingSoon] = useState([])
   const [loading, setLoading] = useState(true)
+  const [belowFoldLoaded, setBelowFoldLoaded] = useState(false)
+  const [feedReady, setFeedReady] = useState(false)
   const navigate = useNavigate()
 
   useSeo({
-    title: "CareerDost — Pakistan's Daily Career, Education & Opportunity Hub",
-    description: "Discover verified government jobs, bank openings, private vacancies, scholarships, internships, admissions and merit results across Pakistan — updated daily.",
+    title: 'CareerDost | Pakistan Jobs, Sindh Govt Schemes & Latest Updates',
+    description: 'CareerDost provides the latest Pakistan jobs, Sindh government schemes, BISP updates, scholarships, admissions, and public information with official source links.',
     canonical: '/',
     jsonLd: {
       '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name: 'CareerDost',
-      url: SITE_URL,
-      potentialAction: {
-        '@type': 'SearchAction',
-        target: `${SITE_URL}/search?q={search_term_string}`,
-        'query-input': 'required name=search_term_string',
-      },
+      '@graph': [
+        {
+          '@type': 'WebSite',
+          '@id': `${SITE_URL}/#website`,
+          name: 'CareerDost',
+          url: SITE_URL,
+          description: 'Pakistan-focused jobs, education, government schemes, and public updates platform',
+          publisher: {
+            '@id': `${SITE_URL}/#organization`,
+          },
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: `${SITE_URL}/search?q={search_term_string}`,
+            'query-input': 'required name=search_term_string',
+          },
+          inLanguage: 'en-PK',
+        },
+        {
+          '@type': 'Organization',
+          '@id': `${SITE_URL}/#organization`,
+          name: 'CareerDost',
+          url: SITE_URL,
+          description: 'Pakistan-focused jobs, education, government schemes, and public updates platform',
+          logo: {
+            '@type': 'ImageObject',
+            url: `${SITE_URL}/favicon.svg`,
+          },
+          sameAs: [
+            'https://whatsapp.com/channel/0029VbDnzwFF1YlIkJax2P1o',
+            'https://facebook.com/CareerDost',
+          ],
+          areaServed: [
+            {
+              '@type': 'Country',
+              name: 'Pakistan',
+            },
+            {
+              '@type': 'AdministrativeArea',
+              name: 'Sindh',
+            },
+          ],
+        },
+      ],
     },
   })
 
   useEffect(() => {
     let isMounted = true
 
-    Promise.all([
+    // Schedule feed mounting on next frame / idle to keep initial paint task < 50ms
+    const idleHandle = (typeof requestIdleCallback !== 'undefined')
+      ? requestIdleCallback(() => isMounted && setFeedReady(true), { timeout: 120 })
+      : setTimeout(() => isMounted && setFeedReady(true), 40)
+
+    // Phase 1: Prioritize above-the-fold content (Daily Updates and Government Jobs)
+    Promise.allSettled([
       getLatestDailyUpdatesFromDb(6),
-      getArticlesByCategoryFromDb('government-jobs'),
-      getArticlesByCategoryFromDb('private-jobs'),
-      getArticlesByCategoryFromDb('admissions'),
-      getArticlesByCategoryFromDb('results'),
-      getArticlesByCategoryFromDb('scholarships'),
-      getArticlesByCategoryFromDb('internships'),
-      getClosingSoonOpportunitiesFromDb(6),
-    ])
-      .then(([updData, govData, pvtData, admData, resData, schData, intData, clsData]) => {
+      getArticlesByCategoryFromDb('government-jobs', 4),
+    ]).then(([updRes, govRes]) => {
+      if (!isMounted) return
+      if (updRes.status === 'fulfilled' && updRes.value) setDailyUpdates(updRes.value)
+      if (govRes.status === 'fulfilled' && govRes.value) setGovJobs(govRes.value.slice(0, 4))
+      setLoading(false)
+    })
+
+    // Phase 2: Load below-the-fold categories on interaction or idle timeout
+    let timerHandle = null
+
+    const loadBelowFold = () => {
+      if (!isMounted) return
+      setBelowFoldLoaded(true)
+      Promise.allSettled([
+        getClosingSoonOpportunitiesFromDb(6),
+        getArticlesByCategoryFromDb('private-jobs', 4),
+        getArticlesByCategoryFromDb('admissions', 4),
+        getArticlesByCategoryFromDb('results', 4),
+        getArticlesByCategoryFromDb('scholarships', 4),
+        getArticlesByCategoryFromDb('internships', 4),
+      ]).then(([clsRes, pvtRes, admRes, resRes, schRes, intRes]) => {
         if (!isMounted) return
-        if (updData) setDailyUpdates(updData)
-        if (govData) setGovJobs(govData.slice(0, 4))
-        if (pvtData) setPvtJobs(pvtData.slice(0, 4))
-        if (admData) setAdmissions(admData.slice(0, 4))
-        if (resData) setResults(resData.slice(0, 4))
-        if (schData) setScholarships(schData.slice(0, 4))
-        if (intData) setInternships(intData.slice(0, 4))
-        if (clsData) setClosingSoon(clsData)
+        if (clsRes.status === 'fulfilled' && clsRes.value) setClosingSoon(clsRes.value)
+        if (pvtRes.status === 'fulfilled' && pvtRes.value) setPvtJobs(pvtRes.value.slice(0, 4))
+        if (admRes.status === 'fulfilled' && admRes.value) setAdmissions(admRes.value.slice(0, 4))
+        if (resRes.status === 'fulfilled' && resRes.value) setResults(resRes.value.slice(0, 4))
+        if (schRes.status === 'fulfilled' && schRes.value) setScholarships(schRes.value.slice(0, 4))
+        if (intRes.status === 'fulfilled' && intRes.value) setInternships(intRes.value.slice(0, 4))
       })
-      .catch((err) => {
-        console.warn('Home page load warning:', err)
-      })
-      .finally(() => {
-        if (isMounted) setLoading(false)
-      })
+    }
+
+    const triggerBelowFold = () => {
+      if (timerHandle) clearTimeout(timerHandle)
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('scroll', triggerBelowFold)
+        window.removeEventListener('touchstart', triggerBelowFold)
+      }
+      loadBelowFold()
+    }
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', triggerBelowFold, { once: true, passive: true })
+      window.addEventListener('touchstart', triggerBelowFold, { once: true, passive: true })
+      timerHandle = setTimeout(triggerBelowFold, 8000)
+    }
 
     return () => {
       isMounted = false
+      if (typeof cancelIdleCallback !== 'undefined') {
+        cancelIdleCallback(idleHandle)
+      } else {
+        clearTimeout(idleHandle)
+      }
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('scroll', triggerBelowFold)
+        window.removeEventListener('touchstart', triggerBelowFold)
+      }
+      if (timerHandle) {
+        clearTimeout(timerHandle)
+      }
     }
   }, [])
 
@@ -141,16 +217,16 @@ export default function Home() {
         <div className="container-x">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 border border-green/30 bg-green-light px-3.5 py-1 text-xs font-sans font-semibold text-green mb-4 rounded-full">
-              <span className="w-2 h-2 rounded-full bg-green animate-pulse"></span>
+              <span className="w-2 h-2 rounded-full bg-green"></span>
               Verified Pakistan Career &amp; Education News • Updated Daily
             </div>
 
             <h1 className="font-serif text-3xl sm:text-5xl font-bold text-ink leading-tight mb-4">
-              Pakistan&rsquo;s Daily Career, Education &amp; Opportunity Hub
+              Pakistan Jobs, Sindh Govt Schemes &amp; Latest Updates
             </h1>
 
             <p className="font-sans text-sm sm:text-base text-inksoft leading-relaxed mb-8 max-w-2xl mx-auto">
-              Real-time verified notifications for federal &amp; provincial government vacancies, bank recruitment, corporate jobs, fully funded scholarships, university admissions, and pre-entry merit results.
+              Real-time verified notifications for federal &amp; provincial government vacancies, Sindh government schemes (Benazir Hari Card &amp; subsidies), BISP 8171 updates, bank recruitment, scholarships, university admissions, and merit results.
             </p>
 
             {/* Prominent Hero Search Field */}
@@ -220,205 +296,203 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. LATEST UPDATES (TODAY'S BULLETINS) */}
-      <section className="container-x">
-        <div className="border border-line bg-white p-6 sm:p-8 rounded-xs shadow-xs">
-          <SectionHeader
-            tag="🔴 Real-Time Feed"
-            title="Latest Updates &amp; Announcements"
-            subtitle="Same-day verified alerts, testing notices, roll number slips, and urgent recruitment deadlines"
-            linkTo="/daily-updates"
-            linkText="View All Updates →"
-          />
+      {/* 3, 4, 5: MAIN FEED SECTIONS (Progressively rendered after initial paint) */}
+      {feedReady && (
+        <>
+          {/* 3. LATEST UPDATES (TODAY'S BULLETINS) */}
+          <section className="container-x">
+            <div className="border border-line bg-white p-6 sm:p-8 rounded-xs shadow-xs">
+              <SectionHeader
+                tag="🔴 Real-Time Feed"
+                title="Latest Updates &amp; Announcements"
+                subtitle="Same-day verified alerts, testing notices, roll number slips, and urgent recruitment deadlines"
+                linkTo="/daily-updates"
+                linkText="View All Updates →"
+              />
 
-          {loading ? (
-            <LoadingGrid count={6} cols="grid sm:grid-cols-2 lg:grid-cols-3" />
-          ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {dailyUpdates.slice(0, 6).map((item) => (
-                <UpdateCard key={item.slug} updateItem={item} />
-              ))}
+              {loading ? (
+                <LoadingGrid count={6} cols="grid sm:grid-cols-2 lg:grid-cols-3" />
+              ) : (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {dailyUpdates.slice(0, 6).map((item) => (
+                    <UpdateCard key={item.slug} updateItem={item} />
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </section>
+          </section>
 
-      {/* 4. WHATSAPP CHANNEL PROMOTIONAL CTA */}
-      <section className="container-x">
-        <WhatsAppCTA variant="banner" className="my-0" />
-      </section>
+          {/* 4. WHATSAPP CHANNEL PROMOTIONAL CTA */}
+          <section className="container-x">
+            <WhatsAppCTA variant="banner" className="my-0" />
+          </section>
 
-      {/* 5. GOVERNMENT JOBS */}
-      <section className="container-x">
-        <SectionHeader
-          tag="🏛️ Public Sector"
-          title="Government Jobs"
-          subtitle="Federal &amp; provincial departments, armed forces, autonomous authorities, and public health recruitment"
-          linkTo="/category/government-jobs"
-          linkText="All Government Jobs →"
-        />
+          {/* 5. GOVERNMENT JOBS */}
+          <section className="container-x">
+            <SectionHeader
+              tag="🏛️ Public Sector"
+              title="Government Jobs"
+              subtitle="Federal &amp; provincial departments, armed forces, autonomous authorities, and public health recruitment"
+              linkTo="/category/government-jobs"
+              linkText="All Government Jobs →"
+            />
 
-        {loading ? (
-          <LoadingGrid count={4} />
-        ) : govJobs.length === 0 ? (
-          <p className="text-sm font-sans text-inksoft text-center py-8">No government vacancies listed currently.</p>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {govJobs.map((item) => (
-              <OpportunityCard key={item.slug} opportunity={item} />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* 6. PRIVATE & CORPORATE JOBS */}
-      <section className="container-x">
-        <SectionHeader
-          tag="🏢 Private Sector"
-          title="Private &amp; Corporate Jobs"
-          subtitle="Verified vacancies in manufacturing, FMCG, banking, software engineering, and corporate conglomerates"
-          linkTo="/category/private-jobs"
-          linkText="All Private Jobs →"
-        />
-
-        {loading ? (
-          <LoadingGrid count={4} />
-        ) : pvtJobs.length === 0 ? (
-          <p className="text-sm font-sans text-inksoft text-center py-8">No private listings found.</p>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {pvtJobs.map((item) => (
-              <OpportunityCard key={item.slug} opportunity={item} />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* 7. ADMISSIONS 2026–2027 */}
-      <section className="container-x">
-        <SectionHeader
-          tag="🏫 Academic Intakes"
-          title="University Admissions"
-          subtitle="Spring &amp; Fall undergraduate, MBBS, BDS, PharmD, MS/MPhil, and PhD intake announcements across Pakistan"
-          linkTo="/category/admissions"
-          linkText="All Admissions →"
-        />
-
-        {loading ? (
-          <LoadingGrid count={4} />
-        ) : admissions.length === 0 ? (
-          <p className="text-sm font-sans text-inksoft text-center py-8">No admission announcements available at this time.</p>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {admissions.map((item) => (
-              <OpportunityCard key={item.slug} opportunity={item} />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* 8. RESULTS & MERIT LISTS */}
-      <section className="container-x">
-        <SectionHeader
-          tag="📊 Examination &amp; Merit Lists"
-          title="Results &amp; Merit Lists"
-          subtitle="Provisional university merit lists, NTS NAT &amp; GAT roll number slips, answer keys, and board gazettes"
-          linkTo="/category/results"
-          linkText="All Results →"
-        />
-
-        {loading ? (
-          <LoadingGrid count={4} />
-        ) : results.length === 0 ? (
-          <p className="text-sm font-sans text-inksoft text-center py-8">No merit lists or results published yet.</p>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {results.map((item) => (
-              <OpportunityCard key={item.slug} opportunity={item} />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* 9. SCHOLARSHIPS */}
-      <section className="container-x">
-        <SectionHeader
-          tag="📜 Educational Grants"
-          title="Scholarships &amp; Financial Aid"
-          subtitle="HEC indigenous, foreign bilateral, Commonwealth, Türkiye Burslari, and university welfare trust funds"
-          linkTo="/category/scholarships"
-          linkText="All Scholarships →"
-        />
-
-        {loading ? (
-          <LoadingGrid count={4} />
-        ) : scholarships.length === 0 ? (
-          <p className="text-sm font-sans text-inksoft text-center py-8">No active scholarship programs found.</p>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {scholarships.map((item) => (
-              <OpportunityCard key={item.slug} opportunity={item} />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* 10. INTERNSHIPS */}
-      <section className="container-x">
-        <SectionHeader
-          tag="🎓 Student &amp; Graduate Trainee"
-          title="Internships &amp; Apprenticeships"
-          subtitle="Paid corporate traineeships, government research fellowships, and school teacher internship initiatives"
-          linkTo="/category/internships"
-          linkText="All Internships →"
-        />
-
-        {loading ? (
-          <LoadingGrid count={4} />
-        ) : internships.length === 0 ? (
-          <p className="text-sm font-sans text-inksoft text-center py-8">No internship opportunities listed currently.</p>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {internships.map((item) => (
-              <OpportunityCard key={item.slug} opportunity={item} />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* 11. CLOSING SOON (PRIORITY DEADLINES) */}
-      <section className="container-x">
-        <div className="bg-slate-900 text-white p-6 sm:p-8 rounded-xs shadow-md">
-          <div className="flex items-baseline justify-between mb-6 flex-wrap gap-2 border-b border-white/15 pb-4">
-            <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-sans font-bold text-amber-400 uppercase tracking-wider mb-1">
-                <span>⏰</span> Priority Deadlines
+            {loading ? (
+              <LoadingGrid count={4} />
+            ) : govJobs.length === 0 ? (
+              <p className="text-sm font-sans text-inksoft text-center py-8">No government vacancies listed currently.</p>
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {govJobs.map((item) => (
+                  <OpportunityCard key={item.slug} opportunity={item} />
+                ))}
               </div>
-              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white">Closing Soon</h2>
-              <p className="text-xs sm:text-sm font-sans text-slate-300 mt-0.5">High-priority vacancies and admissions with upcoming submission deadlines</p>
-            </div>
+            )}
+          </section>
+        </>
+      )}
 
-            <Link
-              to="/category/government-jobs"
-              className="border border-amber-400 text-amber-300 hover:bg-amber-500 hover:text-slate-950 px-4 py-2 text-xs font-sans font-semibold rounded-xs transition-colors"
-            >
-              Browse All Deadlines →
-            </Link>
-          </div>
+      {/* BELOW-THE-FOLD SECTIONS (Loaded on scroll or idle) */}
+      {belowFoldLoaded && (
+        <>
+          {/* 6. PRIVATE & CORPORATE JOBS */}
+          <section className="container-x">
+            <SectionHeader
+              tag="🏢 Private Sector"
+              title="Private &amp; Corporate Jobs"
+              subtitle="Verified vacancies in manufacturing, FMCG, banking, software engineering, and corporate conglomerates"
+              linkTo="/category/private-jobs"
+              linkText="All Private Jobs →"
+            />
 
-          {loading ? (
-            <LoadingGrid count={6} cols="grid sm:grid-cols-2 lg:grid-cols-3" />
-          ) : closingSoon.length === 0 ? (
-            <p className="text-xs text-slate-400 text-center py-6">No immediate closing deadlines found.</p>
-          ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {closingSoon.slice(0, 6).map((item) => (
-                <OpportunityCard key={item.slug} opportunity={item} showDeadlineBadge={true} />
-              ))}
+            {pvtJobs.length === 0 ? (
+              <LoadingGrid count={4} />
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {pvtJobs.map((item) => (
+                  <OpportunityCard key={item.slug} opportunity={item} />
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* 7. ADMISSIONS 2026–2027 */}
+          <section className="container-x">
+            <SectionHeader
+              tag="🏫 Academic Intakes"
+              title="University Admissions"
+              subtitle="Spring &amp; Fall undergraduate, MBBS, BDS, PharmD, MS/MPhil, and PhD intake announcements across Pakistan"
+              linkTo="/category/admissions"
+              linkText="All Admissions →"
+            />
+
+            {admissions.length === 0 ? (
+              <LoadingGrid count={4} />
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {admissions.map((item) => (
+                  <OpportunityCard key={item.slug} opportunity={item} />
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* 8. RESULTS & MERIT LISTS */}
+          <section className="container-x">
+            <SectionHeader
+              tag="📊 Examination &amp; Merit Lists"
+              title="Results &amp; Merit Lists"
+              subtitle="Provisional university merit lists, NTS NAT &amp; GAT roll number slips, answer keys, and board gazettes"
+              linkTo="/category/results"
+              linkText="All Results →"
+            />
+
+            {results.length === 0 ? (
+              <LoadingGrid count={4} />
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {results.map((item) => (
+                  <OpportunityCard key={item.slug} opportunity={item} />
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* 9. SCHOLARSHIPS */}
+          <section className="container-x">
+            <SectionHeader
+              tag="📜 Educational Grants"
+              title="Scholarships &amp; Financial Aid"
+              subtitle="HEC indigenous, foreign bilateral, Commonwealth, Türkiye Burslari, and university welfare trust funds"
+              linkTo="/category/scholarships"
+              linkText="All Scholarships →"
+            />
+
+            {scholarships.length === 0 ? (
+              <LoadingGrid count={4} />
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {scholarships.map((item) => (
+                  <OpportunityCard key={item.slug} opportunity={item} />
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* 10. INTERNSHIPS */}
+          <section className="container-x">
+            <SectionHeader
+              tag="🎓 Student &amp; Graduate Trainee"
+              title="Internships &amp; Apprenticeships"
+              subtitle="Paid corporate traineeships, government research fellowships, and school teacher internship initiatives"
+              linkTo="/category/internships"
+              linkText="All Internships →"
+            />
+
+            {internships.length === 0 ? (
+              <LoadingGrid count={4} />
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {internships.map((item) => (
+                  <OpportunityCard key={item.slug} opportunity={item} />
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* 11. CLOSING SOON (PRIORITY DEADLINES) */}
+          <section className="container-x">
+            <div className="bg-slate-900 text-white p-6 sm:p-8 rounded-xs shadow-md">
+              <div className="flex items-baseline justify-between mb-6 flex-wrap gap-2 border-b border-white/15 pb-4">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 text-xs font-sans font-bold text-amber-400 uppercase tracking-wider mb-1">
+                    <span>⏰</span> Priority Deadlines
+                  </div>
+                  <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white">Closing Soon</h2>
+                  <p className="text-xs sm:text-sm font-sans text-slate-300 mt-0.5">High-priority vacancies and admissions with upcoming submission deadlines</p>
+                </div>
+
+                <Link
+                  to="/category/government-jobs"
+                  className="border border-amber-400 text-amber-300 hover:bg-amber-500 hover:text-slate-950 px-4 py-2 text-xs font-sans font-semibold rounded-xs transition-colors"
+                >
+                  Browse All Deadlines →
+                </Link>
+              </div>
+
+              {closingSoon.length === 0 ? (
+                <LoadingGrid count={6} cols="grid sm:grid-cols-2 lg:grid-cols-3" />
+              ) : (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {closingSoon.slice(0, 6).map((item) => (
+                    <OpportunityCard key={item.slug} opportunity={item} showDeadlineBadge={true} />
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </section>
+          </section>
+        </>
+      )}
     </div>
   )
 }

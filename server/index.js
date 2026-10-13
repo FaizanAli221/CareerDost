@@ -23,8 +23,16 @@ app.use('*', async (c, next) => {
   c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
   c.header(
     'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://www.googletagmanager.com https://cdn.zanderio.ai https://*.zanderio.ai; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.zanderio.ai https://*.zanderio.ai; font-src 'self' https://fonts.gstatic.com https://cdn.zanderio.ai https://*.zanderio.ai; img-src 'self' data: https: https://www.googletagmanager.com https://*.google-analytics.com https://www.google-analytics.com https://cdn.zanderio.ai https://*.zanderio.ai; connect-src 'self' https://challenges.cloudflare.com https://*.google-analytics.com https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://cdn.zanderio.ai https://*.zanderio.ai wss://*.zanderio.ai; frame-src 'self' https://challenges.cloudflare.com https://cdn.zanderio.ai https://*.zanderio.ai; base-uri 'self'; form-action 'self';"
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://www.googletagmanager.com https://cdn.zanderio.ai https://*.zanderio.ai https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.zanderio.ai https://*.zanderio.ai; font-src 'self' https://fonts.gstatic.com https://cdn.zanderio.ai https://*.zanderio.ai; img-src 'self' data: https: https://www.googletagmanager.com https://*.google-analytics.com https://www.google-analytics.com https://cdn.zanderio.ai https://*.zanderio.ai; connect-src 'self' https://challenges.cloudflare.com https://*.google-analytics.com https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://cdn.zanderio.ai https://*.zanderio.ai wss://*.zanderio.ai https://cloudflareinsights.com https://*.cloudflareinsights.com; frame-src 'self' https://challenges.cloudflare.com https://cdn.zanderio.ai https://*.zanderio.ai; base-uri 'self'; form-action 'self';"
   )
+})
+
+// Edge & Browser Cache for public read-only GET endpoints (eliminates D1 cold starts & waterfall delays)
+app.use('/api/*', async (c, next) => {
+  await next()
+  if (c.req.method === 'GET' && !c.req.path.startsWith('/api/admin')) {
+    c.header('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600')
+  }
 })
 
 // CORS Middleware with origin validation

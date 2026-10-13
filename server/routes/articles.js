@@ -6,6 +6,7 @@ const app = new Hono()
 
 // Public API: Get published articles with optional filtering/search
 app.get('/', async (c) => {
+  c.header('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600')
   const db = getDb(c)
   const query = c.req.query('q')
   const featured = c.req.query('featured')
@@ -35,11 +36,14 @@ app.get('/', async (c) => {
   }
 
   if (category) {
-    const articles = await ArticleModel.getByCategory(db, category, 'published')
+    const articles = await ArticleModel.getByCategory(db, category, 'published', limit)
     return c.json({ success: true, data: articles })
   }
 
-  const articles = await ArticleModel.getAll(db, 'published')
+  let articles = await ArticleModel.getAll(db, 'published')
+  if (limit && Number(limit) > 0) {
+    articles = articles.slice(0, Number(limit))
+  }
   return c.json({ success: true, data: articles })
 })
 

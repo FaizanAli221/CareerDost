@@ -360,8 +360,8 @@ export default function AdminPage() {
     }
   }
 
-  const handleGenerateNanoPrompt = (title, category) => {
-    const prompt = `Create a professional, modern 16:9 aspect ratio featured visual image banner for a Pakistani career information article titled "${title || 'Job Opening'}" in category "${category}". Clean vector design, dark emerald green & gold corporate palette, clean typography, official Pakistan recruitment style.`
+  const handleGenerateNanoPrompt = (title, category, org = '') => {
+    const prompt = `Create a professional, modern 16:9 aspect ratio featured visual image banner for a Pakistani career portal publication titled "${title || 'Career Opportunity'}" ${org ? 'by ' + org : ''} in category "${category}". Clean vector design, dark emerald green (#0B3D2E) and gold corporate palette, clean typography, official Pakistan recruitment style. No misleading official seals or logos.`
     setNanoPromptBox(prompt)
   }
 
@@ -369,32 +369,47 @@ export default function AdminPage() {
     const title = (targetForm.title || '').trim()
     const org = (targetForm.organization || '').trim()
     const slug = (targetForm.slug || generateSlug(title)).trim()
+    const category = targetForm.category || 'Career Opportunity'
 
-    let suggestedTitle = `${title} — CareerDost`
-    if (suggestedTitle.length > 60 && org) {
-      suggestedTitle = `${org}: ${title}`.slice(0, 48) + ' — CareerDost'
-    } else if (suggestedTitle.length > 60) {
-      suggestedTitle = title.slice(0, 47) + ' — CareerDost'
+    // Clean, high-CTR SEO Title between 45 and 58 characters
+    let cleanT = title.replace(/\s*\|\s*CareerDost\s*$/i, '').replace(/\s*—\s*CareerDost\s*$/i, '').trim()
+    if (cleanT.includes('–') || cleanT.includes('—') || cleanT.includes(' - ')) {
+      const parts = cleanT.split(/\s*[–—-]\s*/)
+      if (parts[0].trim().length >= 15 && `${parts[0].trim()} — CareerDost`.length <= 60) {
+        cleanT = parts[0].trim()
+      }
+    }
+    let suggestedTitle = `${cleanT} — CareerDost`
+    if (suggestedTitle.length > 60) {
+      suggestedTitle = cleanT.slice(0, 46).trim() + ' — CareerDost'
     }
 
-    let descBase = targetForm.excerpt || targetForm.shortDescription || ''
-    if (!descBase) {
-      descBase = `Explore ${title} announced by ${org || 'official department'}. Check verified eligibility, qualifications, application process, and deadline on CareerDost.`
+    // High-CTR Meta Description between 140 and 155 characters
+    let descBase = (targetForm.excerpt || targetForm.shortDescription || '').trim()
+    if (!descBase || descBase.length < 50) {
+      descBase = `Explore verified details for ${cleanT}${org ? ' announced by ' + org : ''}. Check eligibility, qualification requirements, and apply online on CareerDost.`
     }
-    const suggestedDesc = descBase.length > 155 ? descBase.slice(0, 152) + '...' : descBase
-    const suggestedKeyword = title.split(' ').slice(0, 4).join(' ')
+    if (descBase.length > 155) {
+      descBase = descBase.slice(0, 152).trim() + '...'
+    }
+
+    const suggestedAlt = `${cleanT}${org ? ' — ' + org : ''} Official Announcement CareerDost`.slice(0, 150)
+    const suggestedKeyword = cleanT.split(' ').slice(0, 4).join(' ')
     const canonicalUrl = `${SITE_PRODUCTION_URL}/${isArticle ? 'jobs' : 'daily-updates'}/${slug}`
 
     setFormState((prev) => ({
       ...prev,
       seoTitle: suggestedTitle,
-      metaDescription: suggestedDesc,
+      metaDescription: descBase,
+      imageAlt: prev.imageAlt || suggestedAlt,
       focusKeyword: prev.focusKeyword || suggestedKeyword,
       canonicalUrl: canonicalUrl,
       ogTitle: suggestedTitle,
-      ogDescription: suggestedDesc,
+      ogDescription: descBase,
     }))
-    setFormMsg('✨ Automatic SEO suggestions generated based on verified content.')
+
+    handleGenerateNanoPrompt(cleanT, category, org)
+    setFormMsg('✨ Automatic SEO & Image Alt suggestions generated based on verified content.')
   }
 
   const handleSaveUpdate = async (targetStatus = 'published') => {

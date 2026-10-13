@@ -75,7 +75,7 @@ export function getOpportunityStatus(iso, noDeadline = false) {
     return {
       status: 'CLOSES TODAY',
       label: 'CLOSES TODAY',
-      badgeClass: 'bg-red-100 text-red-800 border-red-300 font-bold animate-pulse',
+      badgeClass: 'bg-red-100 text-red-800 border-red-300 font-bold',
       isExpired: false,
       days: 0,
     }

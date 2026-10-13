@@ -47,10 +47,13 @@ export default function Contact() {
       </p>
 
       <div className="mb-8 p-4 border border-line bg-paper text-sm space-y-2">
-        <h2 className="font-semibold text-ink">Direct Contact &amp; Social Media:</h2>
-        <div className="flex flex-col sm:flex-row gap-4 text-xs text-ink font-medium">
+        <h2 className="font-semibold text-ink">Direct Contact &amp; Official Channels:</h2>
+        <div className="flex flex-col sm:flex-row gap-4 text-xs text-ink font-medium flex-wrap">
+          <a href="https://whatsapp.com/channel/0029VbDnzwFF1YlIkJax2P1o" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-green">
+            📢 <strong>WhatsApp Channel:</strong> Join Alerts
+          </a>
           <a href="https://wa.me/923173425680" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-green">
-            💬 <strong>WhatsApp:</strong> 03173425680
+            💬 <strong>WhatsApp Helpline:</strong> 03173425680
           </a>
           <a href="https://facebook.com/CareerDost" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-green">
             🌐 <strong>Facebook:</strong> CareerDost

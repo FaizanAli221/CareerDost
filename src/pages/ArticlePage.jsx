@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { getListingBySlug as defaultGetListing, getListingsByCategory as defaultGetByCategory } from '../data/listings'
 import { categoryBySlug as defaultCategoryBySlug } from '../data/categories'
 import { getArticleBySlugFromDb, getArticlesByCategoryFromDb, getCategoriesFromDb } from '../api/client'
 import CategoryTag from '../components/CategoryTag'
@@ -12,6 +11,7 @@ import { getAbsoluteUrl } from '../lib/config'
 import { trackApplyNowClick } from '../lib/analytics'
 
 import CategoryFallbackImage from '../components/CategoryFallbackImage'
+import OptimizedImage from '../components/OptimizedImage'
 import WhatsAppCTA from '../components/WhatsAppCTA'
 import ShareButtons from '../components/ShareButtons'
 import SafeContent from '../components/SafeContent'
@@ -40,37 +40,45 @@ export default function ArticlePage() {
     setLoading(true)
     setNotFound(false)
 
-    // Attempt to load from DB, then fallback to static file if needed
+    // Attempt to load from DB, then dynamically fallback if needed
     getArticleBySlugFromDb(slug)
-      .then((data) => {
+      .then(async (data) => {
         if (!isMounted) return
-        const article = data || defaultGetListing(slug)
+        let article = data
+        if (!article) {
+          try {
+            const mod = await import('../data/listings')
+            article = mod.getListingBySlug(slug)
+          } catch {}
+        }
 
         if (article) {
           setListing(article)
           setNotFound(false)
 
-          getArticlesByCategoryFromDb(article.category).then((rel) => {
+          getArticlesByCategoryFromDb(article.category, 5).then((rel) => {
             if (!isMounted) return
-            const relatedList = rel && rel.length > 0 ? rel : defaultGetByCategory(article.category)
-            setRelated(relatedList.filter((l) => l.slug !== article.slug).slice(0, 4))
+            setRelated((rel || []).filter((l) => l.slug !== article.slug).slice(0, 4))
           })
         } else {
           setListing(null)
           setNotFound(true)
         }
       })
-      .catch((err) => {
+      .catch(async (err) => {
         console.warn('Error fetching article:', err)
         if (!isMounted) return
-        const fallback = defaultGetListing(slug)
-        if (fallback) {
-          setListing(fallback)
-          setNotFound(false)
-        } else {
-          setListing(null)
-          setNotFound(true)
-        }
+        try {
+          const mod = await import('../data/listings')
+          const fallback = mod.getListingBySlug(slug)
+          if (fallback) {
+            setListing(fallback)
+            setNotFound(false)
+            return
+          }
+        } catch {}
+        setListing(null)
+        setNotFound(true)
       })
       .finally(() => {
         if (isMounted) setLoading(false)
@@ -302,9 +310,12 @@ export default function ArticlePage() {
           {/* Featured Image / Fallback Cover Banner */}
           <div className="relative aspect-[16/9] w-full bg-slate-900 rounded-xs overflow-hidden mb-6 shadow-xs">
             {hasImage ? (
-              <img
+              <OptimizedImage
                 src={listing.featuredImage}
                 alt={listing.imageAlt || listing.title}
+                width={1200}
+                height={675}
+                priority={true}
                 className="w-full h-full object-cover"
               />
             ) : (

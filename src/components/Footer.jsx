@@ -25,7 +25,7 @@ export default function Footer() {
                 href={WHATSAPP_CHANNEL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center space-x-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-3 py-1.5 rounded text-xs font-bold transition-colors w-fit shadow-xs"
+                className="inline-flex items-center space-x-2 bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 px-3 py-1.5 rounded text-xs font-bold transition-colors w-fit shadow-xs"
               >
                 <WhatsAppIcon className="w-4 h-4" />
                 <span>Join WhatsApp Channel</span>

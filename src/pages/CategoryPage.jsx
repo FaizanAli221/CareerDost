@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { categoryBySlug as defaultCategoryBySlug, categories as defaultCategories } from '../data/categories'
-import { getListingsByCategory as defaultGetByCategory } from '../data/listings'
 import { getCategoryBySlugFromDb, getCategoriesFromDb } from '../api/client'
 import ListingRow from '../components/ListingRow'
 import OpportunityCard from '../components/OpportunityCard'
@@ -31,7 +30,7 @@ export default function CategoryPage() {
     })
 
     getCategoryBySlugFromDb(slug)
-      .then((res) => {
+      .then(async (res) => {
         if (!isMounted) return
         if (res && res.category) {
           setCat(res.category)
@@ -41,7 +40,12 @@ export default function CategoryPage() {
           const fallbackCat = defaultCategoryBySlug(slug)
           if (fallbackCat) {
             setCat(fallbackCat)
-            setItems(defaultGetByCategory(slug))
+            try {
+              const mod = await import('../data/listings')
+              setItems(mod.getListingsByCategory(slug))
+            } catch {
+              setItems([])
+            }
             setNotFound(false)
           } else {
             setCat(null)
@@ -50,13 +54,18 @@ export default function CategoryPage() {
           }
         }
       })
-      .catch((err) => {
+      .catch(async (err) => {
         console.warn('Error fetching category:', err)
         if (!isMounted) return
         const fallbackCat = defaultCategoryBySlug(slug)
         if (fallbackCat) {
           setCat(fallbackCat)
-          setItems(defaultGetByCategory(slug))
+          try {
+            const mod = await import('../data/listings')
+            setItems(mod.getListingsByCategory(slug))
+          } catch {
+            setItems([])
+          }
           setNotFound(false)
         } else {
           setCat(null)

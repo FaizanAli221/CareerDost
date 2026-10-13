@@ -70,7 +70,7 @@ export class ArticleModel {
     return formatArticle(row)
   }
 
-  static async getByCategory(db, categorySlug, statusOnly = null) {
+  static async getByCategory(db, categorySlug, statusOnly = null, limit = null) {
     let sql = 'SELECT * FROM articles WHERE category_slug = ?'
     const params = [categorySlug]
     if (statusOnly) {
@@ -78,6 +78,10 @@ export class ArticleModel {
       params.push(statusOnly)
     }
     sql += ' ORDER BY publish_date DESC, id DESC'
+    if (limit && Number(limit) > 0) {
+      sql += ' LIMIT ?'
+      params.push(Number(limit))
+    }
 
     const { results } = await db.prepare(sql).bind(...params).all()
     return (results || []).map(formatArticle)

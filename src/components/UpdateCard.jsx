@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import CategoryFallbackImage from './CategoryFallbackImage'
+import OptimizedImage from './OptimizedImage'
 import { getOpportunityStatus } from '../lib/format'
 
 function isRecent(publishDate, hours = 48) {
@@ -26,7 +27,7 @@ function formatDate(dateStr) {
   })
 }
 
-export default function UpdateCard({ updateItem }) {
+export default function UpdateCard({ updateItem, priority = false }) {
   if (!updateItem) return null
 
   const isNew = isRecent(updateItem.publishDate)
@@ -39,11 +40,13 @@ export default function UpdateCard({ updateItem }) {
         {/* Aspect Ratio Container for Image / Fallback */}
         <div className="relative aspect-[16/9] w-full bg-slate-900 overflow-hidden">
           {hasImage ? (
-            <img
+            <OptimizedImage
               src={updateItem.featuredImage}
               alt={updateItem.imageAlt || updateItem.title}
+              width={640}
+              height={360}
+              priority={priority}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              loading="lazy"
             />
           ) : (
             <CategoryFallbackImage
@@ -56,12 +59,12 @@ export default function UpdateCard({ updateItem }) {
           {/* Badges */}
           <div className="absolute top-2 left-2 flex items-center gap-1.5 z-10 flex-wrap">
             {isNew && (
-              <span className="bg-red-600 text-white text-[10px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm animate-pulse">
+              <span className="bg-red-600 text-white text-[10px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
                 New
               </span>
             )}
             {updateItem.isVerified && (
-              <span className="bg-emerald-600 text-white text-[10px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
+              <span className="bg-green text-white text-[11px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
                 ✓ Verified
               </span>
             )}

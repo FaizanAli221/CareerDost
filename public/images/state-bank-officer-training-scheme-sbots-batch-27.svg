@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <defs>
+    <linearGradient id="bgGrad_state_bank_officer_training_scheme_sbots_batch_27" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#78350f" />
+      <stop offset="100%" stop-color="#451a03" />
+    </linearGradient>
+    <pattern id="grid_state_bank_officer_training_scheme_sbots_batch_27" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="675" fill="url(#bgGrad_state_bank_officer_training_scheme_sbots_batch_27)"/>
+  <rect width="1200" height="675" fill="url(#grid_state_bank_officer_training_scheme_sbots_batch_27)"/>
+
+  <!-- Top Bar -->
+  <g transform="translate(60, 60)">
+    <text font-family="'Georgia', serif" font-weight="700" font-size="34" fill="#ffffff">
+      CareerDost
+    </text>
+    <text x="180" y="-3" font-family="'Segoe UI', system-ui, sans-serif" font-weight="600" font-size="14" fill="#d4af37">
+      • Pakistan Career Portal
+    </text>
+
+    <!-- Category Pill -->
+    <rect x="840" y="-22" width="240" height="42" rx="21" fill="#d97706"/>
+    <text x="960" y="5" font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="15" fill="#ffffff" text-anchor="middle">
+      Bank Jobs
+    </text>
+  </g>
+
+  <!-- Center Content -->
+  <g transform="translate(60, 200)">
+    <!-- Organization -->
+    <text font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="20" fill="#fbbf24" letter-spacing="1">
+      STATE BANK OF PAKISTAN (SBP)
+    </text>
+
+    <!-- Title -->
+    <text y="75" font-family="'Georgia', serif" font-weight="800" font-size="42" fill="#ffffff">
+      SBP SBOTS Batch 27 Officers Recruitment
+    </text>
+
+    <!-- Subtitle Badge -->
+    <rect y="125" width="880" height="52" rx="8" fill="rgba(251, 191, 36, 0.15)" stroke="rgba(251, 191, 36, 0.5)" stroke-width="1.5"/>
+    <text x="24" y="158" font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="18" fill="#fef3c7">
+      OG-2 Officers Training Scheme • Commercial &amp; Central Banking
+    </text>
+  </g>
+
+  <!-- Bottom Details Bar -->
+  <g transform="translate(60, 560)">
+    <line x1="0" y1="0" x2="1080" y2="0" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+    
+    <text y="42" font-family="'Segoe UI', system-ui, sans-serif" font-weight="600" font-size="18" fill="rgba(255,255,255,0.9)">
+      Registration via NTS: nts.org.pk • NIBAF Residential Training
+    </text>
+
+    <text x="1080" y="42" font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="16" fill="#fbbf24" text-anchor="end">
+      Deadline: 20 October 2026
+    </text>
+  </g>
+</svg>

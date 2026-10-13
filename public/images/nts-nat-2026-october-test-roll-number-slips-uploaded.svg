@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <defs>
+    <linearGradient id="bgGrad_nts_nat_2026_october_test_roll_number_slips_uploaded" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0c2340" />
+      <stop offset="100%" stop-color="#083344" />
+    </linearGradient>
+    <pattern id="grid_nts_nat_2026_october_test_roll_number_slips_uploaded" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="675" fill="url(#bgGrad_nts_nat_2026_october_test_roll_number_slips_uploaded)"/>
+  <rect width="1200" height="675" fill="url(#grid_nts_nat_2026_october_test_roll_number_slips_uploaded)"/>
+
+  <!-- Top Bar -->
+  <g transform="translate(60, 60)">
+    <text font-family="'Georgia', serif" font-weight="700" font-size="34" fill="#ffffff">
+      CareerDost
+    </text>
+    <text x="180" y="-3" font-family="'Segoe UI', system-ui, sans-serif" font-weight="600" font-size="14" fill="#d4af37">
+      • Pakistan Career Portal
+    </text>
+
+    <!-- Category Pill -->
+    <rect x="840" y="-22" width="240" height="42" rx="21" fill="#0284c7"/>
+    <text x="960" y="5" font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="15" fill="#ffffff" text-anchor="middle">
+      Results
+    </text>
+  </g>
+
+  <!-- Center Content -->
+  <g transform="translate(60, 200)">
+    <!-- Organization -->
+    <text font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="20" fill="#38bdf8" letter-spacing="1">
+      NATIONAL TESTING SERVICE (NTS) PAKISTAN
+    </text>
+
+    <!-- Title -->
+    <text y="75" font-family="'Georgia', serif" font-weight="800" font-size="42" fill="#ffffff">
+      NTS NAT 2026 October Roll Number Slips
+    </text>
+
+    <!-- Subtitle Badge -->
+    <rect y="125" width="880" height="52" rx="8" fill="rgba(56, 189, 248, 0.15)" stroke="rgba(56, 189, 248, 0.5)" stroke-width="1.5"/>
+    <text x="24" y="158" font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="18" fill="#e0f2fe">
+      NAT 2026-X Candidate Admit Cards &amp; Center Allocation Live
+    </text>
+  </g>
+
+  <!-- Bottom Details Bar -->
+  <g transform="translate(60, 560)">
+    <line x1="0" y1="0" x2="1080" y2="0" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+    
+    <text y="42" font-family="'Segoe UI', system-ui, sans-serif" font-weight="600" font-size="18" fill="rgba(255,255,255,0.9)">
+      Download Electronic Slips at portal.nts.org.pk
+    </text>
+
+    <text x="1080" y="42" font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="16" fill="#38bdf8" text-anchor="end">
+      Test Schedule: October 2026
+    </text>
+  </g>
+</svg>

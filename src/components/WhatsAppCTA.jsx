@@ -16,7 +16,7 @@ export default function WhatsAppCTA({ variant = 'banner', className = '' }) {
     return (
       <div className={`p-4 bg-emerald-900 text-white rounded font-sans border-l-4 border-[#25D366] shadow-sm ${className}`}>
         <div className="flex items-start space-x-3">
-          <div className="p-2 bg-[#25D366] text-white rounded-full shrink-0">
+          <div className="p-2 bg-[#25D366] text-slate-950 rounded-full shrink-0">
             <WhatsAppIcon className="w-6 h-6" />
           </div>
           <div>
@@ -29,7 +29,7 @@ export default function WhatsAppCTA({ variant = 'banner', className = '' }) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackWhatsAppChannelClick(variant)}
-              className="inline-flex items-center space-x-2 mt-3 px-4 py-2 bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold rounded tracking-wide transition-all shadow hover:shadow-md"
+              className="inline-flex items-center space-x-2 mt-3 px-4 py-2 bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 text-xs font-bold rounded tracking-wide transition-all shadow hover:shadow-md"
             >
               <WhatsAppIcon className="w-4 h-4" />
               <span>Join Channel Now</span>
@@ -47,7 +47,7 @@ export default function WhatsAppCTA({ variant = 'banner', className = '' }) {
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => trackWhatsAppChannelClick(variant)}
-        className={`inline-flex items-center space-x-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-sans font-bold px-3.5 py-1.5 rounded text-xs transition-colors shadow-xs ${className}`}
+        className={`inline-flex items-center space-x-2 bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-sans font-bold px-3.5 py-1.5 rounded text-xs transition-colors shadow-xs ${className}`}
       >
         <WhatsAppIcon className="w-4 h-4" />
         <span>Join WhatsApp</span>
@@ -63,12 +63,12 @@ export default function WhatsAppCTA({ variant = 'banner', className = '' }) {
 
       <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center space-x-4">
-          <div className="w-14 h-14 bg-[#25D366] text-white rounded-2xl flex items-center justify-center shrink-0 shadow-lg border-2 border-white/20">
+          <div className="w-14 h-14 bg-[#25D366] text-slate-950 rounded-2xl flex items-center justify-center shrink-0 shadow-lg border-2 border-white/20">
             <WhatsAppIcon className="w-8 h-8" />
           </div>
           <div>
             <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-[#25D366]/20 border border-[#25D366]/40 text-[#25D366] text-xs font-bold uppercase tracking-wider mb-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] animate-pulse"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#25D366]"></span>
               <span>Official Channel</span>
             </div>
             <h3 className="font-serif font-bold text-xl sm:text-2xl text-white">
@@ -86,7 +86,7 @@ export default function WhatsAppCTA({ variant = 'banner', className = '' }) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppChannelClick(variant)}
-            className="w-full md:w-auto inline-flex items-center justify-center space-x-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold px-6 py-3 rounded-md text-sm transition-all shadow-lg hover:shadow-emerald-500/20 active:scale-98"
+            className="w-full md:w-auto inline-flex items-center justify-center space-x-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-bold px-6 py-3 rounded-md text-sm transition-all shadow-lg hover:shadow-emerald-500/20 active:scale-98"
           >
             <WhatsAppIcon className="w-5 h-5" />
             <span>Join CareerDost WhatsApp Channel →</span>
