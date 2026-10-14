@@ -7,10 +7,20 @@ import { categories } from '../src/data/categories.js'
 const SITE_URL = process.env.SITE_URL || 'https://careerdost.blog'
 
 const publishedDailyUpdates = [
+  { slug: 'zarkhez-e-asaan-digital-zarai-qarza-guide-2026', date: '2026-10-14' },
+  { slug: 'benazir-women-agricultural-worker-card-sindh-guide-2026', date: '2026-10-14' },
+  { slug: 'sindh-peoples-housing-flood-affectees-sphf-subsidy-guide-2026', date: '2026-10-14' },
+  { slug: 'sindh-solar-energy-project-ssep-home-solar-systems-subsidy-2026', date: '2026-10-14' },
+  { slug: 'sbp-housing-solar-financing-rules-circular-06-2026', date: '2026-10-14' },
+  { slug: 'sindh-mamta-programme-2026-october-dashboard', date: '2026-10-14' },
+  { slug: 'benazir-hunarmand-programme-2026-karachi-guide', date: '2026-10-14' },
+  { slug: 'pakistan-wheat-support-price-2026-27', date: '2026-10-14' },
+  { slug: 'wheat-imports-karachi-october-2026', date: '2026-10-14' },
+  { slug: 'bisp-8171-payment-check-2026-official-guide', date: '2026-10-14' },
+  { slug: 'nadra-digital-payments-2026', date: '2026-10-14' },
   { slug: 'sindh-wheat-subsidy-benazir-hari-card-2026', date: '2026-10-12' },
   { slug: 'sindh-kisan-subsidy-2026-eligibility-payments', date: '2026-10-12' },
   { slug: 'sindh-minimum-wage-2026-workers-salary', date: '2026-10-12' },
-  { slug: 'bisp-8171-payment-check-2026-official-guide', date: '2026-10-12' },
   { slug: 'sindh-job-portal-2026-junior-clerk-jobs', date: '2026-10-12' },
   { slug: 'sindh-hec-research-support-programme-2026-27', date: '2026-10-12' },
   { slug: 'szabist-hyderabad-spring-2027-admissions', date: '2026-10-12' },

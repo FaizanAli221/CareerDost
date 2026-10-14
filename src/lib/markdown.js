@@ -4,7 +4,7 @@ import DOMPurify from 'dompurify'
  * CareerDost Semantic Markdown Parser & Sanitizer
  * Transforms editorial markdown (headings, callouts, tables, lists, links) into sanitized HTML.
  */
-export function parseMarkdownToHtml(md) {
+export function parseMarkdownToHtml(md, options = {}) {
   if (!md) return ''
   let rawText = ''
   if (Array.isArray(md)) {
@@ -39,6 +39,11 @@ export function parseMarkdownToHtml(md) {
   let inBlockquote = false
   let quoteType = 'note'
   let quoteContent = []
+
+  const targetTitleClean = (options.stripTitle || '')
+    .toLowerCase()
+    .replace(/[^\w\s]/g, '')
+    .trim()
 
   function flushList() {
     if (inList) {
@@ -110,6 +115,8 @@ export function parseMarkdownToHtml(md) {
       .replace(/`([^`]+)`/g, '<code class="bg-paper px-1.5 py-0.5 rounded text-xs font-mono border border-line text-ink">$1</code>')
   }
 
+  let firstHeadingChecked = false
+
   for (let i = 0; i < lines.length; i++) {
     const rawLine = lines[i]
     const line = rawLine.trim()
@@ -169,20 +176,45 @@ export function parseMarkdownToHtml(md) {
       flushTable()
     }
 
+    function isDuplicateHeading(headingText) {
+      if (!headingText || !targetTitleClean) return false
+      const cleanH = headingText.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim()
+      if (!cleanH) return false
+      if (cleanH === targetTitleClean) return true
+      if (cleanH.length > 15 && targetTitleClean.includes(cleanH)) return true
+      if (targetTitleClean.length > 15 && cleanH.includes(targetTitleClean)) return true
+      const hWords = cleanH.split(' ').filter((w) => w.length > 2)
+      const tWords = new Set(targetTitleClean.split(' ').filter((w) => w.length > 2))
+      if (hWords.length >= 3) {
+        const matches = hWords.filter((w) => tWords.has(w)).length
+        if (matches / hWords.length >= 0.7) return true
+      }
+      return false
+    }
+
     // Headings
     if (line.startsWith('### ')) {
       flushList()
-      html.push('<h3 class="font-serif text-xl sm:text-2xl font-bold text-ink mt-8 mb-4 border-b border-line pb-2">' + formatInline(line.slice(4)) + '</h3>')
+      html.push('<h3 class="font-serif text-lg sm:text-xl font-bold text-ink mt-6 mb-3">' + formatInline(line.slice(4)) + '</h3>')
       continue
     }
     if (line.startsWith('## ')) {
       flushList()
-      html.push('<h2 class="font-serif text-2xl sm:text-3xl font-bold text-ink mt-10 mb-4 border-b border-line pb-2">' + formatInline(line.slice(3)) + '</h2>')
+      const headingText = line.slice(3).trim()
+      if (isDuplicateHeading(headingText)) {
+        continue
+      }
+      html.push('<h2 class="font-serif text-xl sm:text-2xl font-bold text-ink mt-8 mb-4 border-b border-line pb-2">' + formatInline(headingText) + '</h2>')
       continue
     }
     if (line.startsWith('# ')) {
       flushList()
-      html.push('<h1 class="font-serif text-3xl sm:text-4xl font-bold text-ink mt-8 mb-4">' + formatInline(line.slice(2)) + '</h1>')
+      const headingText = line.slice(2).trim()
+      if (isDuplicateHeading(headingText)) {
+        continue
+      }
+      // Clean semantic H2 instead of duplicate H1
+      html.push('<h2 class="font-serif text-xl sm:text-2xl font-bold text-ink mt-8 mb-4 border-b border-line pb-2">' + formatInline(headingText) + '</h2>')
       continue
     }
 

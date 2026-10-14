@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getDailyUpdateBySlugFromDb, getLatestDailyUpdatesFromDb } from '../api/client'
 import CategoryFallbackImage from '../components/CategoryFallbackImage'
@@ -7,10 +7,11 @@ import UpdateCard from '../components/UpdateCard'
 import WhatsAppCTA from '../components/WhatsAppCTA'
 import ShareButtons from '../components/ShareButtons'
 import SafeContent from '../components/SafeContent'
+import KeyInfoSummary from '../components/KeyInfoSummary'
 import { useSeo } from '../lib/useSeo'
 import { getAbsoluteUrl } from '../lib/config'
-import { getOpportunityStatus } from '../lib/format'
 import { trackApplyNowClick, trackOfficialSourceClick } from '../lib/analytics'
+import { getContentType, getContentTypeLabels, getContextualStatus } from '../lib/contentType'
 
 function formatDate(dateStr) {
   if (!dateStr) return ''
@@ -25,9 +26,23 @@ function formatDate(dateStr) {
 
 export default function UpdateDetailPage() {
   const { slug } = useParams()
-  const [updateItem, setUpdateItem] = useState(null)
+  const [updateItem, setUpdateItem] = useState(() => {
+    if (typeof window !== 'undefined' && window.__INITIAL_UPDATE__ && window.__INITIAL_UPDATE__.slug === slug) {
+      return window.__INITIAL_UPDATE__
+    }
+    return null
+  })
   const [related, setRelated] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined' && window.__INITIAL_UPDATE__ && window.__INITIAL_UPDATE__.slug === slug) {
+      return false
+    }
+    return true
+  })
+
+  const contentType = useMemo(() => getContentType(updateItem), [updateItem])
+  const labels = useMemo(() => getContentTypeLabels(contentType), [contentType])
+  const statusInfo = useMemo(() => getContextualStatus(updateItem, contentType), [updateItem, contentType])
 
   const jsonLdSchema = React.useMemo(() => {
     if (!updateItem) return null
@@ -97,6 +112,19 @@ export default function UpdateDetailPage() {
 
   useEffect(() => {
     let isMounted = true
+
+    if (updateItem && updateItem.slug === slug) {
+      getLatestDailyUpdatesFromDb(4).then((latestData) => {
+        if (!isMounted) return
+        if (latestData) {
+          setRelated(latestData.filter((u) => u.slug !== slug).slice(0, 3))
+        }
+      })
+      return () => {
+        isMounted = false
+      }
+    }
+
     setLoading(true)
 
     Promise.all([
@@ -148,12 +176,12 @@ export default function UpdateDetailPage() {
   }
 
   const hasImage = updateItem.featuredImage && updateItem.featuredImage.trim().length > 0
-  const oppStatus = getOpportunityStatus(updateItem.deadline, updateItem.noDeadline)
+  const actionDestination = updateItem.applyLink || updateItem.officialLink
 
   return (
-    <article className="container-x py-8 sm:py-12 max-w-4xl font-sans">
+    <article className="container-x py-6 sm:py-10 max-w-4xl font-sans">
       {/* Breadcrumbs */}
-      <nav className="text-xs text-inksoft mb-6 flex items-center gap-1.5 flex-wrap">
+      <nav className="text-xs text-inksoft mb-4 flex items-center gap-1.5 flex-wrap">
         <Link to="/" className="hover:text-green">Home</Link>
         <span>/</span>
         <Link to="/daily-updates" className="hover:text-green">Daily Updates</Link>
@@ -164,6 +192,9 @@ export default function UpdateDetailPage() {
       {/* Header Info */}
       <header className="mb-6">
         <div className="flex items-center gap-2 mb-3 flex-wrap">
+          <span className={`text-[11px] font-sans font-bold px-2.5 py-0.5 rounded-full border ${labels.badgeClass}`}>
+            {labels.badge}
+          </span>
           <Link
             to="/daily-updates"
             className="bg-green/10 hover:bg-green/20 text-green text-xs font-sans font-bold px-3 py-1 rounded-full border border-green/20 transition-colors"
@@ -184,18 +215,10 @@ export default function UpdateDetailPage() {
           {updateItem.title}
         </h1>
 
-        <p className="font-sans text-base sm:text-lg text-inksoft leading-relaxed border-l-4 border-green pl-4 py-1 bg-paper mb-6">
-          {updateItem.shortDescription}
-        </p>
-
-        {/* Key Specs Bar if present */}
-        {(updateItem.organization || updateItem.qualification || updateItem.location || updateItem.experience || updateItem.positions) && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-paper border border-line mb-6 text-xs">
-            {updateItem.organization && <div><span className="text-inksoft block">Organization</span><strong className="text-ink">{updateItem.organization}</strong></div>}
-            {updateItem.location && <div><span className="text-inksoft block">Location</span><strong className="text-ink">{updateItem.location}</strong></div>}
-            {updateItem.qualification && <div><span className="text-inksoft block">Qualification</span><strong className="text-ink">{updateItem.qualification}</strong></div>}
-            {updateItem.positions && <div><span className="text-inksoft block">Vacancies</span><strong className="text-ink">{updateItem.positions}</strong></div>}
-          </div>
+        {updateItem.shortDescription && (
+          <p className="font-sans text-base sm:text-lg text-inksoft leading-relaxed border-l-4 border-green pl-4 py-1 bg-paper mb-6">
+            {updateItem.shortDescription}
+          </p>
         )}
 
         {/* Social Share Buttons */}
@@ -203,7 +226,7 @@ export default function UpdateDetailPage() {
       </header>
 
       {/* Featured Image */}
-      <div className="relative aspect-[16/9] w-full bg-slate-900 rounded-xs overflow-hidden mb-8 shadow-sm">
+      <div className="relative aspect-[16/9] w-full bg-slate-900 rounded-xs overflow-hidden mb-6 shadow-xs">
         {hasImage ? (
           <OptimizedImage
             src={updateItem.featuredImage}
@@ -218,57 +241,60 @@ export default function UpdateDetailPage() {
         )}
       </div>
 
-      {/* Deadline Alert Card if present */}
-      {(updateItem.deadline || updateItem.noDeadline) && (
-        <div className={`border p-4 mb-8 rounded-xs font-sans flex items-center justify-between gap-4 ${oppStatus.badgeClass}`}>
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">⏰</span>
-            <div>
-              <strong className="text-slate-900 text-sm block font-bold">Opportunity Status: {oppStatus.status}</strong>
-              <span className="text-xs text-amber-900">
-                {updateItem.noDeadline ? 'No strict deadline specified.' : `Application deadline: ${updateItem.deadline} (${oppStatus.label})`}
-              </span>
-            </div>
-          </div>
-          {updateItem.applyLink && (
-            <a
-              href={updateItem.applyLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() =>
-                trackApplyNowClick({
-                  jobTitle: updateItem.title,
-                  organization: updateItem.organization || 'CareerDost',
-                  officialLink: updateItem.applyLink,
-                  category: updateItem.category,
-                })
-              }
-              className="bg-amber-600 text-white text-xs font-bold px-4 py-2 rounded-xs hover:bg-amber-700 whitespace-nowrap"
-            >
-              Apply Now →
-            </a>
-          )}
-        </div>
-      )}
+      {/* Concise Key Information Summary Box */}
+      <KeyInfoSummary item={updateItem} type={contentType} labels={labels} statusInfo={statusInfo} />
 
-      {/* Main Content Paragraphs (Safe HTML Sanitized) */}
+      {/* Contextual Status Alert Box */}
+      <div className={`border p-4 mb-8 rounded-xs text-xs sm:text-sm font-sans flex items-center justify-between gap-4 shadow-xs ${statusInfo.badgeClass}`}>
+        <div className="flex items-center gap-3">
+          <span className="text-xl sm:text-2xl">{contentType === 'notification' ? '📋' : '⏰'}</span>
+          <div>
+            <strong className="text-slate-900 text-sm block font-bold">
+              {labels.statusPrefix}: {statusInfo.status}
+            </strong>
+            <span className="text-xs text-slate-800">
+              {statusInfo.description}
+            </span>
+          </div>
+        </div>
+        {actionDestination && (
+          <a
+            href={actionDestination}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            onClick={() =>
+              trackApplyNowClick({
+                jobTitle: updateItem.title,
+                organization: updateItem.organization || 'CareerDost',
+                officialLink: actionDestination,
+                category: updateItem.category,
+              })
+            }
+            className="bg-green text-white text-xs font-bold px-4 py-2 rounded-xs hover:bg-green-dark whitespace-nowrap shadow-xs transition-colors shrink-0"
+          >
+            {labels.ctaLabel.includes('→') ? labels.ctaLabel : `${labels.ctaLabel}`}
+          </a>
+        )}
+      </div>
+
+      {/* Main Content Paragraphs with Semantic H2/H3 and Title Deduplication */}
       <div className="font-sans text-ink text-base leading-relaxed space-y-5 mb-10 border-b border-line pb-8">
-        <SafeContent content={updateItem.content} />
+        <SafeContent content={updateItem.content} stripTitle={updateItem.title} />
       </div>
 
       {/* Source Links & Action Buttons */}
       <div className="bg-paper border border-line p-5 mb-8 rounded-xs flex flex-wrap items-center justify-between gap-4 font-sans text-sm">
         <div className="space-y-1">
           <strong className="text-ink text-xs uppercase tracking-wider block">Verified Information Source</strong>
-          <span className="text-xs text-inksoft">Official CareerDost Bulletin</span>
+          <span className="text-xs text-inksoft">Official CareerDost Editorial Desk</span>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           {updateItem.officialLink && (
             <a
               href={updateItem.officialLink}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
               onClick={() =>
                 trackOfficialSourceClick({
                   title: updateItem.title,
@@ -277,27 +303,27 @@ export default function UpdateDetailPage() {
                   category: updateItem.category,
                 })
               }
-              className="border border-line bg-white text-ink px-4 py-2 text-xs font-semibold hover:border-green hover:text-green transition-colors"
+              className="border border-line bg-white text-ink px-4 py-2 text-xs font-semibold hover:border-green hover:text-green transition-colors rounded-xs"
             >
-              Official Website / Gazette ↗
+              Official Department Website / Gazette ↗
             </a>
           )}
-          {updateItem.applyLink && (
+          {actionDestination && (
             <a
-              href={updateItem.applyLink}
+              href={actionDestination}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
               onClick={() =>
                 trackApplyNowClick({
                   jobTitle: updateItem.title,
                   organization: 'CareerDost',
-                  officialLink: updateItem.applyLink,
+                  officialLink: actionDestination,
                   category: updateItem.category,
                 })
               }
-              className="bg-green text-white px-5 py-2 text-xs font-semibold hover:bg-green-dark transition-colors shadow-xs"
+              className="bg-green text-white px-5 py-2 text-xs font-semibold hover:bg-green-dark transition-colors shadow-xs rounded-xs"
             >
-              Apply Online →
+              {labels.ctaLabel}
             </a>
           )}
         </div>

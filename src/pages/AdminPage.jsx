@@ -26,6 +26,7 @@ import { getOpportunityStatus, formatDate } from '../lib/format'
 import { safeUrl } from '../lib/security'
 import { useSeo } from '../lib/useSeo'
 import { SITE_URL } from '../lib/config'
+import { getContentType, getContentTypeLabels } from '../lib/contentType'
 
 const UPDATE_CATEGORIES = [
   'Latest Jobs',
@@ -81,6 +82,7 @@ export default function AdminPage() {
   const [updateForm, setUpdateForm] = useState({
     title: '',
     slug: '',
+    contentType: '',
     category: 'Latest Jobs',
     shortDescription: '',
     content: '',
@@ -113,6 +115,7 @@ export default function AdminPage() {
   const [articleForm, setArticleForm] = useState({
     title: '',
     slug: '',
+    contentType: '',
     category: 'government-jobs',
     organization: '',
     jobType: 'Full Time',
@@ -150,6 +153,12 @@ export default function AdminPage() {
     tone: 'slate',
     description: '',
   })
+
+  const activeUpdateType = updateForm.contentType || getContentType(updateForm)
+  const updateLabels = getContentTypeLabels(activeUpdateType)
+
+  const activeArticleType = articleForm.contentType || getContentType(articleForm)
+  const articleLabels = getContentTypeLabels(activeArticleType)
 
   useEffect(() => {
     if (token) {
@@ -360,8 +369,66 @@ export default function AdminPage() {
     }
   }
 
+  // Pre-Publish Quality, Safety & Transparency Validator
+  const validatePrePublish = (form, isArticle, existingList, currentEditingSlug) => {
+    const errors = []
+    const warnings = []
+
+    // 1. Title & Slug
+    if (!form.title || form.title.trim().length < 5) {
+      errors.push('Title must be at least 5 characters long.')
+    }
+    const slug = (form.slug || generateSlug(form.title || '')).trim()
+    if (!slug) {
+      errors.push('A valid URL slug is required.')
+    }
+
+    // 2. Duplicate Detection
+    const duplicate = (existingList || []).find((item) => {
+      if (currentEditingSlug && item.slug === currentEditingSlug) return false
+      return item.slug === slug || (item.title && item.title.toLowerCase().trim() === (form.title || '').toLowerCase().trim())
+    })
+    if (duplicate) {
+      errors.push(`Duplicate detected: An existing ${isArticle ? 'article' : 'update'} already uses slug "${duplicate.slug}".`)
+    }
+
+    // 3. Official Source Verification
+    if (form.isVerified) {
+      if (!form.officialLink || !form.officialLink.trim()) {
+        errors.push('Listing is marked as "Official Source Verified", but no Official Source Link is provided. You must provide a valid official URL.')
+      } else if (!/^https?:\/\//i.test(form.officialLink.trim())) {
+        errors.push('Official Source Link must start with http:// or https://')
+      }
+    }
+
+    // 4. AI Content and Hallucination Check
+    const rawContent = Array.isArray(form.content) ? form.content.join('\n') : form.content || ''
+    const aiPhrases = [
+      'as an ai language model',
+      'i cannot guarantee',
+      'insert date here',
+      'insert link here',
+      'lorem ipsum',
+      '[insert ',
+      '{insert '
+    ]
+    for (const phrase of aiPhrases) {
+      if (rawContent.toLowerCase().includes(phrase)) {
+        errors.push(`Unreviewed AI placeholder found in content body: "${phrase}". Please review and edit before publishing.`)
+      }
+    }
+
+    // 5. Short Description / Excerpt Check
+    const desc = form.excerpt || form.shortDescription || ''
+    if (!desc || desc.trim().length < 20) {
+      warnings.push('Short description / summary is very short. Provide at least 20 characters for clean SEO snippet display.')
+    }
+
+    return { errors, warnings }
+  }
+
   const handleGenerateNanoPrompt = (title, category, org = '') => {
-    const prompt = `Create a professional, modern 16:9 aspect ratio featured visual image banner for a Pakistani career portal publication titled "${title || 'Career Opportunity'}" ${org ? 'by ' + org : ''} in category "${category}". Clean vector design, dark emerald green (#0B3D2E) and gold corporate palette, clean typography, official Pakistan recruitment style. No misleading official seals or logos.`
+    const prompt = `Editorial 16:9 featured banner for CareerDost (Pakistani career & opportunities portal). Topic: "${title || 'Career Opportunity'}" (${category}${org ? ', ' + org : ''}). Palette: Deep forest green (#059669 / #064e3b), clean off-white background (#faf9f6), subtle gold accents. Clean architectural lines, professional Pakistan public institution aesthetic, modern flat editorial illustration style. Highly professional, zero watermark, strictly no hallucinated or unverified text.`
     setNanoPromptBox(prompt)
   }
 
@@ -414,6 +481,14 @@ export default function AdminPage() {
 
   const handleSaveUpdate = async (targetStatus = 'published') => {
     setFormMsg('')
+    if (targetStatus === 'published') {
+      const validation = validatePrePublish(updateForm, false, updates, editingUpdate?.slug)
+      if (validation.errors.length > 0) {
+        setFormMsg(`❌ Pre-publish check failed: ${validation.errors.join(' | ')}`)
+        return
+      }
+    }
+
     try {
       const finalSlug = updateForm.slug || generateSlug(updateForm.title)
       const payload = {
@@ -545,6 +620,14 @@ export default function AdminPage() {
 
   const handleSaveArticle = async (targetStatus = 'published') => {
     setFormMsg('')
+    if (targetStatus === 'published') {
+      const validation = validatePrePublish(articleForm, true, articles, editingArticle?.slug)
+      if (validation.errors.length > 0) {
+        setFormMsg(`❌ Pre-publish check failed: ${validation.errors.join(' | ')}`)
+        return
+      }
+    }
+
     try {
       const finalSlug = articleForm.slug || generateSlug(articleForm.title)
       const payload = {
@@ -1218,9 +1301,27 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-3 gap-4">
+              <div className="grid sm:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-ink font-bold mb-1">Category / Content Type *</label>
+                  <label className="block text-ink font-bold mb-1">Content Type</label>
+                  <select
+                    value={updateForm.contentType || 'auto'}
+                    onChange={(e) => setUpdateForm({ ...updateForm, contentType: e.target.value === 'auto' ? '' : e.target.value })}
+                    className="w-full border border-line p-2.5 bg-white font-semibold text-xs focus:border-green"
+                  >
+                    <option value="auto">Auto-detect ({updateLabels.badge})</option>
+                    <option value="job">Real Job Vacancy</option>
+                    <option value="notification">Government Notification / Gazette</option>
+                    <option value="scheme">Welfare Scheme / Public Benefit</option>
+                    <option value="admission">Admission Notice</option>
+                    <option value="scholarship">Scholarship Opportunity</option>
+                    <option value="result">Result / Merit List</option>
+                    <option value="guide">Career Guide</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-ink font-bold mb-1">Category *</label>
                   <select
                     value={updateForm.category}
                     onChange={(e) => setUpdateForm({ ...updateForm, category: e.target.value })}
@@ -1233,76 +1334,82 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-ink font-bold mb-1">Organization / Department</label>
+                  <label className="block text-ink font-bold mb-1">{updateLabels.orgLabel} *</label>
                   <input
                     type="text"
                     value={updateForm.organization}
                     onChange={(e) => setUpdateForm({ ...updateForm, organization: e.target.value })}
                     className="w-full border border-line p-2.5 bg-white focus:border-green"
-                    placeholder="e.g. FPSC, PPSC, HEC, SBP, Punjab University"
+                    placeholder="e.g. FPSC, Sindh Labour Dept, BISP, HEC"
+                    required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-ink font-bold mb-1">Location / City / Province</label>
+                  <label className="block text-ink font-bold mb-1">{updateLabels.locationLabel}</label>
                   <input
                     type="text"
                     value={updateForm.location}
                     onChange={(e) => setUpdateForm({ ...updateForm, location: e.target.value })}
                     className="w-full border border-line p-2.5 bg-white focus:border-green"
-                    placeholder="e.g. Islamabad / All Pakistan / Lahore"
+                    placeholder="e.g. Islamabad / All Pakistan / Sindh"
                   />
                 </div>
               </div>
 
               {/* SMART CONDITIONAL FIELDS SECTION */}
               <div className="p-4 bg-white border border-line/80 rounded-xs space-y-4">
-                <div className="text-[11px] font-bold text-green uppercase tracking-wider">
-                  Category Specific Fields ({updateForm.category})
+                <div className="flex items-center justify-between">
+                  <div className="text-[11px] font-bold text-green uppercase tracking-wider">
+                    {updateLabels.badge} Specific Fields
+                  </div>
+                  <span className="text-[11px] text-inksoft font-sans">
+                    {updateLabels.isJob ? 'Standard job recruitment attributes' : 'Contextual public information fields'}
+                  </span>
                 </div>
 
                 <div className="grid sm:grid-cols-4 gap-4">
                   <div>
-                    <label className="block text-inksoft font-semibold mb-1">Qualification Required</label>
+                    <label className="block text-inksoft font-semibold mb-1">{updateLabels.qualificationLabel}</label>
                     <input
                       type="text"
                       value={updateForm.qualification}
                       onChange={(e) => setUpdateForm({ ...updateForm, qualification: e.target.value })}
                       className="w-full border border-line p-2 bg-paper focus:bg-white text-xs"
-                      placeholder="e.g. Bachelor's / Master's / Matric"
+                      placeholder={updateLabels.isJob ? "e.g. Bachelor's / Master's / Matric" : "e.g. Applicable to all commercial establishments"}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-inksoft font-semibold mb-1">Experience Needed</label>
-                    <input
-                      type="text"
-                      value={updateForm.experience}
-                      onChange={(e) => setUpdateForm({ ...updateForm, experience: e.target.value })}
-                      className="w-full border border-line p-2 bg-paper focus:bg-white text-xs"
-                      placeholder="e.g. Fresh / 2 Years Experience"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-inksoft font-semibold mb-1">Vacancies / Positions</label>
+                    <label className="block text-inksoft font-semibold mb-1">{updateLabels.positionsLabel}</label>
                     <input
                       type="text"
                       value={updateForm.positions}
                       onChange={(e) => setUpdateForm({ ...updateForm, positions: e.target.value })}
                       className="w-full border border-line p-2 bg-paper focus:bg-white text-xs"
-                      placeholder="e.g. 450 Posts / Multiple"
+                      placeholder={updateLabels.isJob ? "e.g. 450 Posts / Multiple" : "e.g. 4 Worker Categories / 9.3M Families"}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-inksoft font-semibold mb-1">Employment Type / Mode</label>
+                    <label className="block text-inksoft font-semibold mb-1">{updateLabels.salaryLabel}</label>
+                    <input
+                      type="text"
+                      value={updateForm.salary || ''}
+                      onChange={(e) => setUpdateForm({ ...updateForm, salary: e.target.value })}
+                      className="w-full border border-line p-2 bg-paper focus:bg-white text-xs"
+                      placeholder={updateLabels.isJob ? "BPS-17 / Market Competitive" : "Rs. 43,000 / month"}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-inksoft font-semibold mb-1">Classification / Mode</label>
                     <input
                       type="text"
                       value={updateForm.jobType}
                       onChange={(e) => setUpdateForm({ ...updateForm, jobType: e.target.value })}
                       className="w-full border border-line p-2 bg-paper focus:bg-white text-xs"
-                      placeholder="Full Time / Contract / Fully Funded"
+                      placeholder={updateLabels.isJob ? "Full Time / Contract" : "Statutory Gazette / Public Relief"}
                     />
                   </div>
                 </div>
@@ -1800,7 +1907,25 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-3 gap-4">
+              <div className="grid sm:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-ink font-bold mb-1">Content Type</label>
+                  <select
+                    value={articleForm.contentType || 'auto'}
+                    onChange={(e) => setArticleForm({ ...articleForm, contentType: e.target.value === 'auto' ? '' : e.target.value })}
+                    className="w-full border border-line p-2.5 bg-white font-semibold text-xs focus:border-green"
+                  >
+                    <option value="auto">Auto-detect ({articleLabels.badge})</option>
+                    <option value="job">Real Job Vacancy</option>
+                    <option value="notification">Government Notification / Gazette</option>
+                    <option value="scheme">Welfare Scheme / Public Benefit</option>
+                    <option value="admission">Admission Notice</option>
+                    <option value="scholarship">Scholarship Opportunity</option>
+                    <option value="result">Result / Merit List</option>
+                    <option value="guide">Career Guide</option>
+                  </select>
+                </div>
+
                 <div>
                   <label className="block text-ink font-bold mb-1">Category *</label>
                   <select
@@ -1815,66 +1940,84 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-ink font-bold mb-1">Organization *</label>
+                  <label className="block text-ink font-bold mb-1">{articleLabels.orgLabel} *</label>
                   <input
                     type="text"
                     value={articleForm.organization}
                     onChange={(e) => setArticleForm({ ...articleForm, organization: e.target.value })}
                     className="w-full border border-line p-2.5 bg-white focus:border-green"
+                    placeholder="e.g. FPSC, Sindh Labour Dept, BISP, HEC"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-ink font-bold mb-1">Location</label>
+                  <label className="block text-ink font-bold mb-1">{articleLabels.locationLabel}</label>
                   <input
                     type="text"
                     value={articleForm.location}
                     onChange={(e) => setArticleForm({ ...articleForm, location: e.target.value })}
                     className="w-full border border-line p-2.5 bg-white focus:border-green"
+                    placeholder="e.g. Islamabad / All Pakistan / Sindh"
                   />
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-inksoft font-semibold mb-1">Qualification</label>
-                  <input
-                    type="text"
-                    value={articleForm.qualification}
-                    onChange={(e) => setArticleForm({ ...articleForm, qualification: e.target.value })}
-                    className="w-full border border-line p-2 bg-white text-xs focus:border-green"
-                  />
+              {/* DYNAMIC ATTRIBUTES SECTION */}
+              <div className="p-4 bg-white border border-line/80 rounded-xs space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="text-[11px] font-bold text-green uppercase tracking-wider">
+                    {articleLabels.badge} Specific Fields
+                  </div>
+                  <span className="text-[11px] text-inksoft font-sans">
+                    {articleLabels.isJob ? 'Standard employment fields' : 'Contextual public information fields'}
+                  </span>
                 </div>
 
-                <div>
-                  <label className="block text-inksoft font-semibold mb-1">Experience</label>
-                  <input
-                    type="text"
-                    value={articleForm.experience}
-                    onChange={(e) => setArticleForm({ ...articleForm, experience: e.target.value })}
-                    className="w-full border border-line p-2 bg-white text-xs focus:border-green"
-                  />
-                </div>
+                <div className="grid sm:grid-cols-4 gap-4">
+                  <div>
+                    <label className="block text-inksoft font-semibold mb-1">{articleLabels.qualificationLabel}</label>
+                    <input
+                      type="text"
+                      value={articleForm.qualification}
+                      onChange={(e) => setArticleForm({ ...articleForm, qualification: e.target.value })}
+                      className="w-full border border-line p-2 bg-paper focus:bg-white text-xs"
+                      placeholder={articleLabels.isJob ? "e.g. Bachelor's / Master's / Matric" : "e.g. Applicable to all commercial establishments / PMT < 32"}
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-inksoft font-semibold mb-1">Positions</label>
-                  <input
-                    type="text"
-                    value={articleForm.positions}
-                    onChange={(e) => setArticleForm({ ...articleForm, positions: e.target.value })}
-                    className="w-full border border-line p-2 bg-white text-xs focus:border-green"
-                  />
-                </div>
+                  <div>
+                    <label className="block text-inksoft font-semibold mb-1">{articleLabels.positionsLabel}</label>
+                    <input
+                      type="text"
+                      value={articleForm.positions}
+                      onChange={(e) => setArticleForm({ ...articleForm, positions: e.target.value })}
+                      className="w-full border border-line p-2 bg-paper focus:bg-white text-xs"
+                      placeholder={articleLabels.isJob ? "e.g. 450 Posts / Multiple" : "e.g. 4 Worker Categories / 9.3M Families"}
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-inksoft font-semibold mb-1">Job Type / Scale</label>
-                  <input
-                    type="text"
-                    value={articleForm.jobType}
-                    onChange={(e) => setArticleForm({ ...articleForm, jobType: e.target.value })}
-                    className="w-full border border-line p-2 bg-white text-xs focus:border-green"
-                  />
+                  <div>
+                    <label className="block text-inksoft font-semibold mb-1">{articleLabels.salaryLabel}</label>
+                    <input
+                      type="text"
+                      value={articleForm.salary || ''}
+                      onChange={(e) => setArticleForm({ ...articleForm, salary: e.target.value })}
+                      className="w-full border border-line p-2 bg-paper focus:bg-white text-xs"
+                      placeholder={articleLabels.isJob ? "BPS-17 / Market Competitive" : "Rs. 43,000 / month"}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-inksoft font-semibold mb-1">Classification / Type</label>
+                    <input
+                      type="text"
+                      value={articleForm.jobType}
+                      onChange={(e) => setArticleForm({ ...articleForm, jobType: e.target.value })}
+                      className="w-full border border-line p-2 bg-paper focus:bg-white text-xs"
+                      placeholder={articleLabels.isJob ? "Full Time / Contract" : "Statutory Gazette / Public Relief"}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1895,7 +2038,7 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-ink font-bold mb-1">Last Date</label>
+                  <label className="block text-ink font-bold mb-1">{articleLabels.deadlineLabel}</label>
                   <input
                     type="date"
                     value={articleForm.lastDate}
@@ -1914,7 +2057,7 @@ export default function AdminPage() {
                     className="w-4 h-4 text-green"
                   />
                   <label htmlFor="noDeadlineArticle" className="text-ink font-bold">
-                    No deadline
+                    No deadline / Not applicable
                   </label>
                 </div>
               </div>
@@ -1927,30 +2070,37 @@ export default function AdminPage() {
                     value={articleForm.officialLink}
                     onChange={(e) => setArticleForm({ ...articleForm, officialLink: e.target.value })}
                     className="w-full border border-line p-2 bg-white text-xs focus:border-green"
+                    placeholder="https://... official government or department page"
                   />
                 </div>
                 <div>
-                  <label className="block text-ink font-bold mb-1">Apply Link</label>
+                  <label className="block text-ink font-bold mb-1">{articleLabels.isJob ? 'Apply Online URL' : 'Official Portal / Notification URL'}</label>
                   <input
                     type="url"
                     value={articleForm.applyLink}
                     onChange={(e) => setArticleForm({ ...articleForm, applyLink: e.target.value })}
                     className="w-full border border-line p-2 bg-white text-xs focus:border-green"
+                    placeholder="https://..."
                   />
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  id="isVerifiedArticle"
-                  checked={articleForm.isVerified}
-                  onChange={(e) => setArticleForm({ ...articleForm, isVerified: e.target.checked })}
-                  className="w-4 h-4 text-green"
-                />
-                <label htmlFor="isVerifiedArticle" className="text-ink font-bold text-xs">
-                  ✅ Official Source Verified by Admin
-                </label>
+              <div className="space-y-1">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="isVerifiedArticle"
+                    checked={articleForm.isVerified}
+                    onChange={(e) => setArticleForm({ ...articleForm, isVerified: e.target.checked })}
+                    className="w-4 h-4 text-green"
+                  />
+                  <label htmlFor="isVerifiedArticle" className="text-ink font-bold text-xs">
+                    ✅ Official Source Verified by Admin (Manually verified against gazette/official notice)
+                  </label>
+                </div>
+                {articleForm.isVerified && !articleForm.officialLink && (
+                  <span className="text-brick text-[11px] block pl-7">⚠️ An Official Source Link is required when marking as Verified.</span>
+                )}
               </div>
             </div>
 

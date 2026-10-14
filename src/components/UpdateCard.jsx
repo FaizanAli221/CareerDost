@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import CategoryFallbackImage from './CategoryFallbackImage'
 import OptimizedImage from './OptimizedImage'
-import { getOpportunityStatus } from '../lib/format'
+import { getContentType, getContentTypeLabels, getContextualStatus } from '../lib/contentType'
 
 function isRecent(publishDate, hours = 48) {
   if (!publishDate) return false
@@ -31,7 +31,9 @@ export default function UpdateCard({ updateItem, priority = false }) {
   if (!updateItem) return null
 
   const isNew = isRecent(updateItem.publishDate)
-  const oppStatus = getOpportunityStatus(updateItem.deadline, updateItem.noDeadline)
+  const contentType = getContentType(updateItem)
+  const labels = getContentTypeLabels(contentType)
+  const statusInfo = getContextualStatus(updateItem, contentType)
   const hasImage = updateItem.featuredImage && updateItem.featuredImage.trim().length > 0
 
   return (
@@ -63,19 +65,19 @@ export default function UpdateCard({ updateItem, priority = false }) {
                 New
               </span>
             )}
-            {updateItem.isVerified && (
+            {(updateItem.isVerified || updateItem.is_verified) && (
               <span className="bg-green text-white text-[11px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
                 ✓ Verified
               </span>
             )}
             <span className="bg-slate-950/80 backdrop-blur-xs text-white text-[11px] font-sans font-medium px-2.5 py-0.5 rounded-xs border border-white/20">
-              {updateItem.category}
+              {labels.badge}
             </span>
           </div>
 
-          {(updateItem.deadline || updateItem.noDeadline) && (
-            <div className={`absolute bottom-2 right-2 text-[10px] font-sans font-bold px-2 py-0.5 rounded-xs shadow-xs z-10 border ${oppStatus.badgeClass}`}>
-              {oppStatus.label}
+          {(updateItem.deadline || updateItem.noDeadline || statusInfo) && (
+            <div className={`absolute bottom-2 right-2 text-[10px] font-sans font-bold px-2 py-0.5 rounded-xs shadow-xs z-10 border ${statusInfo.badgeClass}`}>
+              {contentType === 'notification' ? '📋' : '⏰'} {statusInfo.label}
             </div>
           )}
         </div>

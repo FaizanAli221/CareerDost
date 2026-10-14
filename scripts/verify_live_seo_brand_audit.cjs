@@ -130,6 +130,21 @@ async function run() {
   assert(llms.body.includes('Sindh') && llms.body.includes('Pakistan'), 'llms.txt covers Pakistan and Sindh');
   assert(llms.body.includes('NOT affiliated with, connected to, or related to any similarly named platforms, businesses, or career boards in India'), 'llms.txt contains explicit Indian platform disambiguation');
 
+  // 10. Google Search Console Verification Token
+  const gsc = await fetchUrl('https://careerdost.blog/googlefa0859c31163b27d.html');
+  assert(gsc.status === 200, 'GSC Verification File returns HTTP 200', `Status ${gsc.status}`);
+  assert(gsc.body.includes('googlefa0859c31163b27d.html'), 'GSC Verification Token string is present in response');
+
+  // 11. Sindh Minimum Wage 2026 Non-Job Presentation Test
+  const wage = await fetchUrl('https://careerdost.blog/jobs/sindh-minimum-wage-2026-workers-salary');
+  assert(wage.status === 200, 'Sindh Minimum Wage Article returns HTTP 200', `Status ${wage.status}`);
+  assert(wage.body.includes('Official Statutory Notification') || wage.body.includes('Official Notification'), 'Sindh Minimum Wage uses statutory notification presentation');
+  assert(wage.body.includes('https://lhr.sindh.gov.pk/'), 'Sindh Minimum Wage includes verified official Labour Dept portal link');
+  assert(!wage.body.includes('>Vacancies</span><strong'), 'Sindh Minimum Wage does not present minimum wage tiers as vacancies');
+
+  // 12. Edge HTML LCP Optimization Preload Test
+  assert(wage.body.includes('rel="preload"') && wage.body.includes('as="image"'), 'Hero image is preloaded in head for mobile LCP optimization');
+
   console.log(`\n=== Verification Complete: ${passed} Passed, ${failed} Failed ===`);
   if (failed > 0) process.exit(1);
 }

@@ -1,10 +1,10 @@
 import React from 'react'
 import { parseMarkdownToHtml } from '../lib/markdown'
 
-export default function SafeContent({ content, className = '' }) {
+export default function SafeContent({ content, stripTitle = '', className = '' }) {
   if (!content) return null
 
-  const html = parseMarkdownToHtml(content)
+  const html = parseMarkdownToHtml(content, { stripTitle })
 
   return (
     <div

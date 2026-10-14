@@ -1,8 +1,10 @@
-# Exclude static sitemap, robots, and icons from SPA rewrite
+# Exclude static sitemap, robots, verification files, and icons from SPA rewrite
 /sitemap.xml /sitemap.xml 200
 /robots.txt /robots.txt 200
 /favicon.svg /favicon.svg 200
 /favicon.ico /favicon.ico 200
+/googlefa0859c31163b27d.html /googlefa0859c31163b27d.html 200
+/llms.txt /llms.txt 200
 
 # SPA fallback rule for React Router
 /* /index.html 200
