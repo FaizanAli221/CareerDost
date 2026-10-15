@@ -43,7 +43,18 @@ export function getContentType(item) {
     return 'notification'
   }
 
-  // 2. Government Schemes & Public Benefits
+  // 2. Career & Public Informational Guides (How-to guides, portal checks, official verification guides)
+  if (
+    cat === 'career-guides' ||
+    slug.includes('official-guide') ||
+    slug.includes('payment-check') ||
+    title.includes('guide') ||
+    jobType.includes('guide')
+  ) {
+    return 'guide'
+  }
+
+  // 3. Government Schemes & Public Benefits
   if (
     cat === 'government-schemes' ||
     slug.includes('bisp') ||
@@ -105,10 +116,6 @@ export function getContentType(item) {
     return 'scholarship'
   }
 
-  // 6. Career Guides
-  if (cat === 'career-guides' || jobType.includes('guide') || slug.includes('official-guide')) {
-    return 'guide'
-  }
 
   // 7. Genuine Jobs / Vacancies (Default for government-jobs, private-jobs, bank-jobs, it-jobs, internships)
   return 'job'

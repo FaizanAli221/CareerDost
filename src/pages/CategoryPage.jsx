@@ -13,14 +13,26 @@ export default function CategoryPage() {
   const [viewMode, setViewMode] = useState('grid')
 
   const [categoriesList, setCategoriesList] = useState(() => defaultCategories)
-  const [cat, setCat] = useState(null)
-  const [items, setItems] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [cat, setCat] = useState(() => defaultCategoryBySlug(slug) || null)
+  const [items, setItems] = useState(() => {
+    if (typeof window !== 'undefined' && Array.isArray(window.__INITIAL_CATEGORY_ARTICLES__) && window.__INITIAL_CATEGORY_SLUG__ === slug) {
+      return window.__INITIAL_CATEGORY_ARTICLES__
+    }
+    return []
+  })
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined' && Array.isArray(window.__INITIAL_CATEGORY_ARTICLES__) && window.__INITIAL_CATEGORY_SLUG__ === slug) {
+      return false
+    }
+    return true
+  })
   const [notFound, setNotFound] = useState(false)
 
   useEffect(() => {
     let isMounted = true
-    setLoading(true)
+    if (!items.length) {
+      setLoading(true)
+    }
     setNotFound(false)
 
     getCategoriesFromDb().then((cats) => {

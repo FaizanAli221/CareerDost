@@ -133,7 +133,15 @@ export default function UpdateDetailPage() {
     ])
       .then(([updateData, latestData]) => {
         if (!isMounted) return
-        setUpdateItem(updateData)
+        if (updateData) {
+          setUpdateItem(updateData)
+        } else {
+          getArticleBySlugFromDb(slug).then((art) => {
+            if (art && isMounted) {
+              window.location.replace(`/jobs/${slug}`)
+            }
+          })
+        }
         if (latestData) {
           setRelated(latestData.filter((u) => u.slug !== slug).slice(0, 3))
         }

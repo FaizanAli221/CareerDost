@@ -18,12 +18,10 @@ const publishedDailyUpdates = [
   { slug: 'benazir-hunarmand-programme-2026-karachi-guide', date: '2026-10-14' },
   { slug: 'pakistan-wheat-support-price-2026-27', date: '2026-10-14' },
   { slug: 'wheat-imports-karachi-october-2026', date: '2026-10-14' },
-  { slug: 'bisp-8171-payment-check-2026-official-guide', date: '2026-10-14' },
   { slug: 'nadra-digital-payments-2026', date: '2026-10-14' },
   { slug: 'sindh-wheat-subsidy-benazir-hari-card-2026', date: '2026-10-12' },
   { slug: 'sindh-kisan-subsidy-2026-eligibility-payments', date: '2026-10-12' },
   { slug: 'sindh-minimum-wage-2026-workers-salary', date: '2026-10-12' },
-  { slug: 'sindh-job-portal-2026-junior-clerk-jobs', date: '2026-10-12' },
   { slug: 'sindh-hec-research-support-programme-2026-27', date: '2026-10-12' },
   { slug: 'szabist-hyderabad-spring-2027-admissions', date: '2026-10-12' },
   { slug: 'shaikh-ayaz-university-admissions-2027', date: '2026-10-12' },
@@ -170,12 +168,15 @@ function generateSitemap() {
     }
   } catch {}
 
-  const updateUrls = updateUrlsList.map(u => ({
-    loc: `/daily-updates/${u.slug}`,
-    priority: '0.9',
-    changefreq: 'daily',
-    lastmod: formatLastModDate(u.date)
-  }))
+  const existingJobSlugs = new Set(articleUrlsList.map(a => a.slug))
+  const updateUrls = updateUrlsList
+    .filter(u => !existingJobSlugs.has(u.slug))
+    .map(u => ({
+      loc: `/daily-updates/${u.slug}`,
+      priority: '0.8',
+      changefreq: 'daily',
+      lastmod: formatLastModDate(u.date)
+    }))
 
   // Deduplicate all URLs by loc
   const seenLocs = new Set()

@@ -243,6 +243,17 @@ function detectContentTypeEdge(category, title = '', slug = '', jobType = '') {
     return 'notification'
   }
   if (
+    cat === 'career-guides' ||
+    s.includes('official-guide') ||
+    s.includes('payment-check') ||
+    t.toLowerCase().includes('guide') ||
+    jType.includes('guide') ||
+    s.includes('guide') ||
+    text.includes('how to')
+  ) {
+    return 'guide'
+  }
+  if (
     cat === 'government-schemes' ||
     s.includes('bisp') ||
     s.includes('scooty-scheme') ||
@@ -272,9 +283,6 @@ function detectContentTypeEdge(category, title = '', slug = '', jobType = '') {
   }
   if (cat === 'scholarships' || s.includes('scholarship') || text.includes('scholarship') || text.includes('fellowship')) {
     return 'scholarship'
-  }
-  if (cat === 'career-guides' || s.includes('guide') || text.includes('guide') || text.includes('how to')) {
-    return 'guide'
   }
   return 'job'
 }
@@ -504,16 +512,28 @@ function generateJobHtml(article, canonical) {
     dateLabel = 'Submission Deadline'
     actionBtnText = 'Official Scholarship Portal ↗'
     typeBadge = 'Scholarship Program'
+  } else if (cType === 'guide') {
+    orgLabel = 'Administering Department'
+    locLabel = 'Jurisdiction / Scope'
+    qualLabel = 'Target Beneficiaries'
+    salaryLabel = ''
+    jobTypeLabel = 'Guide Category'
+    dateLabel = 'Effective Window'
+    actionBtnText = 'Official Portal / Guidelines ↗'
+    typeBadge = 'Official Guide'
   }
 
-  const specsBox = (org || loc || qual || salary || jobType || lastDate) ? `
+  const displaySalary = (cType === 'guide' || cType === 'notification') ? '' : salary
+  const displayLastDate = (cType === 'guide') ? '' : lastDate
+
+  const specsBox = (org || loc || qual || displaySalary || jobType || displayLastDate) ? `
     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 bg-paper border border-line mb-6 text-xs" style="background:#faf9f6;border:1px solid #e7e5e4;padding:16px;margin-bottom:24px;">
       ${org ? `<div><span style="color:#78716c;display:block;">${orgLabel}</span><strong style="color:#1c1917;">${org}</strong></div>` : ''}
       ${loc ? `<div><span style="color:#78716c;display:block;">${locLabel}</span><strong style="color:#1c1917;">${loc}</strong></div>` : ''}
       ${qual ? `<div><span style="color:#78716c;display:block;">${qualLabel}</span><strong style="color:#1c1917;">${qual}</strong></div>` : ''}
-      ${salary ? `<div><span style="color:#78716c;display:block;">${salaryLabel}</span><strong style="color:#1c1917;">${salary}</strong></div>` : ''}
+      ${displaySalary ? `<div><span style="color:#78716c;display:block;">${salaryLabel}</span><strong style="color:#1c1917;">${displaySalary}</strong></div>` : ''}
       ${jobType ? `<div><span style="color:#78716c;display:block;">${jobTypeLabel}</span><strong style="color:#1c1917;">${jobType}</strong></div>` : ''}
-      ${lastDate ? `<div><span style="color:#78716c;display:block;">${dateLabel}</span><strong style="color:#1c1917;">${lastDate}</strong></div>` : ''}
+      ${displayLastDate ? `<div><span style="color:#78716c;display:block;">${dateLabel}</span><strong style="color:#1c1917;">${displayLastDate}</strong></div>` : ''}
     </div>` : ''
 
   let statusBanner = ''
@@ -523,6 +543,15 @@ function generateJobHtml(article, canonical) {
         <div>
           <strong style="color:#065f46;display:block;font-size:14px;">Official Statutory Notification (In Force)</strong>
           <span style="color:#047857;font-size:12px;">This is an enforceable gazette notification, not a job vacancy. No application fee or job submission is required.</span>
+        </div>
+        ${officialLink ? `<a href="${officialLink}" target="_blank" rel="noopener noreferrer" style="background:#059669;color:#ffffff;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;border-radius:4px;">${actionBtnText}</a>` : ''}
+      </div>`
+  } else if (cType === 'guide') {
+    statusBanner = `
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;padding:16px;margin-bottom:24px;border-radius:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div>
+          <strong style="color:#166534;display:block;font-size:14px;">Official Public Information &amp; Verification Guide</strong>
+          <span style="color:#15803d;font-size:12px;">This is an authoritative informational guide and procedural walkthrough, not an employment vacancy. Follow designated official government links.</span>
         </div>
         ${officialLink ? `<a href="${officialLink}" target="_blank" rel="noopener noreferrer" style="background:#059669;color:#ffffff;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;border-radius:4px;">${actionBtnText}</a>` : ''}
       </div>`
@@ -595,6 +624,176 @@ function generateJobHtml(article, canonical) {
       </main>
       <footer class="border-t border-line bg-white py-12 mt-16 font-sans">
         <div class="container-x text-center text-xs text-inksoft">
+          <p>© 2026 CareerDost. Pakistan's Daily Career, Education &amp; Opportunity Hub.</p>
+        </div>
+      </footer>
+    </div>
+  `
+}
+
+const CATEGORY_META = {
+  'government-jobs': {
+    label: 'Government Jobs',
+    short: 'Govt Jobs',
+    description: 'Federal, provincial and departmental vacancies advertised in Pakistan — from BPS-05 clerical posts to BPS-20 management positions.'
+  },
+  'private-jobs': {
+    label: 'Private Jobs',
+    short: 'Private',
+    description: 'Openings from private companies, NGOs and multinationals operating in Pakistan across sales, operations, engineering and support roles.'
+  },
+  'bank-jobs': {
+    label: 'Bank Jobs',
+    short: 'Banking',
+    description: 'Teller, officer grade and management trainee positions from commercial banks, microfinance banks and the State Bank of Pakistan.'
+  },
+  'it-jobs': {
+    label: 'IT Jobs',
+    short: 'IT',
+    description: 'Software, QA, DevOps and IT-support roles from software houses and tech teams hiring across Pakistan and for remote work.'
+  },
+  'scholarships': {
+    label: 'Scholarships',
+    short: 'Scholarships',
+    description: 'Fully funded and partial scholarships for undergraduate, graduate and PhD study in Pakistan and abroad.'
+  },
+  'internships': {
+    label: 'Internships',
+    short: 'Internships',
+    description: 'Paid and unpaid internship openings for students and recent graduates across government departments and private organisations.'
+  },
+  'admissions': {
+    label: 'Admissions',
+    short: 'Admissions',
+    description: 'Open admissions, entry test schedules and merit-list dates for universities, colleges and professional institutes.'
+  },
+  'government-schemes': {
+    label: 'Government Schemes',
+    short: 'Schemes',
+    description: 'Welfare, subsidy and support programmes launched by federal and provincial governments, including how to check eligibility.'
+  },
+  'results': {
+    label: 'Results',
+    short: 'Results',
+    description: 'Announced results and roll-number slips for board exams, entry tests and recruitment tests across Pakistan.'
+  },
+  'career-guides': {
+    label: 'Career Guides',
+    short: 'Guides',
+    description: 'Comprehensive citizen guides, eligibility checks, verification steps, and official portal walkthroughs across Pakistan.'
+  }
+}
+
+function generateCategoryHtml(slug, catMeta, articles, canonical) {
+  const label = escapeHtml(catMeta.label || slug)
+  const desc = escapeHtml(catMeta.description || '')
+  const count = articles.length
+
+  const allCategoriesNav = [
+    { slug: 'government-jobs', label: 'Govt Jobs' },
+    { slug: 'private-jobs', label: 'Private Jobs' },
+    { slug: 'bank-jobs', label: 'Bank Jobs' },
+    { slug: 'it-jobs', label: 'IT Jobs' },
+    { slug: 'scholarships', label: 'Scholarships' },
+    { slug: 'internships', label: 'Internships' },
+    { slug: 'admissions', label: 'Admissions' },
+    { slug: 'government-schemes', label: 'Schemes' },
+    { slug: 'results', label: 'Results' },
+    { slug: 'career-guides', label: 'Guides' },
+  ]
+
+  const navPills = allCategoriesNav.map((c) => {
+    const isCurrent = c.slug === slug
+    const style = isCurrent
+      ? 'background:#059669;color:#ffffff;border:1px solid #059669;padding:6px 12px;font-size:12px;text-decoration:none;font-weight:600;border-radius:2px;'
+      : 'background:#ffffff;color:#1c1917;border:1px solid #e7e5e4;padding:6px 12px;font-size:12px;text-decoration:none;border-radius:2px;'
+    return `<a href="/category/${c.slug}" style="${style}">${escapeHtml(c.label)}</a>`
+  }).join(' ')
+
+  const articleCards = articles.length > 0 ? articles.map((art) => {
+    const artTitle = escapeHtml(art.title || '')
+    const artOrg = art.organization ? escapeHtml(art.organization) : ''
+    const artLoc = art.location ? escapeHtml(art.location) : 'Pakistan'
+    const artDate = art.last_date ? escapeHtml(art.last_date) : (art.publish_date ? `Posted ${escapeHtml(art.publish_date)}` : '')
+    const artExcerpt = art.excerpt ? escapeHtml(art.excerpt) : ''
+    const artImg = art.featured_image ? getAbsoluteUrl(art.featured_image) : ''
+    const artAlt = escapeHtml(art.image_alt || art.title || '')
+
+    return `
+      <article class="bg-white border border-line rounded-xs overflow-hidden shadow-xs hover:border-green transition-all flex flex-col justify-between" style="background:#ffffff;border:1px solid #e7e5e4;border-radius:2px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+        ${artImg ? `
+        <div style="aspect-ratio:16/9;width:100%;overflow:hidden;background:#0f172a;">
+          <img src="${artImg}" alt="${artAlt}" width="600" height="338" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" />
+        </div>` : ''}
+        <div style="padding:16px;flex:1;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:8px;">
+            <span style="color:#059669;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">${label}</span>
+            ${artDate ? `<span style="color:#78716c;">${artDate}</span>` : ''}
+          </div>
+          <h2 style="font-family:serif;font-size:16px;font-weight:700;line-height:1.35;margin-bottom:8px;color:#1c1917;">
+            <a href="/jobs/${art.slug}" style="color:#1c1917;text-decoration:none;">${artTitle}</a>
+          </h2>
+          ${artOrg ? `<p style="font-size:12px;color:#78716c;margin-bottom:8px;font-weight:500;">${artOrg}</p>` : ''}
+          ${artExcerpt ? `<p style="font-size:12px;color:#78716c;line-height:1.5;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${artExcerpt}</p>` : ''}
+          <div style="margin-top:auto;padding-top:12px;border-top:1px solid #f5f5f4;display:flex;justify-content:space-between;align-items:center;font-size:12px;">
+            <span style="color:#78716c;">${artLoc}</span>
+            <a href="/jobs/${art.slug}" style="color:#059669;font-weight:600;text-decoration:none;">View Details →</a>
+          </div>
+        </div>
+      </article>
+    `
+  }).join('\n') : `
+    <div style="grid-column:1/-1;padding:48px 16px;text-align:center;color:#78716c;">
+      <p>No listings currently available in this category. Please check back soon.</p>
+    </div>
+  `
+
+  return `
+    <div class="min-h-screen flex flex-col bg-paper font-sans">
+      <header class="border-b border-line bg-white sticky top-0 z-40 shadow-xs" style="background:#ffffff;border-bottom:1px solid #e7e5e4;">
+        <div class="container-x">
+          <div class="flex items-center justify-between h-16 gap-4 border-b border-line/50">
+            <a href="/" class="flex items-baseline gap-1.5 shrink-0 group" style="text-decoration:none;">
+              <span class="font-serif text-2xl sm:text-3xl font-bold text-ink" style="color:#1c1917;">
+                CareerDost
+              </span>
+            </a>
+            <nav class="hidden md:flex items-center gap-6 text-sm font-sans font-medium text-ink">
+              <a href="/daily-updates" style="color:#1c1917;text-decoration:none;margin-right:16px;">Daily Updates</a>
+              <a href="/category/government-jobs" style="color:#1c1917;text-decoration:none;margin-right:16px;">Govt Jobs</a>
+              <a href="/category/scholarships" style="color:#1c1917;text-decoration:none;margin-right:16px;">Scholarships</a>
+              <a href="/category/admissions" style="color:#1c1917;text-decoration:none;margin-right:16px;">Admissions</a>
+              <a href="/about" style="color:#1c1917;text-decoration:none;">About</a>
+            </nav>
+          </div>
+        </div>
+      </header>
+      <main class="flex-1">
+        <div class="container-x py-8" style="padding-top:32px;padding-bottom:32px;">
+          <nav style="font-size:12px;color:#78716c;margin-bottom:12px;" aria-label="Breadcrumb">
+            <a href="/" style="color:#059669;text-decoration:none;">Home</a>
+            <span style="margin:0 6px;">/</span>
+            <span style="color:#1c1917;">${label}</span>
+          </nav>
+
+          <h1 class="font-serif text-2xl sm:text-3xl font-bold text-ink mb-2" style="font-family:serif;font-size:28px;font-weight:700;color:#1c1917;margin-bottom:8px;">${label} in Pakistan</h1>
+          ${desc ? `<p class="font-sans text-inksoft max-w-2xl mb-6" style="color:#78716c;max-width:42rem;margin-bottom:24px;font-size:14px;line-height:1.6;">${desc}</p>` : ''}
+
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;">
+            ${navPills}
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e7e5e4;padding-bottom:12px;margin-bottom:24px;">
+            <span style="font-size:12px;color:#78716c;font-weight:600;">${count} verified listing${count === 1 ? '' : 's'}</span>
+          </div>
+
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));gap:24px;margin-bottom:48px;">
+            ${articleCards}
+          </div>
+        </div>
+      </main>
+      <footer class="border-t border-line bg-white py-12 mt-16 font-sans" style="border-top:1px solid #e7e5e4;background:#ffffff;padding:48px 0;margin-top:64px;text-align:center;">
+        <div class="container-x text-center text-xs text-inksoft" style="font-size:12px;color:#78716c;">
           <p>© 2026 CareerDost. Pakistan's Daily Career, Education &amp; Opportunity Hub.</p>
         </div>
       </footer>
@@ -769,6 +968,17 @@ export async function onRequest(context) {
     if (slug) {
       if (context.env?.DB) {
         try {
+          // If this slug exists as a primary published article in articles table,
+          // permanently 301 redirect to its canonical URL /jobs/:slug
+          const primaryArticle = await context.env.DB
+            .prepare(`SELECT slug FROM articles WHERE slug = ? AND status = 'published' LIMIT 1`)
+            .bind(slug)
+            .first()
+
+          if (primaryArticle) {
+            return Response.redirect(`${SITE_URL}/jobs/${primaryArticle.slug}`, 301)
+          }
+
           const update = await context.env.DB
             .prepare(
               `SELECT id, slug, title, short_description, content, seo_title, meta_description,
@@ -1137,10 +1347,74 @@ export async function onRequest(context) {
     const slug = pathname.replace('/category/', '').split('/')[0]
     if (slug) {
       if (VALID_CATEGORIES.has(slug)) {
-        const catFormatted = slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-        const pageTitle = escapeHtml(`${catFormatted} in Pakistan — CareerDost`)
-        const pageDesc = escapeHtml(`Explore verified ${catFormatted} across Pakistan with deadlines, eligibility criteria, and direct official application links on CareerDost.`)
+        const catMeta = CATEGORY_META[slug] || {
+          label: slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+          description: `Explore verified ${slug.replace(/-/g, ' ')} across Pakistan with deadlines, eligibility criteria, and direct official application links on CareerDost.`
+        }
+        const pageTitle = escapeHtml(`${catMeta.label} in Pakistan — CareerDost`)
+        const pageDesc = escapeHtml(catMeta.description)
         const canonical = `${SITE_URL}/category/${slug}`
+        const ogImage = DEFAULT_OG_IMAGE
+
+        let articles = []
+        if (context.env?.DB) {
+          try {
+            const { results } = await context.env.DB
+              .prepare(
+                `SELECT id, slug, title, excerpt, featured_image, image_alt,
+                        category_slug, organization, location, qualification, salary,
+                        publish_date, last_date, job_type, is_verified
+                 FROM articles
+                 WHERE category_slug = ? AND status = 'published'
+                 ORDER BY publish_date DESC
+                 LIMIT 40`
+              )
+              .bind(slug)
+              .all()
+            articles = results || []
+          } catch (err) {
+            console.warn('Category articles query error:', err)
+          }
+        }
+
+        const categoryHtml = generateCategoryHtml(slug, catMeta, articles, canonical)
+
+        const jsonLd = {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            {
+              '@type': 'ListItem',
+              position: 1,
+              name: 'Home',
+              item: SITE_URL,
+            },
+            {
+              '@type': 'ListItem',
+              position: 2,
+              name: catMeta.label,
+              item: canonical,
+            },
+          ],
+        }
+
+        const clientCategoryArticles = articles.map((a) => ({
+          id: a.id,
+          slug: a.slug,
+          title: a.title,
+          excerpt: a.excerpt || '',
+          featuredImage: a.featured_image || '',
+          imageAlt: a.image_alt || '',
+          category: a.category_slug,
+          organization: a.organization || '',
+          location: a.location || 'Pakistan',
+          qualification: a.qualification || '',
+          salary: a.salary || '',
+          publishDate: a.publish_date || '',
+          lastDate: a.last_date || '',
+          jobType: a.job_type || '',
+          isVerified: Boolean(a.is_verified),
+        }))
 
         return new HTMLRewriter()
           .on('title', { element: (e) => e.setInnerContent(pageTitle) })
@@ -1149,6 +1423,23 @@ export async function onRequest(context) {
           .on('meta[property="og:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
           .on('meta[property="og:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
           .on('meta[property="og:url"]', { element: (e) => e.setAttribute('content', canonical) })
+          .on('meta[property="og:image"]', { element: (e) => e.setAttribute('content', ogImage) })
+          .on('meta[name="twitter:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
+          .on('meta[name="twitter:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
+          .on('meta[name="twitter:image"]', { element: (e) => e.setAttribute('content', ogImage) })
+          .on('head', {
+            element(e) {
+              e.append(`<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`, { html: true })
+              if (clientCategoryArticles.length > 0) {
+                e.append(`<script>window.__INITIAL_CATEGORY_ARTICLES__ = ${JSON.stringify(clientCategoryArticles).replace(/</g, '\\u003c')}; window.__INITIAL_CATEGORY_SLUG__ = "${slug}";</script>\n`, { html: true })
+              }
+            },
+          })
+          .on('#root', {
+            element(e) {
+              e.setInnerContent(categoryHtml, { html: true })
+            },
+          })
           .transform(response)
       } else {
         return new Response(generate404Html('Category Not Found', `The category "${escapeHtml(slug)}" does not exist.`), {
