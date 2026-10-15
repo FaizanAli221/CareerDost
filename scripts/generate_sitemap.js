@@ -7,6 +7,8 @@ import { categories } from '../src/data/categories.js'
 const SITE_URL = process.env.SITE_URL || 'https://careerdost.blog'
 
 const publishedDailyUpdates = [
+  { slug: 'wheat-seed-prices-2026-pakistan-nsdra-directives', date: '2026-10-15' },
+  { slug: 'fbr-tax-return-deadline-2026-extension-status-iris-filing-guide', date: '2026-10-15' },
   { slug: 'zarkhez-e-asaan-digital-zarai-qarza-guide-2026', date: '2026-10-14' },
   { slug: 'benazir-women-agricultural-worker-card-sindh-guide-2026', date: '2026-10-14' },
   { slug: 'sindh-peoples-housing-flood-affectees-sphf-subsidy-guide-2026', date: '2026-10-14' },
