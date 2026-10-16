@@ -824,6 +824,142 @@ function generateCategoryHtml(slug, catMeta, articles, canonical) {
   `
 }
 
+function generateDailyUpdatesIndexHtml(updates, canonical) {
+  const updatePills = [
+    'All Updates',
+    'Latest Jobs',
+    'Government Jobs',
+    'Private Jobs',
+    'Bank Jobs',
+    'Internships',
+    'Scholarships',
+    'Admissions',
+    'Results',
+  ]
+
+  const navPills = updatePills.map((p, idx) => {
+    const isCurrent = idx === 0
+    const style = isCurrent
+      ? 'background:#059669;color:#ffffff;border:1px solid #059669;padding:6px 12px;font-size:12px;text-decoration:none;font-weight:600;border-radius:2px;'
+      : 'background:#ffffff;color:#1c1917;border:1px solid #e7e5e4;padding:6px 12px;font-size:12px;text-decoration:none;border-radius:2px;'
+    return `<a href="/daily-updates" style="${style}">${escapeHtml(p)}</a>`
+  }).join(' ')
+
+  const cardsHtml = updates && updates.length > 0 ? updates.map((up) => {
+    const upTitle = escapeHtml(up.title || '')
+    const upCat = escapeHtml(up.category || 'Career Alert')
+    const upOrg = up.organization ? escapeHtml(up.organization) : ''
+    const upLoc = up.location ? escapeHtml(up.location) : 'Pakistan'
+    const upDate = up.publish_date ? escapeHtml(up.publish_date) : ''
+    const upDeadline = up.deadline && !up.no_deadline ? escapeHtml(up.deadline) : ''
+    const upDesc = escapeHtml(up.short_description || up.meta_description || '')
+    const upImg = up.featured_image ? getAbsoluteUrl(up.featured_image) : ''
+    const upAlt = escapeHtml(up.image_alt || up.title || '')
+    const upUrl = `/daily-updates/${up.slug}`
+
+    return `
+      <article class="bg-white border border-line rounded-xs overflow-hidden shadow-xs hover:border-green transition-all flex flex-col justify-between" style="background:#ffffff;border:1px solid #e7e5e4;border-radius:2px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+        ${upImg ? `
+        <div style="aspect-ratio:16/9;width:100%;overflow:hidden;background:#0f172a;">
+          <img src="${upImg}" alt="${upAlt}" width="600" height="338" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" />
+        </div>` : ''}
+        <div style="padding:16px;flex:1;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:8px;gap:8px;">
+            <span style="color:#059669;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">${upCat}</span>
+            ${upDate ? `<span style="color:#78716c;font-size:11px;">${upDate}</span>` : ''}
+          </div>
+          <h2 style="font-family:serif;font-size:16px;font-weight:700;line-height:1.35;margin-bottom:8px;color:#1c1917;">
+            <a href="${upUrl}" style="color:#1c1917;text-decoration:none;">${upTitle}</a>
+          </h2>
+          ${upOrg ? `<p style="font-size:12px;color:#78716c;margin-bottom:6px;font-weight:500;">${upOrg} • ${upLoc}</p>` : ''}
+          ${upDesc ? `<p style="font-size:12px;color:#78716c;line-height:1.5;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${upDesc}</p>` : ''}
+          <div style="margin-top:auto;padding-top:12px;border-top:1px solid #f5f5f4;display:flex;justify-content:space-between;align-items:center;font-size:12px;">
+            <span style="color:${upDeadline ? '#b45309' : '#059669'};font-weight:500;">${upDeadline ? `Deadline: ${upDeadline}` : 'Active Alert'}</span>
+            <a href="${upUrl}" style="color:#059669;font-weight:600;text-decoration:none;">Read Update →</a>
+          </div>
+        </div>
+      </article>
+    `
+  }).join('\n') : `
+    <div style="grid-column:1/-1;padding:48px 16px;text-align:center;color:#78716c;">
+      <p>No daily updates currently published. Please check back soon.</p>
+    </div>
+  `
+
+  return `
+    <div class="min-h-screen flex flex-col bg-paper font-sans">
+      <header class="border-b border-line bg-white sticky top-0 z-40 shadow-xs" style="background:#ffffff;border-bottom:1px solid #e7e5e4;">
+        <div class="container-x">
+          <div class="flex items-center justify-between h-16 gap-4 border-b border-line/50">
+            <a href="/" class="flex items-baseline gap-1.5 shrink-0 group" style="text-decoration:none;">
+              <span class="font-serif text-2xl sm:text-3xl font-bold text-ink" style="color:#1c1917;">
+                CareerDost
+              </span>
+            </a>
+            <nav class="hidden md:flex items-center gap-6 text-sm font-sans font-medium text-ink">
+              <a href="/daily-updates" style="color:#059669;text-decoration:none;font-weight:700;margin-right:16px;">Daily Updates</a>
+              <a href="/category/government-jobs" style="color:#1c1917;text-decoration:none;margin-right:16px;">Govt Jobs</a>
+              <a href="/category/scholarships" style="color:#1c1917;text-decoration:none;margin-right:16px;">Scholarships</a>
+              <a href="/category/admissions" style="color:#1c1917;text-decoration:none;margin-right:16px;">Admissions</a>
+              <a href="/about" style="color:#1c1917;text-decoration:none;">About</a>
+            </nav>
+          </div>
+        </div>
+      </header>
+      <main class="flex-1">
+        <div class="container-x py-8" style="padding-top:32px;padding-bottom:32px;">
+          <nav style="font-size:12px;color:#78716c;margin-bottom:12px;" aria-label="Breadcrumb">
+            <a href="/" style="color:#059669;text-decoration:none;">Home</a>
+            <span style="margin:0 6px;">/</span>
+            <span style="color:#1c1917;">Daily Updates</span>
+          </nav>
+
+          <div style="background:#ffffff;border:1px solid #e7e5e4;padding:24px;border-radius:2px;margin-bottom:24px;">
+            <div style="display:inline-flex;align-items:center;gap:8px;background:#ecfdf5;border:1px solid #a7f3d0;padding:4px 10px;font-size:11px;font-weight:700;color:#065f46;border-radius:9999px;margin-bottom:12px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:#059669;display:inline-block;"></span>
+              Live Pakistan Career Feed
+            </div>
+            <h1 class="font-serif text-2xl sm:text-4xl font-bold text-ink mb-2" style="font-family:serif;font-size:32px;font-weight:700;color:#1c1917;margin-bottom:8px;">
+              Daily Updates &amp; Opportunity Alerts
+            </h1>
+            <p class="font-sans text-inksoft max-w-3xl" style="color:#78716c;max-width:48rem;font-size:14px;line-height:1.6;">
+              Real-time updates on verified Pakistan recruitment drives, government job gazettes, university admissions, scholarship deadlines, and testing agency announcements.
+            </p>
+          </div>
+
+          <div style="background:linear-gradient(to right, #064e3b, #065f46, #0f172a);color:#ffffff;padding:24px;border-radius:8px;margin-bottom:24px;border:1px solid rgba(5,150,105,0.3);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+            <div>
+              <div style="display:inline-block;background:rgba(37,211,102,0.2);border:1px solid rgba(37,211,102,0.4);color:#25d366;font-size:11px;font-weight:700;padding:2px 8px;border-radius:9999px;margin-bottom:8px;text-transform:uppercase;">Official Channel</div>
+              <strong style="font-family:serif;font-size:20px;display:block;color:#ffffff;">Want Daily Opportunity Alerts?</strong>
+              <p style="font-size:13px;color:#a7f3d0;margin-top:4px;max-width:36rem;">Join CareerDost on WhatsApp. Get official Pakistan government &amp; private job postings, university admissions, and scholarship alerts delivered directly to your phone.</p>
+            </div>
+            <div>
+              <a href="https://whatsapp.com/channel/0029VbDnzwFF1YlIkJax2P1o" target="_blank" rel="noopener noreferrer" style="background:#25d366;color:#020617;font-weight:700;font-size:13px;padding:12px 20px;border-radius:6px;text-decoration:none;display:inline-block;">Join CareerDost WhatsApp Channel →</a>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;">
+            ${navPills}
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e7e5e4;padding-bottom:12px;margin-bottom:24px;">
+            <span style="font-size:12px;color:#78716c;font-weight:600;">Latest Live Updates (${updates ? updates.length : 0} items)</span>
+          </div>
+
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));gap:24px;margin-bottom:48px;">
+            ${cardsHtml}
+          </div>
+        </div>
+      </main>
+      <footer class="border-t border-line bg-white py-12 mt-16 font-sans" style="border-top:1px solid #e7e5e4;background:#ffffff;padding:48px 0;margin-top:64px;text-align:center;">
+        <div class="container-x text-center text-xs text-inksoft" style="font-size:12px;color:#78716c;">
+          <p>© 2026 CareerDost. Pakistan's Daily Career, Education &amp; Opportunity Hub.</p>
+        </div>
+      </footer>
+    </div>
+  `
+}
+
 export async function onRequest(context) {
   const url = new URL(context.request.url)
   const host = url.hostname.toLowerCase()
@@ -1510,6 +1646,93 @@ export async function onRequest(context) {
     const pageTitle = 'Daily Career & Education Updates in Pakistan — CareerDost'
     const pageDesc = 'Live real-time feed of Pakistan career notifications, university admissions, testing roll numbers, and government scheme updates.'
     const canonical = `${SITE_URL}/daily-updates`
+
+    let updates = []
+    if (context.env?.DB) {
+      try {
+        const { results } = await context.env.DB
+          .prepare(
+            `SELECT id, slug, title, category, short_description, featured_image, image_alt,
+                    official_link, apply_link, deadline, publish_date, organization,
+                    location, qualification, salary, is_verified, no_deadline
+             FROM daily_updates WHERE status = 'published' ORDER BY publish_date DESC LIMIT 24`
+          )
+          .all()
+        if (results && results.length > 0) {
+          updates = results
+        }
+      } catch (err) {
+        console.warn('DB daily updates fetch error:', err)
+      }
+    }
+
+    const updatesHtml = generateDailyUpdatesIndexHtml(updates, canonical)
+
+    const clientUpdates = updates.map((u) => ({
+      id: u.id,
+      slug: u.slug,
+      title: u.title,
+      category: u.category,
+      shortDescription: u.short_description || '',
+      featuredImage: u.featured_image || '',
+      imageAlt: u.image_alt || '',
+      officialLink: u.official_link || '',
+      applyLink: u.apply_link || '',
+      deadline: u.deadline || '',
+      publishDate: u.publish_date || '',
+      organization: u.organization || '',
+      location: u.location || '',
+      qualification: u.qualification || '',
+      salary: u.salary || '',
+      isVerified: Boolean(u.is_verified),
+      noDeadline: Boolean(u.no_deadline),
+    }))
+
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'CollectionPage',
+          '@id': `${canonical}#webpage`,
+          url: canonical,
+          name: pageTitle,
+          description: pageDesc,
+          isPartOf: { '@id': `${SITE_URL}/#website` },
+          about: {
+            '@type': 'Thing',
+            name: 'Pakistan Career Updates, Admissions & Government Schemes',
+          },
+          mainEntity: {
+            '@type': 'ItemList',
+            numberOfItems: updates.length,
+            itemListElement: updates.slice(0, 10).map((u, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              name: u.title,
+              url: `${SITE_URL}/daily-updates/${u.slug}`,
+            })),
+          },
+        },
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            {
+              '@type': 'ListItem',
+              position: 1,
+              name: 'Home',
+              item: SITE_URL,
+            },
+            {
+              '@type': 'ListItem',
+              position: 2,
+              name: 'Daily Updates',
+              item: canonical,
+            },
+          ],
+        },
+      ],
+    }
+
     return new HTMLRewriter()
       .on('title', { element: (e) => e.setInnerContent(pageTitle) })
       .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
@@ -1517,6 +1740,19 @@ export async function onRequest(context) {
       .on('meta[property="og:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
       .on('meta[property="og:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('meta[property="og:url"]', { element: (e) => e.setAttribute('content', canonical) })
+      .on('head', {
+        element(e) {
+          e.append(`<script id="page-jsonld" type="application/ld+json">${JSON.stringify(jsonLd)}</script>`, { html: true })
+          if (clientUpdates.length > 0) {
+            e.append(`<script>window.__INITIAL_UPDATES__ = ${JSON.stringify(clientUpdates).replace(/</g, '\\u003c')};</script>\n`, { html: true })
+          }
+        },
+      })
+      .on('#root', {
+        element(e) {
+          e.setInnerContent(updatesHtml, { html: true })
+        },
+      })
       .transform(response)
   }
 

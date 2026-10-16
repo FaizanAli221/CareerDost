@@ -1,6 +1,32 @@
+# CareerDost (https://careerdost.blog) — Robots Configuration
+
+# Primary Web Search Engines
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# Generative Engine Optimization (GEO) & Answer Search Bots (Allowed for real-time citations)
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# Default Crawlers
 User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /api/
 
+# XML Sitemap
 Sitemap: https://careerdost.blog/sitemap.xml

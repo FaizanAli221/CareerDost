@@ -10,7 +10,8 @@ async function main() {
       '--headless=new',
       '--disable-gpu',
       '--no-sandbox',
-      '--disable-dev-shm-usage'
+      '--disable-dev-shm-usage',
+      '--ignore-certificate-errors'
     ],
     chromePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
   });

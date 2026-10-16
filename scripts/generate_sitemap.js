@@ -226,12 +226,38 @@ function generateSitemap() {
   fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), xml, 'utf8')
   console.log(`Generated sitemap.xml with ${allUrls.length} public URLs at public/sitemap.xml`)
 
-  // Write robots.txt
-  const robotsTxt = `User-agent: *
+  // Write robots.txt with dedicated directives for search and GEO/AEO citation bots
+  const robotsTxt = `# CareerDost (https://careerdost.blog) — Robots Configuration
+
+# Primary Web Search Engines
+User-agent: Googlebot
 Allow: /
 Disallow: /admin
 Disallow: /api/
 
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# Generative Engine Optimization (GEO) & Answer Search Bots (Allowed for real-time citations)
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# Default Crawlers
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# XML Sitemap
 Sitemap: ${SITE_URL}/sitemap.xml
 `
   fs.writeFileSync(path.join(publicDir, 'robots.txt'), robotsTxt, 'utf8')

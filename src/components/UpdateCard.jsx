@@ -12,19 +12,27 @@ function isRecent(publishDate, hours = 48) {
 
 function formatDate(dateStr) {
   if (!dateStr) return ''
-  const date = new Date(dateStr)
-  if (isNaN(date.getTime())) return dateStr
+  try {
+    const date = new Date(dateStr)
+    if (isNaN(date.getTime())) return String(dateStr)
 
-  const diffMs = Date.now() - date.getTime()
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-  if (diffHours < 1) return 'Just now'
-  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
+    const diffMs = Date.now() - date.getTime()
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+    if (diffHours < 1) return 'Just now'
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
 
-  return date.toLocaleDateString('en-PK', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  })
+    return date.toLocaleDateString('en-PK', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    })
+  } catch {
+    try {
+      return new Date(dateStr).toISOString().split('T')[0]
+    } catch {
+      return String(dateStr)
+    }
+  }
 }
 
 export default function UpdateCard({ updateItem, priority = false }) {

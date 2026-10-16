@@ -36,7 +36,13 @@ function setJsonLd(schema) {
   const isSiteWideDuplicate = serialized.includes('/#website') && document.querySelectorAll('script[type="application/ld+json"]').length >= 1
 
   if (!schema || isSiteWideDuplicate) {
-    if (pageScript) pageScript.remove()
+    if (pageScript) {
+      if (pageScript.parentNode) {
+        pageScript.parentNode.removeChild(pageScript)
+      } else if (typeof pageScript.remove === 'function') {
+        pageScript.remove()
+      }
+    }
     return
   }
 

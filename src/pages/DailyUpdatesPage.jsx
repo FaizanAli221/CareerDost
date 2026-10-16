@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { getDailyUpdatesFromDb } from '../api/client'
 import UpdateCard from '../components/UpdateCard'
@@ -20,20 +20,60 @@ const UPDATE_CATEGORIES = [
 ]
 
 export default function DailyUpdatesPage() {
-  const [updates, setUpdates] = useState([])
+  const initialUpdates =
+    typeof window !== 'undefined' && Array.isArray(window.__INITIAL_UPDATES__) && window.__INITIAL_UPDATES__.length > 0
+      ? window.__INITIAL_UPDATES__
+      : []
+  const [updates, setUpdates] = useState(initialUpdates)
   const [selectedCategory, setSelectedCategory] = useState('All Updates')
   const [searchQuery, setSearchQuery] = useState('')
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(initialUpdates.length === 0)
+  const [visibleCount, setVisibleCount] = useState(24)
+
+  const jsonLd = useMemo(() => ({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': 'https://careerdost.blog/daily-updates#webpage',
+        url: 'https://careerdost.blog/daily-updates',
+        name: 'Daily Updates & Job Notifications — CareerDost Pakistan',
+        description: 'Latest daily career updates, government job announcements, test results, scholarship deadlines, and admission notices across Pakistan.',
+        isPartOf: { '@id': 'https://careerdost.blog/#website' },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: 'https://careerdost.blog/',
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Daily Updates',
+            item: 'https://careerdost.blog/daily-updates',
+          },
+        ],
+      },
+    ],
+  }), [])
 
   useSeo({
     title: 'Daily Updates & Job Notifications — CareerDost Pakistan',
     description: 'Latest daily career updates, government job announcements, test results, scholarship deadlines, and admission notices across Pakistan.',
     canonical: '/daily-updates',
+    jsonLd,
   })
 
   useEffect(() => {
     let isMounted = true
-    setLoading(true)
+
+    if (selectedCategory !== 'All Updates' || searchQuery.trim() || updates.length === 0) {
+      setLoading(true)
+    }
 
     const params = {}
     if (selectedCategory !== 'All Updates') {
@@ -45,7 +85,9 @@ export default function DailyUpdatesPage() {
 
     getDailyUpdatesFromDb(params)
       .then((data) => {
-        if (isMounted) setUpdates(data || [])
+        if (isMounted && Array.isArray(data)) {
+          setUpdates(data)
+        }
       })
       .catch((err) => {
         console.warn('Failed to load updates:', err)
@@ -165,10 +207,25 @@ export default function DailyUpdatesPage() {
           )}
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {updates.map((item) => (
-            <UpdateCard key={item.slug} updateItem={item} />
-          ))}
+        <div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {updates.slice(0, visibleCount).map((item) => (
+              <UpdateCard key={item.slug} updateItem={item} />
+            ))}
+          </div>
+          {updates.length > visibleCount && (
+            <div className="mt-10 text-center">
+              <button
+                onClick={() => setVisibleCount((prev) => prev + 24)}
+                className="inline-flex items-center gap-2 border border-green text-green hover:bg-green hover:text-white px-6 py-2.5 text-xs font-sans font-semibold rounded-xs transition-colors shadow-xs"
+              >
+                <span>Load More Updates</span>
+                <span className="bg-green/10 text-green group-hover:bg-white/20 px-2 py-0.5 rounded-full text-[10px]">
+                  {updates.length - visibleCount} more
+                </span>
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
