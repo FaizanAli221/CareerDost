@@ -7,6 +7,7 @@ import { categories } from '../src/data/categories.js'
 const SITE_URL = process.env.SITE_URL || 'https://careerdost.blog'
 
 const publishedDailyUpdates = [
+  { slug: 'electricity-bills-november-2026-rs256-fuel-adjustment-explained', date: '2026-10-16' },
   { slug: '10pearls-shine-virtual-internship-2026', date: '2026-10-15' },
   { slug: 'mcb-bank-infosec-trainee-jobs-2026', date: '2026-10-15' },
   { slug: 'japan-jds-scholarship-2026-pakistan', date: '2026-10-15' },
