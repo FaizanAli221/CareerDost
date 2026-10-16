@@ -10,6 +10,7 @@ import { useSeo } from '../lib/useSeo'
 import { getAbsoluteUrl } from '../lib/config'
 import { trackApplyNowClick, trackOfficialSourceClick } from '../lib/analytics'
 import { getContentType, getContentTypeLabels, getContextualStatus } from '../lib/contentType'
+import { isGenuineJobVacancy, buildJobPostingSchema } from '../lib/jobSchema'
 
 import CategoryFallbackImage from '../components/CategoryFallbackImage'
 import OptimizedImage from '../components/OptimizedImage'
@@ -160,7 +161,8 @@ export default function ArticlePage() {
       ],
     }
 
-    const qualifiesForJobPosting = contentType === 'job' && listing.schemaType !== 'Article'
+    const qualifiesForJobPosting =
+      isGenuineJobVacancy(listing, contentType) && listing.schemaType !== 'Article'
 
     let mainSchema
     if (!qualifiesForJobPosting) {
@@ -194,47 +196,10 @@ export default function ArticlePage() {
         image: listing.featuredImage ? getAbsoluteUrl(listing.featuredImage) : undefined,
       }
     } else {
-      const jobTypeStr = String(listing.jobType || '').toLowerCase()
-      const isInternship = listing.category === 'internships' || jobTypeStr.includes('intern')
-      mainSchema = {
-        '@type': 'JobPosting',
-        title: listing.title || 'Opportunity',
-        description:
-          listing.metaDescription ||
-          (Array.isArray(listing.content) ? listing.content.join(' ') : String(listing.content || '')),
-        datePosted: listing.publishDate || undefined,
-        validThrough: listing.lastDate && !isNaN(new Date(listing.lastDate.split('T')[0] + 'T00:00:00').getTime()) ? listing.lastDate : undefined,
-        employmentType: isInternship
-          ? 'INTERN'
-          : jobTypeStr.includes('part')
-          ? 'PART_TIME'
-          : 'FULL_TIME',
-        hiringOrganization: listing.organization
-          ? {
-              '@type': 'Organization',
-              name: listing.organization,
-              sameAs: listing.officialLink ? safeUrl(listing.officialLink) : undefined,
-            }
-          : undefined,
-        jobLocation: {
-          '@type': 'Place',
-          address: {
-            '@type': 'PostalAddress',
-            addressLocality: listing.location || 'Pakistan',
-            addressCountry: 'PK',
-          },
-        },
-        baseSalary: listing.salary
-          ? {
-              '@type': 'MonetaryAmount',
-              currency: 'PKR',
-              value: {
-                '@type': 'QuantitativeValue',
-                value: listing.salary,
-              },
-            }
-          : undefined,
-      }
+      mainSchema = buildJobPostingSchema({
+        ...listing,
+        officialLink: listing.officialLink ? safeUrl(listing.officialLink) : undefined,
+      })
     }
 
     return {

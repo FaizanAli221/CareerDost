@@ -23,17 +23,30 @@ function setLinkCanonical(url) {
 }
 
 function setJsonLd(schema) {
-  let script = document.querySelector('script[type="application/ld+json"]')
-  if (!schema) {
-    if (script) script.remove()
+  let pageScript = document.querySelector('script#page-jsonld[type="application/ld+json"]')
+  if (!pageScript) {
+    const allScripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
+    if (allScripts.length > 1) {
+      pageScript = allScripts[allScripts.length - 1]
+      pageScript.setAttribute('id', 'page-jsonld')
+    }
+  }
+
+  const serialized = schema ? (typeof schema === 'string' ? schema : JSON.stringify(schema)) : ''
+  const isSiteWideDuplicate = serialized.includes('/#website') && document.querySelectorAll('script[type="application/ld+json"]').length >= 1
+
+  if (!schema || isSiteWideDuplicate) {
+    if (pageScript) pageScript.remove()
     return
   }
-  if (!script) {
-    script = document.createElement('script')
-    script.setAttribute('type', 'application/ld+json')
-    document.head.appendChild(script)
+
+  if (!pageScript) {
+    pageScript = document.createElement('script')
+    pageScript.setAttribute('id', 'page-jsonld')
+    pageScript.setAttribute('type', 'application/ld+json')
+    document.head.appendChild(pageScript)
   }
-  script.textContent = typeof schema === 'string' ? schema : JSON.stringify(schema)
+  pageScript.textContent = serialized
 }
 
 export function useSeo(options = {}) {

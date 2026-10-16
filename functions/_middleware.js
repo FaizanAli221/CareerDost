@@ -7,6 +7,8 @@
  * 3. Proper HTTP 404 responses for non-existent or unverified slugs (eliminating Soft 404s)
  */
 
+import { isGenuineJobVacancy, buildJobPostingSchema } from '../src/lib/jobSchema.js'
+
 const SITE_URL = 'https://careerdost.blog'
 const SITE_NAME = 'CareerDost'
 const DEFAULT_OG_IMAGE = `${SITE_URL}/images/hec-commonwealth-scholarship-2027.jpg`
@@ -217,7 +219,6 @@ function detectContentTypeEdge(category, title = '', slug = '', jobType = '') {
   const jType = String(jobType || '').toLowerCase().trim()
   const s = String(slug || '').toLowerCase().trim()
   const t = String(title || '').toLowerCase().trim()
-  const text = `${cat} ${jType} ${s} ${t}`
 
   if (
     s.includes('minimum-wage') ||
@@ -232,13 +233,10 @@ function detectContentTypeEdge(category, title = '', slug = '', jobType = '') {
     jType.includes('order') ||
     jType.includes('food reserve') ||
     jType.includes('commodity pricing') ||
-    text.includes('minimum wage') ||
-    text.includes('notification') ||
-    text.includes('gazette') ||
-    text.includes('sro') ||
-    text.includes('section 144') ||
-    text.includes('circular') ||
-    text.includes('price reduced')
+    t.includes('minimum wage') ||
+    t.includes('section 144') ||
+    t.includes('notification') ||
+    t.includes('price reduced')
   ) {
     return 'notification'
   }
@@ -246,10 +244,12 @@ function detectContentTypeEdge(category, title = '', slug = '', jobType = '') {
     cat === 'career-guides' ||
     s.includes('official-guide') ||
     s.includes('payment-check') ||
-    t.toLowerCase().includes('guide') ||
+    s === 'sindh-job-portal-2026-junior-clerk-jobs' ||
+    s === 'pec-graduate-engineer-training-get-program-2026' ||
+    t.includes('guide') ||
+    t.includes('ka tarika') ||
     jType.includes('guide') ||
-    s.includes('guide') ||
-    text.includes('how to')
+    jType.includes('(expired)')
   ) {
     return 'guide'
   }
@@ -268,20 +268,43 @@ function detectContentTypeEdge(category, title = '', slug = '', jobType = '') {
     jType.includes('social safety') ||
     jType.includes('subsidy') ||
     jType.includes('cash transfer') ||
-    text.includes('scheme') ||
-    text.includes('bisp') ||
-    text.includes('subsidy') ||
-    text.includes('programme')
+    jType.includes('cashless') ||
+    jType.includes('skill training')
   ) {
     return 'scheme'
   }
-  if (cat === 'admissions' || s.includes('admission') || text.includes('admission') || text.includes('entry test')) {
+  if (
+    cat === 'admissions' ||
+    s.includes('admissions') ||
+    s.includes('entry-test') ||
+    s.includes('gat-subject') ||
+    s.includes('nat-gat-roll') ||
+    jType.includes('admission') ||
+    jType.includes('intake')
+  ) {
     return 'admission'
   }
-  if (cat === 'results' || s.includes('result') || text.includes('result') || text.includes('merit list')) {
+  if (
+    cat === 'results' ||
+    cat === 'results / test updates' ||
+    s.includes('result') ||
+    s.includes('merit-list') ||
+    s.includes('answer-keys') ||
+    s.includes('exam-slips') ||
+    s.includes('timetable') ||
+    jType.includes('result') ||
+    jType.includes('merit list') ||
+    jType.includes('examination') ||
+    jType.includes('screening test')
+  ) {
     return 'result'
   }
-  if (cat === 'scholarships' || s.includes('scholarship') || text.includes('scholarship') || text.includes('fellowship')) {
+  if (
+    cat === 'scholarships' ||
+    s.includes('scholarship') ||
+    jType.includes('scholarship') ||
+    jType.includes('research support')
+  ) {
     return 'scholarship'
   }
   return 'job'
@@ -1068,7 +1091,7 @@ export async function onRequest(context) {
                       },
                     ],
                   }
-                  e.append(`<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`, { html: true })
+                  e.append(`<script id="page-jsonld" type="application/ld+json">${JSON.stringify(jsonLd)}</script>`, { html: true })
                   const clientUpdateData = {
                     id: update.id,
                     slug: update.slug,
@@ -1163,40 +1186,11 @@ export async function onRequest(context) {
             const ogImage = getAbsoluteUrl(article.featured_image)
             const jobHtml = generateJobHtml(article, canonical)
 
-            const isJob = ['government-jobs', 'private-jobs', 'bank-jobs', 'it-jobs', 'internships'].includes(article.category_slug)
+            const cType = detectContentTypeEdge(article.category_slug, article.title, article.slug, article.job_type)
+            const isJob = isGenuineJobVacancy(article, cType)
 
             const mainSchema = isJob
-              ? {
-                  '@type': 'JobPosting',
-                  title: article.title,
-                  description: article.meta_description || article.excerpt || article.title,
-                  datePosted: article.publish_date,
-                  validThrough: article.last_date || undefined,
-                  employmentType: article.category_slug === 'internships' ? 'INTERN' : 'FULL_TIME',
-                  hiringOrganization: {
-                    '@type': 'Organization',
-                    name: article.organization || 'CareerDost',
-                    sameAs: article.official_link || undefined,
-                  },
-                  jobLocation: {
-                    '@type': 'Place',
-                    address: {
-                      '@type': 'PostalAddress',
-                      addressLocality: article.location || 'Pakistan',
-                      addressCountry: 'PK',
-                    },
-                  },
-                  baseSalary: article.salary
-                    ? {
-                        '@type': 'MonetaryAmount',
-                        currency: 'PKR',
-                        value: {
-                          '@type': 'QuantitativeValue',
-                          value: article.salary,
-                        },
-                      }
-                    : undefined,
-                }
+              ? buildJobPostingSchema(article)
               : {
                   '@type': 'Article',
                   headline: article.title,
@@ -1269,7 +1263,7 @@ export async function onRequest(context) {
                       },
                     ],
                   }
-                  e.append(`<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`, { html: true })
+                  e.append(`<script id="page-jsonld" type="application/ld+json">${JSON.stringify(jsonLd)}</script>`, { html: true })
                   const clientArticleData = {
                     id: article.id,
                     slug: article.slug,
@@ -1429,7 +1423,7 @@ export async function onRequest(context) {
           .on('meta[name="twitter:image"]', { element: (e) => e.setAttribute('content', ogImage) })
           .on('head', {
             element(e) {
-              e.append(`<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`, { html: true })
+              e.append(`<script id="page-jsonld" type="application/ld+json">${JSON.stringify(jsonLd)}</script>`, { html: true })
               if (clientCategoryArticles.length > 0) {
                 e.append(`<script>window.__INITIAL_CATEGORY_ARTICLES__ = ${JSON.stringify(clientCategoryArticles).replace(/</g, '\\u003c')}; window.__INITIAL_CATEGORY_SLUG__ = "${slug}";</script>\n`, { html: true })
               }

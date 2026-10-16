@@ -48,8 +48,12 @@ export function getContentType(item) {
     cat === 'career-guides' ||
     slug.includes('official-guide') ||
     slug.includes('payment-check') ||
+    slug === 'sindh-job-portal-2026-junior-clerk-jobs' ||
+    slug === 'pec-graduate-engineer-training-get-program-2026' ||
     title.includes('guide') ||
-    jobType.includes('guide')
+    title.includes('ka tarika') ||
+    jobType.includes('guide') ||
+    jobType.includes('(expired)')
   ) {
     return 'guide'
   }
