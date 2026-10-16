@@ -7,6 +7,11 @@ import { categories } from '../src/data/categories.js'
 const SITE_URL = process.env.SITE_URL || 'https://careerdost.blog'
 
 const publishedDailyUpdates = [
+  { slug: 'kp-government-project-associate-internship-2026', date: '2026-10-16' },
+  { slug: 'aku-karachi-jobs-traineeships-2026', date: '2026-10-16' },
+  { slug: 'systems-limited-associate-software-engineer-jobs-2026', date: '2026-10-16' },
+  { slug: 'hbl-jobs-internships-the-league-2026', date: '2026-10-16' },
+  { slug: 'jazz-careers-ai-associate-programme-2026', date: '2026-10-16' },
   { slug: 'electricity-bills-november-2026-rs256-fuel-adjustment-explained', date: '2026-10-16' },
   { slug: '10pearls-shine-virtual-internship-2026', date: '2026-10-15' },
   { slug: 'mcb-bank-infosec-trainee-jobs-2026', date: '2026-10-15' },

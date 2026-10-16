@@ -1,79 +1,86 @@
 import fs from 'fs'
 import path from 'path'
-import { oct16EditorialPackages } from './save_oct16_editorial_packages.js'
-import { listings } from '../src/data/listings.js'
-import { execSync } from 'child_process'
+import { oct16JobsPackages } from './save_oct16_jobs_packages.js'
 
-function updateListings() {
-  console.log('=== UPDATING SRC/DATA/LISTINGS.JS FOR OCT 16 ===')
-  const listingsPath = path.resolve('src/data/listings.js')
+console.log('=== UPDATING SRC/DATA/LISTINGS.JS WITH 5 NEW JOBS/INTERNSHIPS ===\n')
 
-  const items = Object.values(oct16EditorialPackages)
+const listingsPath = path.resolve('src/data/listings.js')
+const listingsRaw = fs.readFileSync(listingsPath, 'utf8')
 
-  const newItemsFormatted = items.map(a => ({
-    slug: a.slug,
-    title: a.title,
-    category: a.category_slug,
-    organization: a.organization,
-    jobType: a.job_type,
-    location: a.location,
-    qualification: a.qualification,
-    salary: a.salary,
-    experience: a.experience,
-    positions: a.positions,
-    lastDate: a.last_date,
-    noDeadline: Boolean(a.no_deadline),
-    publishDate: a.publish_date,
-    officialLink: a.official_link,
-    applyLink: a.apply_link,
-    isVerified: Boolean(a.is_verified),
-    featured: Boolean(a.featured),
-    logoInitial: a.logo_initial,
-    featuredImage: a.featured_image,
-    imageAlt: a.image_alt,
-    excerpt: a.excerpt,
-    seoTitle: a.seo_title,
-    metaDescription: a.meta_description,
-    focusKeyword: a.focus_keyword,
-    canonicalUrl: a.canonical_url,
-    ogTitle: a.og_title,
-    ogDescription: a.og_description,
-    schemaType: 'Article',
-    content: a.content
-  }))
-
-  const newSlugs = new Set(items.map(i => i.slug))
-  const filteredOldListings = listings.filter(l => !newSlugs.has(l.slug))
-  const combinedListings = [...newItemsFormatted, ...filteredOldListings]
-
-  const fileContent = `// Generated listings file for CareerDost\nexport const listings = ${JSON.stringify(combinedListings, null, 2)}\n`
-  fs.writeFileSync(listingsPath, fileContent, 'utf8')
-  console.log(`✓ Successfully updated src/data/listings.js with ${combinedListings.length} total articles!`)
+// Parse existing listings
+const match = listingsRaw.match(/export const listings = (\[[\s\S]*\]);?\s*$/)
+if (!match) {
+  console.error('Could not parse listings array from src/data/listings.js')
+  process.exit(1)
 }
 
-function updateSitemapScript() {
-  console.log('\n=== UPDATING SCRIPTS/GENERATE_SITEMAP.JS ===')
-  const sitemapScriptPath = path.resolve('scripts/generate_sitemap.js')
-  let sitemapScript = fs.readFileSync(sitemapScriptPath, 'utf8')
-
-  const newEntries = [
-    { slug: 'electricity-bills-november-2026-rs256-fuel-adjustment-explained', date: '2026-10-16' }
-  ]
-
-  const insertPattern = 'const publishedDailyUpdates = [\n'
-  const entriesStr = newEntries.map(e => `  { slug: '${e.slug}', date: '${e.date}' },\n`).join('')
-
-  if (!sitemapScript.includes('electricity-bills-november-2026-rs256-fuel-adjustment-explained')) {
-    sitemapScript = sitemapScript.replace(insertPattern, insertPattern + entriesStr)
-    fs.writeFileSync(sitemapScriptPath, sitemapScript, 'utf8')
-    console.log('✓ Successfully updated scripts/generate_sitemap.js with new Oct 16 entry!')
-  } else {
-    console.log('scripts/generate_sitemap.js already contains Oct 16 entry.')
-  }
-
-  console.log('\n=== REGENERATING SITEMAP.XML ===')
-  execSync('node scripts/generate_sitemap.js', { stdio: 'inherit' })
+let existingListings
+try {
+  existingListings = JSON.parse(match[1])
+} catch (e) {
+  console.error('JSON.parse error on listings:', e)
+  process.exit(1)
 }
 
-updateListings()
-updateSitemapScript()
+const newItems = Object.values(oct16JobsPackages).map(item => ({
+  slug: item.slug,
+  title: item.title,
+  category: item.category_slug,
+  organization: item.organization,
+  jobType: item.job_type,
+  location: item.location,
+  qualification: item.qualification,
+  salary: item.salary,
+  experience: item.experience,
+  positions: item.positions,
+  lastDate: item.last_date,
+  noDeadline: Boolean(item.no_deadline),
+  publishDate: item.publish_date,
+  officialLink: item.official_link,
+  applyLink: item.apply_link,
+  isVerified: Boolean(item.is_verified),
+  featured: Boolean(item.featured),
+  logoInitial: item.logo_initial,
+  featuredImage: item.featured_image,
+  imageAlt: item.image_alt,
+  excerpt: item.excerpt,
+  seoTitle: item.seo_title,
+  metaDescription: item.meta_description,
+  focusKeyword: item.focus_keyword,
+  canonicalUrl: item.canonical_url,
+  ogTitle: item.og_title,
+  ogDescription: item.og_description,
+  schemaType: 'JobPosting',
+  content: item.content
+}))
+
+// Filter out any existing entries with these slugs
+const newSlugs = new Set(newItems.map(i => i.slug))
+const filteredExisting = existingListings.filter(i => !newSlugs.has(i.slug))
+
+// Prepend new items (they should come after the newest 2026-10-16 electricity-bills, or right at the top)
+// Let's place the electricity-bills post first if it exists, or just prepend them right after 2026-10-16 electricity bills.
+// Actually, sorting by publishDate DESC keeps the latest on top.
+const combinedListings = [...newItems, ...filteredExisting]
+
+// Write back to listings.js
+const updatedContent = `// Generated listings file for CareerDost\nexport const listings = ${JSON.stringify(combinedListings, null, 2)}\n`
+fs.writeFileSync(listingsPath, updatedContent, 'utf8')
+console.log(`✓ Successfully updated src/data/listings.js (Total items: ${combinedListings.length})`)
+
+// Update scripts/generate_sitemap.js
+const sitemapScriptPath = path.resolve('scripts/generate_sitemap.js')
+let sitemapScript = fs.readFileSync(sitemapScriptPath, 'utf8')
+
+const updatesToInsert = newItems.map(i => `  { slug: '${i.slug}', date: '${i.publishDate}' },`).join('\n')
+
+if (!sitemapScript.includes('kp-government-project-associate-internship-2026')) {
+  sitemapScript = sitemapScript.replace(
+    'const publishedDailyUpdates = [\n',
+    `const publishedDailyUpdates = [\n${updatesToInsert}\n`
+  )
+  fs.writeFileSync(sitemapScriptPath, sitemapScript, 'utf8')
+  console.log('✓ Successfully updated scripts/generate_sitemap.js publishedDailyUpdates list')
+}
+
+console.log('\nAll updates completed successfully.')

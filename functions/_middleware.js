@@ -882,7 +882,14 @@ export async function onRequest(context) {
     normalizedPath.startsWith('/assets/') ||
     /\.[a-z0-9]+$/i.test(normalizedPath)
   ) {
-    return await context.next()
+    const res = await context.next()
+    if (normalizedPath.startsWith('/images/') && res.headers.get('content-type')?.includes('text/html')) {
+      return new Response('Not Found', {
+        status: 404,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-cache, no-store' }
+      })
+    }
+    return res
   }
 
   // 2. Legacy / Alternative article routes (/article/:slug, /articles/:slug)

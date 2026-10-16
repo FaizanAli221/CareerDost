@@ -1,6 +1,6 @@
 import fs from 'fs'
 import Database from 'better-sqlite3'
-import { oct16EditorialPackages } from './save_oct16_editorial_packages.js'
+import { oct16JobsPackages } from './save_oct16_jobs_packages.js'
 
 const db = new Database('careerdost.sqlite')
 const tomlPath = 'C:/Users/Faizan Ali/AppData/Roaming/xdg.config/.wrangler/config/default.toml'
@@ -83,22 +83,26 @@ const catMap = {
   admissions: 'Admissions',
   internships: 'Internships',
   results: 'Results',
-  'private-jobs': 'Private Jobs'
+  'private-jobs': 'Private Jobs',
+  'it-jobs': 'IT Jobs',
+  'bank-jobs': 'Bank Jobs'
 }
 
 async function syncRemote() {
-  console.log('=== SYNCING OCT 16 ARTICLE TO REMOTE CLOUDFLARE D1 ===\n')
+  console.log('=== SYNCING 5 VERIFIED JOBS/INTERNSHIPS TO REMOTE CLOUDFLARE D1 ===\n')
 
-  const items = Object.values(oct16EditorialPackages)
+  const items = Object.values(oct16JobsPackages)
 
   for (const item of items) {
     console.log(`Syncing to remote D1: [${item.slug}]`)
     const contentJson = JSON.stringify(item.content)
-    const catLabel = catMap[item.category_slug] || 'Government Schemes'
+    const catLabel = item.category || catMap[item.category_slug] || 'Private Jobs'
 
+    // Get SQLite row ID if exists
     const localRow = db.prepare('SELECT id FROM articles WHERE slug = ?').get(item.slug)
     const artId = localRow ? localRow.id : null
 
+    // 1. Sync into articles table
     const sqlArt = `
       INSERT INTO articles (
         id, slug, title, category_slug, organization, job_type, location,
@@ -181,6 +185,7 @@ async function syncRemote() {
     await queryD1(sqlArt, paramsArt)
     console.log(`  ✓ Remote D1 articles updated: ${item.slug}`)
 
+    // 2. Sync into daily_updates table
     const localDaily = db.prepare('SELECT id FROM daily_updates WHERE slug = ?').get(item.slug)
     const updId = localDaily ? localDaily.id : null
 
@@ -276,7 +281,7 @@ async function syncRemote() {
     }
   }
 
-  console.log('\nOct 16 article successfully synchronized with remote D1!')
+  console.log('\nAll 5 verified jobs and internships successfully synchronized with remote D1!')
 }
 
 syncRemote().catch(err => {
