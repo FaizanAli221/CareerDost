@@ -13,6 +13,18 @@
 
 import { formatDate } from './format.js'
 
+export function isLabourWageNotification(item) {
+  if (!item) return false
+  const slug = String(item.slug || '').toLowerCase().trim()
+  const title = String(item.title || '').toLowerCase().trim()
+  const jobType = String(item.job_type || item.jobType || '').toLowerCase().trim()
+  return (
+    slug.includes('minimum-wage') ||
+    title.includes('minimum wage') ||
+    jobType.includes('minimum wage')
+  )
+}
+
 export function getContentType(item) {
   if (!item) return 'job'
 
@@ -21,46 +33,112 @@ export function getContentType(item) {
   const slug = String(item.slug || '').toLowerCase().trim()
   const title = String(item.title || '').toLowerCase().trim()
 
-  // 1. Labour & Regulatory Notifications (Statutory minimum wage, public orders, price notices, regulations)
+  // 1. Explicit Labour, Tariff, Tax & Regulatory Notifications (Never job vacancies)
   if (
-    slug.includes('minimum-wage') ||
+    isLabourWageNotification(item) ||
     slug.includes('section-144') ||
     slug.includes('barcode') ||
     slug.includes('petrol-price') ||
     slug.includes('support-price') ||
     slug.includes('wheat-imports') ||
-    jobType.includes('notification') ||
-    jobType.includes('regulatory') ||
-    jobType.includes('statutory') ||
-    jobType.includes('order') ||
-    jobType.includes('food reserve') ||
-    jobType.includes('commodity pricing') ||
-    title.includes('minimum wage') ||
+    slug.includes('wheat-seed-prices') ||
+    slug.includes('fbr-tax-return') ||
+    slug.includes('sbp-housing-solar-financing-rules') ||
+    slug.includes('electricity-bills-') ||
     title.includes('section 144') ||
-    title.includes('notification') ||
-    title.includes('price reduced')
+    title.includes('price reduced') ||
+    title.includes('fuel adjustment')
   ) {
     return 'notification'
   }
 
-  // 2. Career & Public Informational Guides (How-to guides, portal checks, official verification guides)
+  // 2. Explicit Informational / Portal Walkthrough Guides
   if (
     cat === 'career-guides' ||
-    slug.includes('official-guide') ||
-    slug.includes('payment-check') ||
     slug === 'sindh-job-portal-2026-junior-clerk-jobs' ||
     slug === 'pec-graduate-engineer-training-get-program-2026' ||
-    title.includes('guide') ||
-    title.includes('ka tarika') ||
-    jobType.includes('guide') ||
-    jobType.includes('(expired)')
+    slug === 'nadra-digital-payments-2026' ||
+    slug.includes('official-guide') ||
+    slug.includes('payment-check')
   ) {
     return 'guide'
   }
 
-  // 3. Government Schemes & Public Benefits
+  // 3. Explicit Exam Schedules / Roll Number Slips
   if (
-    cat === 'government-schemes' ||
+    slug === 'fpsc-latest-updates-adv3-2026-schedule' ||
+    slug === 'nts-nat-gat-roll-number-slip-2026'
+  ) {
+    return 'result'
+  }
+
+  // 4. Primary CMS Category Mapping (Prevents recruitment/result/scheme articles from being hijacked by title words like "Guide" or "Notification")
+  if (
+    cat === 'government-jobs' ||
+    cat === 'private-jobs' ||
+    cat === 'bank-jobs' ||
+    cat === 'it-jobs' ||
+    cat === 'internships' ||
+    cat === 'government jobs' ||
+    cat === 'private jobs' ||
+    cat === 'bank jobs' ||
+    cat === 'it jobs'
+  ) {
+    return 'job'
+  }
+
+  if (cat === 'results' || cat === 'results / test updates') {
+    return 'result'
+  }
+
+  if (cat === 'scholarships') {
+    return 'scholarship'
+  }
+
+  if (cat === 'admissions') {
+    return 'admission'
+  }
+
+  if (cat === 'government-schemes' || cat === 'government schemes') {
+    return 'scheme'
+  }
+
+  // 5. Fallback Keyword Classification for Generic Daily Update Categories ('Latest Jobs', 'Career News', 'Deadline Alerts')
+  if (
+    slug.includes('result') ||
+    slug.includes('merit-list') ||
+    slug.includes('answer-keys') ||
+    slug.includes('exam-slips') ||
+    slug.includes('timetable') ||
+    slug.includes('roll-number-slip') ||
+    jobType.includes('result') ||
+    jobType.includes('merit list') ||
+    jobType.includes('examination') ||
+    jobType.includes('screening test')
+  ) {
+    return 'result'
+  }
+
+  if (
+    slug.includes('scholarship') ||
+    jobType.includes('scholarship') ||
+    jobType.includes('research support') ||
+    jobType.includes('research grant')
+  ) {
+    return 'scholarship'
+  }
+
+  if (
+    slug.includes('admissions') ||
+    slug.includes('entry-test') ||
+    slug.includes('gat-subject') ||
+    jobType.includes('admission') ||
+    jobType.includes('intake')
+  ) {
+    return 'admission'
+  }
+
+  if (
     slug.includes('bisp') ||
     slug.includes('scooty-scheme') ||
     slug.includes('hari-card') ||
@@ -70,83 +148,65 @@ export function getContentType(item) {
     slug.includes('hunarmand') ||
     slug.includes('rozgar-scheme') ||
     slug.includes('social-protection-wallet') ||
+    slug.includes('sphf') ||
+    slug.includes('solar-energy-project') ||
+    slug.includes('flood-affected-families') ||
+    slug.includes('laptop-scheme') ||
     jobType.includes('scheme') ||
     jobType.includes('social safety') ||
     jobType.includes('subsidy') ||
     jobType.includes('cash transfer') ||
-    jobType.includes('cashless') ||
     jobType.includes('skill training')
   ) {
     return 'scheme'
   }
 
-  // 3. Admissions
   if (
-    cat === 'admissions' ||
-    slug.includes('admissions') ||
-    slug.includes('entry-test') ||
-    slug.includes('gat-subject') ||
-    slug.includes('nat-gat-roll') ||
-    jobType.includes('admission') ||
-    jobType.includes('intake')
+    jobType.includes('regulatory') ||
+    jobType.includes('statutory') ||
+    jobType.includes('food reserve') ||
+    jobType.includes('commodity pricing')
   ) {
-    return 'admission'
+    return 'notification'
   }
 
-  // 4. Results & Merit Lists
   if (
-    cat === 'results' ||
-    cat === 'results / test updates' ||
-    slug.includes('result') ||
-    slug.includes('merit-list') ||
-    slug.includes('answer-keys') ||
-    slug.includes('exam-slips') ||
-    slug.includes('timetable') ||
-    jobType.includes('result') ||
-    jobType.includes('merit list') ||
-    jobType.includes('examination') ||
-    jobType.includes('screening test')
+    title.includes('ka tarika') ||
+    jobType.includes('(expired)')
   ) {
-    return 'result'
+    return 'guide'
   }
 
-  // 5. Scholarships
-  if (
-    cat === 'scholarships' ||
-    slug.includes('scholarship') ||
-    jobType.includes('scholarship') ||
-    jobType.includes('research support')
-  ) {
-    return 'scholarship'
-  }
-
-
-  // 7. Genuine Jobs / Vacancies (Default for government-jobs, private-jobs, bank-jobs, it-jobs, internships)
+  // 6. Genuine Jobs / Vacancies (Default)
   return 'job'
 }
 
-export function getContentTypeLabels(type) {
+export function getContentTypeLabels(type, item = null) {
   let res
   switch (type) {
-    case 'notification':
+    case 'notification': {
+      const isWage = isLabourWageNotification(item)
       res = {
-        badge: 'Official Notification',
+        badge: isWage ? 'Official Labour Notification' : 'Official Public Notification',
         badgeClass: 'bg-blue-100 text-blue-900 border-blue-300',
         orgLabel: 'Issuing Authority',
-        typeLabel: 'Regulatory Mandate',
+        typeLabel: isWage ? 'Regulatory Mandate' : 'Policy / Regulatory Scope',
         locLabel: 'Jurisdiction / Scope',
-        qualLabel: 'Protected Beneficiaries',
+        qualLabel: isWage ? 'Protected Beneficiaries' : 'Applicable Citizens / Sector',
         expLabel: 'Coverage Criteria',
-        posLabel: 'Worker Categories',
+        posLabel: isWage ? 'Worker Categories' : 'Key Directives / Tiers',
         salLabel: 'Notified Rates / Mandate',
-        dateLabel: 'Effective Date',
+        dateLabel: 'Effective Date / Status',
         ctaLabel: 'View Official Notification / Department Portal ↗',
         ctaSecondary: null,
-        howToApplyTitle: 'Worker Protections & Redressal Mechanism',
-        statusPrefix: 'Statutory Status',
+        howToApplyTitle: isWage
+          ? 'Worker Protections & Redressal Mechanism'
+          : 'Official Verification & Compliance Steps',
+        statusPrefix: isWage ? 'Statutory Status' : 'Notification Status',
         summaryTitle: 'Key Official Notification Summary',
       }
       break
+    }
     case 'scheme':
       res = {
         badge: 'Government Scheme',
@@ -159,9 +219,9 @@ export function getContentTypeLabels(type) {
         posLabel: 'Target Beneficiaries',
         salLabel: 'Financial Assistance / Subsidy',
         dateLabel: 'Registration Window',
-        ctaLabel: 'Check Eligibility / Official Portal →',
+        ctaLabel: 'Check Official Source / Portal →',
         ctaSecondary: 'Official Scheme Guidelines ↗',
-        howToApplyTitle: 'How to Check Eligibility & Benefit',
+        howToApplyTitle: 'How to Verify Status & Official Channels',
         statusPrefix: 'Programme Status',
         summaryTitle: 'Key Welfare Scheme Summary',
       }
@@ -196,12 +256,12 @@ export function getContentTypeLabels(type) {
         expLabel: 'Test Series / Batch',
         posLabel: 'Merit List Scope',
         salLabel: 'Passing Marks / Score',
-        dateLabel: 'Result / Review Date',
-        ctaLabel: 'Check Result / Download Merit List →',
+        dateLabel: 'Result / Schedule Date',
+        ctaLabel: 'Check Result / Download Slip →',
         ctaSecondary: 'Official Testing Agency Portal ↗',
         howToApplyTitle: 'How to Check Your Result & Merit Score',
         statusPrefix: 'Result Status',
-        summaryTitle: 'Key Results Summary',
+        summaryTitle: 'Key Results & Exam Summary',
       }
       break
     case 'scholarship':
@@ -230,11 +290,11 @@ export function getContentTypeLabels(type) {
         orgLabel: 'Issuing Desk / Department',
         typeLabel: 'Guide Topic',
         locLabel: 'Target Audience / Scope',
-        qualLabel: 'Prerequisites',
+        qualLabel: 'Prerequisites / Eligibility',
         expLabel: 'Experience Level',
         posLabel: 'Key Takeaways',
-        salLabel: null,
-        dateLabel: 'Published Date',
+        salLabel: 'Key Benefit / Coverage',
+        dateLabel: 'Published / Status Date',
         ctaLabel: 'Explore Official Guidelines ↗',
         ctaSecondary: null,
         howToApplyTitle: 'Recommended Action Steps',
@@ -292,28 +352,66 @@ export function getContextualStatus(item, type) {
     }
   }
 
-  const lastDate = item.lastDate || item.last_date || item.deadline || ''
+  const lastDate = String(item.lastDate || item.last_date || item.deadline || '').trim()
+  const lowerDate = lastDate.toLowerCase()
+  const slug = String(item.slug || '').toLowerCase()
   const noDeadline = Boolean(item.noDeadline || item.no_deadline)
 
   if (type === 'notification') {
+    if (isLabourWageNotification(item)) {
+      return {
+        status: 'STATUTORY LAW',
+        label: 'ENFORCEABLE LAW',
+        badgeClass: 'bg-blue-100 text-blue-900 border-blue-300',
+        description: lowerDate.includes('effective')
+          ? lastDate
+          : `Official government notification in statutory effect across ${item?.location || 'Sindh'}.`,
+        isExpired: false,
+      }
+    }
+    if (lowerDate.includes('pending') || lowerDate.includes('underway') || lowerDate.includes('unconfirmed')) {
+      return {
+        status: 'POLICY CONSULTATION',
+        label: 'DECISION PENDING',
+        badgeClass: 'bg-amber-100 text-amber-900 border-amber-300',
+        description: lastDate || 'Official policy consultation underway; final notification pending.',
+        isExpired: false,
+      }
+    }
     return {
-      status: 'STATUTORY LAW',
-      label: 'ENFORCEABLE LAW',
+      status: 'OFFICIAL DIRECTIVE',
+      label: 'OFFICIAL NOTICE',
       badgeClass: 'bg-blue-100 text-blue-900 border-blue-300',
-      description: lastDate.toLowerCase().includes('effective')
-        ? lastDate
-        : `Official government notification in statutory effect across ${item?.location || 'Sindh'}.`,
+      description: lastDate
+        ? `Official status / effective date: ${lastDate}.`
+        : `Official regulatory directive and public notice across ${item?.location || 'Pakistan'}.`,
       isExpired: false,
     }
   }
 
   if (type === 'scheme') {
+    if (
+      lowerDate.includes('unconfirmed') ||
+      lowerDate.includes('not yet announced') ||
+      lowerDate.includes('pending') ||
+      slug.includes('what-is-confirmed')
+    ) {
+      return {
+        status: 'ANNOUNCED (DETAILS PENDING)',
+        label: 'DETAILS PENDING',
+        badgeClass: 'bg-amber-100 text-amber-900 border-amber-300',
+        description:
+          lastDate ||
+          'Government intention announced; official registration portal, eligibility criteria, and schedule are not yet confirmed.',
+        isExpired: false,
+      }
+    }
     return {
       status: 'ACTIVE SCHEME',
       label: noDeadline ? 'OPEN PROGRAMME' : 'ACTIVE REGISTRATION',
       badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300',
       description: noDeadline
-        ? 'Continuous public registration & verification through designated government portals.'
+        ? 'Public registration & verification available through designated official government portals.'
         : `Active public welfare scheme. Verification window: ${lastDate || 'Ongoing'}.`,
       isExpired: false,
     }
@@ -322,9 +420,11 @@ export function getContextualStatus(item, type) {
   if (type === 'result') {
     return {
       status: 'ANNOUNCED',
-      label: 'RESULT AVAILABLE',
+      label: 'OFFICIAL UPDATE',
       badgeClass: 'bg-amber-100 text-amber-900 border-amber-300',
-      description: 'Official merit list and test score portal announced by the conducting authority.',
+      description: lastDate
+        ? `Official test / result schedule: ${lastDate}.`
+        : 'Official merit list, exam schedule, or test score portal announced by the conducting authority.',
       isExpired: false,
     }
   }

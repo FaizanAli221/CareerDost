@@ -43,9 +43,17 @@ function formatUpdate(row) {
   }
 }
 
+const SUMMARY_COLS = `id, slug, title, category, short_description,
+  featured_image, image_alt, official_link, apply_link,
+  deadline, no_deadline, publish_date, organization, location, qualification,
+  experience, positions, job_type, salary, is_verified, featured,
+  seo_title, meta_description, focus_keyword, canonical_url, og_title, og_description,
+  status, created_at, updated_at`
+
 export class DailyUpdateModel {
-  static async getAll(db, statusOnly = null) {
-    let sql = 'SELECT * FROM daily_updates'
+  static async getAll(db, statusOnly = null, includeContent = true) {
+    const cols = includeContent ? '*' : SUMMARY_COLS
+    let sql = `SELECT ${cols} FROM daily_updates`
     const params = []
     if (statusOnly) {
       sql += ' WHERE status = ?'
@@ -69,8 +77,9 @@ export class DailyUpdateModel {
     return formatUpdate(row)
   }
 
-  static async getByCategory(db, category, statusOnly = null) {
-    let sql = 'SELECT * FROM daily_updates WHERE category = ?'
+  static async getByCategory(db, category, statusOnly = null, includeContent = true) {
+    const cols = includeContent ? '*' : SUMMARY_COLS
+    let sql = `SELECT ${cols} FROM daily_updates WHERE category = ?`
     const params = [category]
     if (statusOnly) {
       sql += ' AND status = ?'
@@ -82,8 +91,9 @@ export class DailyUpdateModel {
     return (results || []).map(formatUpdate)
   }
 
-  static async getLatest(db, limit = 6, statusOnly = null) {
-    let sql = 'SELECT * FROM daily_updates'
+  static async getLatest(db, limit = 6, statusOnly = null, includeContent = true) {
+    const cols = includeContent ? '*' : SUMMARY_COLS
+    let sql = `SELECT ${cols} FROM daily_updates`
     const params = []
     if (statusOnly) {
       sql += ' WHERE status = ?'
@@ -96,9 +106,10 @@ export class DailyUpdateModel {
     return (results || []).map(formatUpdate)
   }
 
-  static async search(db, query, statusOnly = null) {
+  static async search(db, query, statusOnly = null, includeContent = true) {
+    const cols = includeContent ? '*' : SUMMARY_COLS
     const q = `%${query.trim()}%`
-    let sql = `SELECT * FROM daily_updates 
+    let sql = `SELECT ${cols} FROM daily_updates 
                WHERE (title LIKE ? OR category LIKE ? OR short_description LIKE ? OR content LIKE ?)`
     const params = [q, q, q, q]
 

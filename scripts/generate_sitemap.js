@@ -7,6 +7,9 @@ import { categories } from '../src/data/categories.js'
 const SITE_URL = process.env.SITE_URL || 'https://careerdost.blog'
 
 const publishedDailyUpdates = [
+  { slug: 'samba-bank-relationship-associate-jobs-2026', date: '2026-10-18' },
+  { slug: 'ezy-business-applications-paid-internship-karachi-2026', date: '2026-10-18' },
+  { slug: 'unilever-pakistan-jobs-october-2026', date: '2026-10-18' },
   { slug: 'pakistan-plans-new-support-poor-flood-affected-families-what-is-confirmed', date: '2026-10-17' },
   { slug: 'kp-government-project-associate-internship-2026', date: '2026-10-16' },
   { slug: 'aku-karachi-jobs-traineeships-2026', date: '2026-10-16' },
@@ -17,7 +20,7 @@ const publishedDailyUpdates = [
   { slug: '10pearls-shine-virtual-internship-2026', date: '2026-10-15' },
   { slug: 'mcb-bank-infosec-trainee-jobs-2026', date: '2026-10-15' },
   { slug: 'japan-jds-scholarship-2026-pakistan', date: '2026-10-15' },
-  { slug: 'bank-alfalah-jobs-internships-2026', date: '2026-10-15' },
+  { slug: 'bank-alfalah-jobs-internships-2026', date: '2026-10-18' },
   { slug: 'wheat-seed-prices-2026-pakistan-nsdra-directives', date: '2026-10-15' },
   { slug: 'fbr-tax-return-deadline-2026-extension-status-iris-filing-guide', date: '2026-10-15' },
   { slug: 'zarkhez-e-asaan-digital-zarai-qarza-guide-2026', date: '2026-10-14' },

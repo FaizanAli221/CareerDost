@@ -9,7 +9,7 @@ import { safeUrl } from '../lib/security'
 import { useSeo } from '../lib/useSeo'
 import { getAbsoluteUrl } from '../lib/config'
 import { trackApplyNowClick, trackOfficialSourceClick } from '../lib/analytics'
-import { getContentType, getContentTypeLabels, getContextualStatus } from '../lib/contentType'
+import { getContentType, getContentTypeLabels, getContextualStatus, isLabourWageNotification } from '../lib/contentType'
 import { isGenuineJobVacancy, buildJobPostingSchema } from '../lib/jobSchema'
 
 import CategoryFallbackImage from '../components/CategoryFallbackImage'
@@ -122,8 +122,13 @@ export default function ArticlePage() {
   }, [slug])
 
   const contentType = useMemo(() => getContentType(listing), [listing])
-  const labels = useMemo(() => getContentTypeLabels(contentType), [contentType])
+  const labels = useMemo(() => getContentTypeLabels(contentType, listing), [contentType, listing])
   const statusInfo = useMemo(() => getContextualStatus(listing, contentType), [listing, contentType])
+  const isWageNotice = useMemo(() => isLabourWageNotification(listing), [listing])
+  const hasFaqInContent = useMemo(() => {
+    const raw = Array.isArray(listing?.content) ? listing.content.join('\n') : String(listing?.content || '')
+    return raw.includes('Frequently Asked Questions') || raw.includes('## FAQ') || raw.includes('### FAQ')
+  }, [listing?.content])
 
   const cat =
     categoriesList.find((c) => c.slug === listing?.category) ||
@@ -250,10 +255,6 @@ export default function ArticlePage() {
 
   const hasImage = listing.featuredImage && listing.featuredImage.trim().length > 0
   const applyDestination = listing.applyLink || listing.officialLink
-  const hasFaqInContent = useMemo(() => {
-    const raw = Array.isArray(listing?.content) ? listing.content.join('\n') : String(listing?.content || '')
-    return raw.includes('Frequently Asked Questions') || raw.includes('## FAQ') || raw.includes('### FAQ')
-  }, [listing?.content])
 
   return (
     <div className="container-x py-6 sm:py-8 font-sans">
@@ -345,19 +346,33 @@ export default function ArticlePage() {
               {labels.howToApplyTitle}
             </h2>
 
-            {contentType === 'notification' ? (
+            {contentType === 'notification' && isWageNotice ? (
               <ol className="list-decimal list-inside space-y-2 text-xs sm:text-sm text-inksoft leading-relaxed">
                 <li><strong>Verify Statutory Pay:</strong> Ensure monthly salary and daily wages meet or exceed the official notified rates across your worker tier.</li>
                 <li><strong>No Illegal Deductions:</strong> Employers cannot reduce wages below statutory minimums for uniforms, tea, food, or arbitrary fines.</li>
                 <li><strong>Universal Worker Entitlement:</strong> Contractual, piece-rate, daily-wage, and third-party outsourced personnel are protected under provincial labour law.</li>
                 <li><strong>Lodge Formal Grievance:</strong> Violations can be filed under the Payment of Wages Act before the Directorate of Labour Sindh or District Labour Officer.</li>
               </ol>
+            ) : contentType === 'notification' ? (
+              <ol className="list-decimal list-inside space-y-2 text-xs sm:text-sm text-inksoft leading-relaxed">
+                <li><strong>Review Official Directive:</strong> Verify the notified rates, dates, compliance thresholds, and scope specified by the issuing authority above.</li>
+                <li><strong>Consult Primary Gazette / Circular:</strong> Cross-check requirements directly on the official department portal linked below.</li>
+                <li><strong>Follow Official Timelines:</strong> Complete any required compliance, filing, or verification before the notified cut-off date.</li>
+                <li><strong>Rely on Verified Portals:</strong> Use only official government or regulatory websites and avoid unverified intermediaries.</li>
+              </ol>
+            ) : contentType === 'scheme' && statusInfo.label === 'DETAILS PENDING' ? (
+              <ol className="list-decimal list-inside space-y-2 text-xs sm:text-sm text-inksoft leading-relaxed">
+                <li><strong>Review Confirmed vs Unconfirmed Facts:</strong> Check the verified summary table above to see what the government has announced versus what remains unconfirmed.</li>
+                <li><strong>Wait for Official Portal Launch:</strong> Do not submit your CNIC, personal data, or money to any unverified link, WhatsApp group, or agent claiming early registration.</li>
+                <li><strong>Monitor Authorized Channels:</strong> Follow official updates from the Press Information Department (PID), BISP (8171), or SPHF portals linked below.</li>
+                <li><strong>Zero Fee Policy:</strong> Official government welfare and relief programmes never charge registration or verification fees.</li>
+              </ol>
             ) : contentType === 'scheme' ? (
               <ol className="list-decimal list-inside space-y-2 text-xs sm:text-sm text-inksoft leading-relaxed">
-                <li><strong>Verify Eligibility Criteria:</strong> Review the official poverty scorecard threshold, regional quota, and valid CNIC requirements detailed above.</li>
+                <li><strong>Verify Eligibility Criteria:</strong> Review the official eligibility requirements, regional scope, and valid CNIC rules detailed above.</li>
                 <li><strong>Use Only Official Portals:</strong> Beware of fake SMS messages from ordinary 11-digit mobile numbers. Use only official government channels.</li>
-                <li><strong>Biometric Verification:</strong> Receive cash disbursements or subsidies only through designated biometric partner bank branches or official campsites.</li>
-                <li><strong>Zero Service Charges:</strong> Official government welfare payments are completely free of fee or processing deductions.</li>
+                <li><strong>Authorized Verification:</strong> Complete verification or receive disbursements only through designated official portals, partner banks, or campsites.</li>
+                <li><strong>Zero Service Charges:</strong> Official government welfare programmes are free of application or processing deductions.</li>
               </ol>
             ) : contentType === 'admission' ? (
               <ol className="list-decimal list-inside space-y-2 text-xs sm:text-sm text-inksoft leading-relaxed">
@@ -430,7 +445,7 @@ export default function ArticlePage() {
                 Frequently Asked Questions (FAQ)
               </h2>
             <div className="space-y-4">
-              {contentType === 'notification' ? (
+              {contentType === 'notification' && isWageNotice ? (
                 <>
                   <div className="border border-line bg-white p-4 rounded-xs">
                     <h3 className="font-semibold text-ink text-sm mb-1">
@@ -462,6 +477,33 @@ export default function ArticlePage() {
                     </h3>
                     <p className="text-xs text-inksoft leading-relaxed">
                       Official gazette notifications are published on the Sindh Labour Department portal: <a href="https://lhr.sindh.gov.pk/" target="_blank" rel="noopener noreferrer" className="text-green hover:underline font-semibold">lhr.sindh.gov.pk</a>.
+                    </p>
+                  </div>
+                </>
+              ) : contentType === 'notification' ? (
+                <>
+                  <div className="border border-line bg-white p-4 rounded-xs">
+                    <h3 className="font-semibold text-ink text-sm mb-1">
+                      Which authority issued this official notification?
+                    </h3>
+                    <p className="text-xs text-inksoft leading-relaxed">
+                      {listing.organization || 'This directive was issued by the relevant federal or provincial regulatory authority in Pakistan.'}
+                    </p>
+                  </div>
+                  <div className="border border-line bg-white p-4 rounded-xs">
+                    <h3 className="font-semibold text-ink text-sm mb-1">
+                      What are the notified rates or key provisions?
+                    </h3>
+                    <p className="text-xs text-inksoft leading-relaxed">
+                      {listing.salary || listing.excerpt || 'Please refer to the official summary and verified source link above for complete rate and compliance details.'}
+                    </p>
+                  </div>
+                  <div className="border border-line bg-white p-4 rounded-xs">
+                    <h3 className="font-semibold text-ink text-sm mb-1">
+                      Where can I verify the primary official source?
+                    </h3>
+                    <p className="text-xs text-inksoft leading-relaxed">
+                      You can verify the official record directly via the authorized department portal linked in this article.
                     </p>
                   </div>
                 </>

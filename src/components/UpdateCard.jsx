@@ -40,7 +40,7 @@ export default function UpdateCard({ updateItem, priority = false }) {
 
   const isNew = isRecent(updateItem.publishDate)
   const contentType = getContentType(updateItem)
-  const labels = getContentTypeLabels(contentType)
+  const labels = getContentTypeLabels(contentType, updateItem)
   const statusInfo = getContextualStatus(updateItem, contentType)
   const hasImage = updateItem.featuredImage && updateItem.featuredImage.trim().length > 0
 

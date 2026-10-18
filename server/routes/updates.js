@@ -14,11 +14,11 @@ updatesRouter.get('/', async (c) => {
 
   let updates = []
   if (q) {
-    updates = await DailyUpdateModel.search(db, q, 'published')
+    updates = await DailyUpdateModel.search(db, q, 'published', false)
   } else if (category) {
-    updates = await DailyUpdateModel.getByCategory(db, category, 'published')
+    updates = await DailyUpdateModel.getByCategory(db, category, 'published', false)
   } else {
-    updates = await DailyUpdateModel.getAll(db, 'published')
+    updates = await DailyUpdateModel.getAll(db, 'published', false)
   }
 
   if (limitQuery) {
@@ -41,7 +41,7 @@ updatesRouter.get('/latest', async (c) => {
   const limitQuery = c.req.query('limit') || '6'
   const limit = Math.min(parseInt(limitQuery, 10) || 6, 20)
 
-  const updates = await DailyUpdateModel.getLatest(db, limit, 'published')
+  const updates = await DailyUpdateModel.getLatest(db, limit, 'published', false)
   return c.json({
     success: true,
     data: updates,

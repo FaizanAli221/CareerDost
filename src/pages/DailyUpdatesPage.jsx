@@ -70,8 +70,9 @@ export default function DailyUpdatesPage() {
 
   useEffect(() => {
     let isMounted = true
+    const isDefaultFilter = selectedCategory === 'All Updates' && !searchQuery.trim()
 
-    if (selectedCategory !== 'All Updates' || searchQuery.trim() || updates.length === 0) {
+    if (!isDefaultFilter || updates.length === 0) {
       setLoading(true)
     }
 
@@ -85,7 +86,8 @@ export default function DailyUpdatesPage() {
 
     getDailyUpdatesFromDb(params)
       .then((data) => {
-        if (isMounted && Array.isArray(data)) {
+        if (!isMounted || !Array.isArray(data)) return
+        if (data.length > 0 || !isDefaultFilter) {
           setUpdates(data)
         }
       })

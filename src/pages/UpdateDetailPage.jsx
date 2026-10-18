@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { getDailyUpdateBySlugFromDb, getLatestDailyUpdatesFromDb } from '../api/client'
+import { getDailyUpdateBySlugFromDb, getLatestDailyUpdatesFromDb, getArticleBySlugFromDb } from '../api/client'
 import CategoryFallbackImage from '../components/CategoryFallbackImage'
 import OptimizedImage from '../components/OptimizedImage'
 import UpdateCard from '../components/UpdateCard'
@@ -41,7 +41,7 @@ export default function UpdateDetailPage() {
   })
 
   const contentType = useMemo(() => getContentType(updateItem), [updateItem])
-  const labels = useMemo(() => getContentTypeLabels(contentType), [contentType])
+  const labels = useMemo(() => getContentTypeLabels(contentType, updateItem), [contentType, updateItem])
   const statusInfo = useMemo(() => getContextualStatus(updateItem, contentType), [updateItem, contentType])
 
   const jsonLdSchema = React.useMemo(() => {

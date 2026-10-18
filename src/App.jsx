@@ -5,19 +5,19 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import ErrorBoundary from './components/ErrorBoundary'
 import Home from './pages/Home'
+import DailyUpdatesPage from './pages/DailyUpdatesPage'
+import UpdateDetailPage from './pages/UpdateDetailPage'
+import CategoryPage from './pages/CategoryPage'
+import ArticlePage from './pages/ArticlePage'
+import SearchPage from './pages/SearchPage'
+import About from './pages/About'
+import Contact from './pages/Contact'
+import Privacy from './pages/Privacy'
+import Disclaimer from './pages/Disclaimer'
+import Terms from './pages/Terms'
+import NotFound from './pages/NotFound'
 
-const DailyUpdatesPage = lazy(() => import('./pages/DailyUpdatesPage'))
-const UpdateDetailPage = lazy(() => import('./pages/UpdateDetailPage'))
-const CategoryPage = lazy(() => import('./pages/CategoryPage'))
-const ArticlePage = lazy(() => import('./pages/ArticlePage'))
-const SearchPage = lazy(() => import('./pages/SearchPage'))
-const About = lazy(() => import('./pages/About'))
-const Contact = lazy(() => import('./pages/Contact'))
-const Privacy = lazy(() => import('./pages/Privacy'))
-const Disclaimer = lazy(() => import('./pages/Disclaimer'))
-const Terms = lazy(() => import('./pages/Terms'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
-const NotFound = lazy(() => import('./pages/NotFound'))
 
 function ScrollToTop() {
   const location = useLocation()

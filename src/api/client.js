@@ -284,23 +284,65 @@ export async function getDailyUpdatesFromDb(params = {}) {
 
     const queryString = query.toString() ? `?${query.toString()}` : ''
     const json = await apiFetch(`/updates${queryString}`)
-    if (json.success && Array.isArray(json.data)) {
+    if (json.success && Array.isArray(json.data) && json.data.length > 0) {
       return json.data
     }
   } catch {
     // Fallback
   }
-  return []
+  if (typeof window !== 'undefined' && Array.isArray(window.__INITIAL_UPDATES__) && window.__INITIAL_UPDATES__.length > 0) {
+    let items = [...window.__INITIAL_UPDATES__]
+    if (params.category) {
+      items = items.filter((u) => u.category === params.category)
+    }
+    if (params.q) {
+      const q = params.q.trim().toLowerCase()
+      items = items.filter((u) =>
+        [u.title, u.category, u.shortDescription, u.organization, u.location].join(' ').toLowerCase().includes(q)
+      )
+    }
+    if (params.limit) {
+      items = items.slice(0, Number(params.limit))
+    }
+    return items
+  }
+  try {
+    const fallbackListings = await getFallbackListings()
+    return fallbackListings.slice(0, Number(params.limit) || 24).map((l) => ({
+      id: l.id,
+      slug: l.slug,
+      title: l.title,
+      category: l.category || 'Government Jobs',
+      shortDescription: l.excerpt || '',
+      featuredImage: l.featuredImage || '',
+      imageAlt: l.imageAlt || l.title,
+      officialLink: l.officialLink || '',
+      applyLink: l.applyLink || '',
+      deadline: l.lastDate || '',
+      publishDate: l.publishDate || '',
+      organization: l.organization || '',
+      location: l.location || '',
+      qualification: l.qualification || '',
+      jobType: l.jobType || '',
+      salary: l.salary || '',
+      isVerified: true,
+    }))
+  } catch {
+    return []
+  }
 }
 
 export async function getLatestDailyUpdatesFromDb(limit = 6) {
   try {
     const json = await apiFetch(`/updates/latest?limit=${limit}`)
-    if (json.success && Array.isArray(json.data)) {
+    if (json.success && Array.isArray(json.data) && json.data.length > 0) {
       return json.data
     }
   } catch {
     // Fallback
+  }
+  if (typeof window !== 'undefined' && Array.isArray(window.__INITIAL_UPDATES__) && window.__INITIAL_UPDATES__.length > 0) {
+    return window.__INITIAL_UPDATES__.slice(0, limit)
   }
   return []
 }

@@ -8,6 +8,7 @@
  */
 
 import { isGenuineJobVacancy, buildJobPostingSchema } from '../src/lib/jobSchema.js'
+import { getContentType, getContentTypeLabels, getContextualStatus } from '../src/lib/contentType.js'
 
 const SITE_URL = 'https://careerdost.blog'
 const SITE_NAME = 'CareerDost'
@@ -86,35 +87,59 @@ function escapeHtml(str) {
 
 function formatInline(str) {
   if (!str) return ''
-  let s = escapeHtml(str)
+  const linkTokens = []
+  const tokenized = String(str).replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]+)\)/g, (_, label, href) => {
+    const id = `@@CDLINK_${linkTokens.length}@@`
+    const safeHref = escapeHtml(href)
+    const safeLabel = escapeHtml(label)
+    const isExternal = href.startsWith('http://') || href.startsWith('https://')
+    const attrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : ''
+    linkTokens.push(`<a href="${safeHref}"${attrs} class="text-green font-semibold underline hover:text-ink">${safeLabel}</a>`)
+    return id
+  })
+  let s = escapeHtml(tokenized)
   s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
   s = s.replace(/\*(.+?)\*/g, '<em>$1</em>')
+  s = s.replace(/`([^`]+)`/g, '<code class="bg-paper px-1.5 py-0.5 rounded-xs text-sm font-mono">$1</code>')
+  for (let i = 0; i < linkTokens.length; i++) {
+    s = s.replace(`@@CDLINK_${i}@@`, linkTokens[i])
+  }
   return s
 }
 
 function renderContentBlocks(content, targetTitle = '') {
   if (!content) return ''
-  let blocks = []
+  let rawBlocks = []
   if (Array.isArray(content)) {
-    blocks = content
+    rawBlocks = content
   } else if (typeof content === 'string') {
     const trimmed = content.trim()
     if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
       try {
         const parsed = JSON.parse(trimmed)
         if (Array.isArray(parsed)) {
-          blocks = parsed
+          rawBlocks = parsed
         } else {
-          blocks = [trimmed]
+          rawBlocks = [trimmed]
         }
       } catch {
-        blocks = [content]
+        rawBlocks = [content]
       }
     } else {
-      blocks = content.split(/\n\s*\n/)
+      rawBlocks = content.split(/\n\s*\n/)
     }
   } else {
-    blocks = [String(content)]
+    rawBlocks = [String(content)]
+  }
+
+  // Split any multi-paragraph blocks that contain double newlines
+  const blocks = []
+  for (const rb of rawBlocks) {
+    if (!rb) continue
+    const parts = String(rb).split(/\n\s*\n/)
+    for (const p of parts) {
+      if (p.trim()) blocks.push(p.trim())
+    }
   }
 
   function isDuplicateHeading(headingText) {
@@ -136,25 +161,72 @@ function renderContentBlocks(content, targetTitle = '') {
 
   let html = ''
 
-  for (const block of blocks) {
-    if (!block) continue
-    const text = String(block).trim()
+  for (const text of blocks) {
     if (!text) continue
 
+    if (text === '---' || text === '***') {
+      html += `<hr class="my-6 border-line" />\n`
+      continue
+    }
+
     if (text.startsWith('### ')) {
-      html += `<h3 class="font-serif text-lg sm:text-xl font-bold text-ink mt-6 mb-3">${escapeHtml(text.replace(/^###\s+/, ''))}</h3>\n`
+      html += `<h3 class="font-serif text-lg sm:text-xl font-bold text-ink mt-6 mb-3">${formatInline(text.replace(/^###\s+/, ''))}</h3>\n`
     } else if (text.startsWith('## ')) {
       const headingText = text.replace(/^##\s+/, '').trim()
       if (isDuplicateHeading(headingText)) {
         continue
       }
-      html += `<h2 class="font-serif text-xl sm:text-2xl font-bold text-ink mt-8 mb-4 border-b border-line pb-2">${escapeHtml(headingText)}</h2>\n`
+      html += `<h2 class="font-serif text-xl sm:text-2xl font-bold text-ink mt-8 mb-4 border-b border-line pb-2">${formatInline(headingText)}</h2>\n`
     } else if (text.startsWith('# ')) {
       const headingText = text.replace(/^#\s+/, '').trim()
       if (isDuplicateHeading(headingText)) {
         continue
       }
-      html += `<h2 class="font-serif text-xl sm:text-2xl font-bold text-ink mt-8 mb-4 border-b border-line pb-2">${escapeHtml(headingText)}</h2>\n`
+      html += `<h2 class="font-serif text-xl sm:text-2xl font-bold text-ink mt-8 mb-4 border-b border-line pb-2">${formatInline(headingText)}</h2>\n`
+    } else if (text.includes('\n') && text.trim().startsWith('|') && /\|\s*:?-{2,}:?\s*\|/.test(text)) {
+      const lines = text.split('\n').map((l) => l.trim()).filter((l) => l.startsWith('|'))
+      if (lines.length >= 2) {
+        const parseRow = (line) =>
+          line
+            .replace(/^\|/, '')
+            .replace(/\|$/, '')
+            .split('|')
+            .map((cell) => cell.trim())
+        const headers = parseRow(lines[0])
+        const dataLines = lines.slice(1).filter((l) => !/^\|?[\s\-:|]+\|?$/.test(l))
+        html += `<div class="overflow-x-auto my-6 border border-line rounded-xs shadow-2xs">\n`
+        html += `  <table class="w-full text-left border-collapse font-sans text-sm">\n`
+        html += `    <thead class="bg-paper border-b border-line text-ink font-bold">\n      <tr>\n`
+        for (const h of headers) {
+          html += `        <th class="py-3 px-4 border-r border-line last:border-r-0">${formatInline(h)}</th>\n`
+        }
+        html += `      </tr>\n    </thead>\n    <tbody class="divide-y divide-line bg-white">\n`
+        for (const dl of dataLines) {
+          const cells = parseRow(dl)
+          html += `      <tr>\n`
+          for (const c of cells) {
+            html += `        <td class="py-2.5 px-4 border-r border-line last:border-r-0 text-ink">${formatInline(c)}</td>\n`
+          }
+          html += `      </tr>\n`
+        }
+        html += `    </tbody>\n  </table>\n</div>\n`
+      }
+    } else if (text.startsWith('>')) {
+      const rawLines = text.split('\n').map((l) => l.replace(/^>\s?/, '').trim()).filter(Boolean)
+      if (rawLines.length > 0) {
+        const firstLine = rawLines[0]
+        const alertMatch = firstLine.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*(.*)$/i)
+        const label = alertMatch ? alertMatch[1].toUpperCase() : null
+        const bodyLines = alertMatch
+          ? [alertMatch[2], ...rawLines.slice(1)].filter(Boolean)
+          : rawLines
+        html += `<blockquote class="my-5 p-4 border-l-4 border-green bg-paper rounded-r-xs text-sm text-ink leading-relaxed">\n`
+        if (label) {
+          html += `  <strong class="block text-xs uppercase tracking-wider mb-1 text-green">${escapeHtml(label)} Notice</strong>\n`
+        }
+        html += `  <div>${bodyLines.map((l) => formatInline(l)).join('<br/>')}</div>\n`
+        html += `</blockquote>\n`
+      }
     } else if (text.startsWith('- ') || text.startsWith('* ')) {
       const items = text.split('\n').filter((l) => l.trim().startsWith('- ') || l.trim().startsWith('* '))
       html += `<ul class="list-disc pl-5 space-y-2 text-ink my-4">\n`
@@ -163,6 +235,14 @@ function renderContentBlocks(content, targetTitle = '') {
         html += `  <li>${formatInline(itemText)}</li>\n`
       }
       html += `</ul>\n`
+    } else if (/^\d+\.\s+/.test(text)) {
+      const items = text.split('\n').filter((l) => /^\d+\.\s+/.test(l.trim()))
+      html += `<ol class="list-decimal pl-5 space-y-2 text-ink my-4">\n`
+      for (const item of items) {
+        const itemText = item.trim().replace(/^\d+\.\s+/, '').trim()
+        html += `  <li>${formatInline(itemText)}</li>\n`
+      }
+      html += `</ol>\n`
     } else {
       const lines = text.split('\n')
       let pContent = ''
@@ -214,106 +294,12 @@ function generate404Html(title, message) {
 </html>`
 }
 
-function detectContentTypeEdge(category, title = '', slug = '', jobType = '') {
-  const cat = String(category || '').toLowerCase().trim()
-  const jType = String(jobType || '').toLowerCase().trim()
-  const s = String(slug || '').toLowerCase().trim()
-  const t = String(title || '').toLowerCase().trim()
-
-  if (
-    s.includes('minimum-wage') ||
-    s.includes('section-144') ||
-    s.includes('barcode') ||
-    s.includes('petrol-price') ||
-    s.includes('support-price') ||
-    s.includes('wheat-imports') ||
-    jType.includes('notification') ||
-    jType.includes('regulatory') ||
-    jType.includes('statutory') ||
-    jType.includes('order') ||
-    jType.includes('food reserve') ||
-    jType.includes('commodity pricing') ||
-    t.includes('minimum wage') ||
-    t.includes('section 144') ||
-    t.includes('notification') ||
-    t.includes('price reduced')
-  ) {
-    return 'notification'
-  }
-  if (
-    cat === 'career-guides' ||
-    s.includes('official-guide') ||
-    s.includes('payment-check') ||
-    s === 'sindh-job-portal-2026-junior-clerk-jobs' ||
-    s === 'pec-graduate-engineer-training-get-program-2026' ||
-    t.includes('guide') ||
-    t.includes('ka tarika') ||
-    jType.includes('guide') ||
-    jType.includes('(expired)')
-  ) {
-    return 'guide'
-  }
-  if (
-    cat === 'government-schemes' ||
-    s.includes('bisp') ||
-    s.includes('scooty-scheme') ||
-    s.includes('hari-card') ||
-    s.includes('kisan-subsidy') ||
-    s.includes('fuel-relief') ||
-    s.includes('mamta-programme') ||
-    s.includes('hunarmand') ||
-    s.includes('rozgar-scheme') ||
-    s.includes('social-protection-wallet') ||
-    jType.includes('scheme') ||
-    jType.includes('social safety') ||
-    jType.includes('subsidy') ||
-    jType.includes('cash transfer') ||
-    jType.includes('cashless') ||
-    jType.includes('skill training')
-  ) {
-    return 'scheme'
-  }
-  if (
-    cat === 'admissions' ||
-    s.includes('admissions') ||
-    s.includes('entry-test') ||
-    s.includes('gat-subject') ||
-    s.includes('nat-gat-roll') ||
-    jType.includes('admission') ||
-    jType.includes('intake')
-  ) {
-    return 'admission'
-  }
-  if (
-    cat === 'results' ||
-    cat === 'results / test updates' ||
-    s.includes('result') ||
-    s.includes('merit-list') ||
-    s.includes('answer-keys') ||
-    s.includes('exam-slips') ||
-    s.includes('timetable') ||
-    jType.includes('result') ||
-    jType.includes('merit list') ||
-    jType.includes('examination') ||
-    jType.includes('screening test')
-  ) {
-    return 'result'
-  }
-  if (
-    cat === 'scholarships' ||
-    s.includes('scholarship') ||
-    jType.includes('scholarship') ||
-    jType.includes('research support')
-  ) {
-    return 'scholarship'
-  }
-  return 'job'
-}
-
 function generateDailyUpdateHtml(update, canonical) {
   const title = escapeHtml(update.title || '')
   const rawCat = update.category || 'Daily Update'
-  const cType = detectContentTypeEdge(rawCat, update.title, update.slug, update.job_type)
+  const cType = getContentType(update)
+  const labels = getContentTypeLabels(cType, update)
+  const statusInfo = getContextualStatus(update, cType)
   const category = escapeHtml(rawCat)
   const shortDesc = update.short_description ? escapeHtml(update.short_description) : ''
   const pubDate = update.publish_date ? escapeHtml(update.publish_date) : ''
@@ -321,86 +307,41 @@ function generateDailyUpdateHtml(update, canonical) {
   const loc = update.location ? escapeHtml(update.location) : ''
   const qual = update.qualification ? escapeHtml(update.qualification) : ''
   const pos = update.positions ? escapeHtml(update.positions) : ''
+  const salary = update.salary ? escapeHtml(update.salary) : ''
+  const jobType = update.job_type ? escapeHtml(update.job_type) : ''
   const deadline = update.deadline ? escapeHtml(update.deadline) : ''
   const applyLink = update.apply_link ? escapeHtml(update.apply_link) : ''
   const officialLink = update.official_link ? escapeHtml(update.official_link) : ''
   const contentHtml = renderContentBlocks(update.content, update.title)
 
-  let orgLabel = 'Organization'
-  let locLabel = 'Location'
-  let qualLabel = 'Qualification'
-  let posLabel = 'Vacancies'
-  let deadlineLabel = 'Application Deadline'
-  let actionBtnText = 'Apply Online →'
-  let officialBtnText = 'Official Website / Gazette ↗'
-  let typeBadge = category
+  const typeBadge = cType === 'job' ? category : escapeHtml(labels.badgeLabel)
+  const actionBtnText = labels.actionBtnText ? escapeHtml(labels.actionBtnText) : ''
+  const officialBtnText = escapeHtml(labels.officialBtnText || 'Official Website / Gazette ↗')
+  const displaySalary = labels.salLabel && salary ? salary : ''
+  const displayDeadline = (cType === 'guide' || update.no_deadline) ? '' : deadline
 
-  if (cType === 'notification') {
-    orgLabel = 'Issuing Authority'
-    locLabel = 'Jurisdiction / Scope'
-    qualLabel = 'Target Sectors / Workers'
-    posLabel = 'Notified Categories'
-    deadlineLabel = 'Effective Date'
-    actionBtnText = ''
-    officialBtnText = 'View Official Notification / Gazette ↗'
-    typeBadge = 'Official Notification'
-  } else if (cType === 'scheme') {
-    orgLabel = 'Administering Department'
-    locLabel = 'Coverage Area'
-    qualLabel = 'Eligibility Criteria'
-    posLabel = 'Target Beneficiaries'
-    deadlineLabel = 'Enrollment Schedule'
-    actionBtnText = 'Verify / Check Portal →'
-    officialBtnText = 'Official Scheme Portal ↗'
-    typeBadge = 'Government Scheme'
-  } else if (cType === 'admission') {
-    orgLabel = 'University / Institute'
-    locLabel = 'Campus Location'
-    qualLabel = 'Required Prior Education'
-    posLabel = 'Programs Offered'
-    deadlineLabel = 'Last Date to Apply'
-    actionBtnText = 'Apply for Admission →'
-    officialBtnText = 'Official Admission Portal ↗'
-    typeBadge = 'Admission Notice'
-  } else if (cType === 'scholarship') {
-    orgLabel = 'Awarding Body'
-    locLabel = 'Eligible Region'
-    qualLabel = 'Eligibility Criteria'
-    posLabel = 'Scholarship Slots'
-    deadlineLabel = 'Submission Deadline'
-    actionBtnText = 'Submit Scholarship Application →'
-    officialBtnText = 'Official Scholarship Portal ↗'
-    typeBadge = 'Scholarship Program'
-  }
-
-  const specsBox = (org || loc || qual || pos) ? `
+  const specsBox = (org || loc || qual || pos || displaySalary || jobType || displayDeadline) ? `
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-paper border border-line mb-6 text-xs" style="background:#faf9f6;border:1px solid #e7e5e4;padding:16px;margin-bottom:24px;">
-      ${org ? `<div><span style="color:#78716c;display:block;">${orgLabel}</span><strong style="color:#1c1917;">${org}</strong></div>` : ''}
-      ${loc ? `<div><span style="color:#78716c;display:block;">${locLabel}</span><strong style="color:#1c1917;">${loc}</strong></div>` : ''}
-      ${qual ? `<div><span style="color:#78716c;display:block;">${qualLabel}</span><strong style="color:#1c1917;">${qual}</strong></div>` : ''}
-      ${pos ? `<div><span style="color:#78716c;display:block;">${posLabel}</span><strong style="color:#1c1917;">${pos}</strong></div>` : ''}
+      ${org ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.orgLabel)}</span><strong style="color:#1c1917;">${org}</strong></div>` : ''}
+      ${loc ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.locLabel)}</span><strong style="color:#1c1917;">${loc}</strong></div>` : ''}
+      ${qual ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.qualLabel)}</span><strong style="color:#1c1917;">${qual}</strong></div>` : ''}
+      ${pos ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.posLabel)}</span><strong style="color:#1c1917;">${pos}</strong></div>` : ''}
+      ${displaySalary ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.salLabel)}</span><strong style="color:#059669;">${displaySalary}</strong></div>` : ''}
+      ${jobType ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.typeLabel)}</span><strong style="color:#1c1917;">${jobType}</strong></div>` : ''}
+      ${displayDeadline ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.dateLabel)}</span><strong style="color:#1c1917;">${displayDeadline}</strong></div>` : ''}
     </div>` : ''
 
-  let statusBanner = ''
-  if (cType === 'notification') {
-    statusBanner = `
-      <div style="background:#ecfdf5;border:1px solid #a7f3d0;padding:16px;margin-bottom:24px;border-radius:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-        <div>
-          <strong style="color:#065f46;display:block;font-size:14px;">Official Statutory Notification (In Force)</strong>
-          <span style="color:#047857;font-size:12px;">This is an enforceable gazette notification, not a job vacancy. No application fee or job submission is required.</span>
-        </div>
-        ${officialLink ? `<a href="${officialLink}" target="_blank" rel="noopener noreferrer" style="background:#059669;color:#ffffff;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;border-radius:4px;">${officialBtnText}</a>` : ''}
-      </div>`
-  } else if (deadline) {
-    statusBanner = `
-      <div style="background:#fef3c7;border:1px solid #fde68a;padding:16px;margin-bottom:24px;border-radius:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-        <div>
-          <strong style="color:#92400e;display:block;font-size:14px;">${deadlineLabel}: ${deadline}</strong>
-          <span style="color:#b45309;font-size:12px;">Submit or verify before official portal cutoff.</span>
-        </div>
-        ${(applyLink && actionBtnText) ? `<a href="${applyLink}" target="_blank" rel="noopener noreferrer" style="background:#d97706;color:#ffffff;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;border-radius:4px;">${actionBtnText}</a>` : ''}
-      </div>`
-  }
+  const primaryCtaHref = (applyLink && actionBtnText) ? applyLink : officialLink
+  const primaryCtaLabel = (applyLink && actionBtnText) ? actionBtnText : officialBtnText
+
+  const statusBanner = `
+    <div style="background:#ecfdf5;border:1px solid #a7f3d0;padding:16px;margin-bottom:24px;border-radius:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div>
+        <strong style="color:#065f46;display:block;font-size:14px;">${escapeHtml(statusInfo.bannerText)}${displayDeadline ? ` — ${escapeHtml(labels.dateLabel)}: ${displayDeadline}` : ''}</strong>
+        <span style="color:#047857;font-size:12px;">${escapeHtml(statusInfo.bannerSub)}</span>
+      </div>
+      ${primaryCtaHref ? `<a href="${primaryCtaHref}" target="_blank" rel="noopener noreferrer" style="background:#059669;color:#ffffff;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;border-radius:4px;">${primaryCtaLabel}</a>` : ''}
+    </div>`
 
   const transparencyNote = `
     <div style="background:#faf9f6;border-left:4px solid #059669;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#44403c;">
@@ -411,7 +352,7 @@ function generateDailyUpdateHtml(update, canonical) {
     <div style="background:#faf9f6;border:1px solid #e7e5e4;padding:20px;margin-bottom:32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
       <div>
         <strong style="font-size:12px;text-transform:uppercase;letter-spacing:0.05em;display:block;">Verified Official Source</strong>
-        <span style="font-size:12px;color:#78716c;">Official CareerDost Editorial Record</span>
+        <span style="font-size:12px;color:#78716c;">Verified CareerDost ${escapeHtml(labels.badgeLabel)} Record</span>
       </div>
       <div style="display:flex;gap:12px;flex-wrap:wrap;">
         ${officialLink ? `<a href="${officialLink}" target="_blank" rel="noopener noreferrer" style="border:1px solid #d6d3d1;background:#ffffff;color:#1c1917;padding:8px 16px;font-size:12px;font-weight:600;text-decoration:none;">${officialBtnText}</a>` : ''}
@@ -434,7 +375,7 @@ function generateDailyUpdateHtml(update, canonical) {
       </header>
       <main class="flex-1">
         <article class="container-x py-8 sm:py-12 max-w-4xl font-sans">
-          <nav class="text-xs text-inksoft mb-6 flex items-center gap-1.5 flex-wrap">
+          <nav class="text-xs text-inksoft mb-6 flex items-center gap-1.5 flex-wrap" aria-label="Breadcrumb">
             <a href="/" class="hover:text-green">Home</a>
             <span>/</span>
             <a href="/daily-updates" class="hover:text-green">Daily Updates</a>
@@ -450,11 +391,16 @@ function generateDailyUpdateHtml(update, canonical) {
               <span class="text-xs font-sans text-inksoft">
                 Published: ${pubDate}
               </span>
+              <span class="text-xs font-sans text-inksoft">• By CareerDost Editorial Desk</span>
             </div>
             <h1 class="font-serif text-2xl sm:text-4xl font-bold text-ink leading-tight mb-4">
               ${title}
             </h1>
             ${shortDesc ? `<p class="font-sans text-base sm:text-lg text-inksoft leading-relaxed border-l-4 border-green pl-4 py-1 bg-paper mb-6">${shortDesc}</p>` : ''}
+            ${update.featured_image ? `
+            <div class="relative aspect-[16/9] w-full bg-slate-900 rounded-xs overflow-hidden mb-6 shadow-xs" style="aspect-ratio:16/9;width:100%;margin-bottom:24px;border-radius:2px;overflow:hidden;background:#0f172a;">
+              <img src="${update.featured_image}" alt="${escapeHtml(update.image_alt || update.title)}" width="1200" height="675" style="width:100%;height:100%;object-fit:cover;display:block;" fetchpriority="high" />
+            </div>` : ''}
             ${specsBox}
           </header>
           ${statusBanner}
@@ -477,122 +423,72 @@ function generateDailyUpdateHtml(update, canonical) {
 function generateJobHtml(article, canonical) {
   const title = escapeHtml(article.title || '')
   const categorySlug = escapeHtml(article.category_slug || 'government-jobs')
-  const cType = detectContentTypeEdge(categorySlug, article.title, article.slug, article.job_type)
+  const cType = getContentType(article)
+  const labels = getContentTypeLabels(cType, article)
+  const statusInfo = getContextualStatus(article, cType)
   const categoryLabel = categorySlug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
   const org = article.organization ? escapeHtml(article.organization) : ''
   const loc = article.location ? escapeHtml(article.location) : ''
   const qual = article.qualification ? escapeHtml(article.qualification) : ''
   const salary = article.salary ? escapeHtml(article.salary) : ''
+  const pos = article.positions ? escapeHtml(article.positions) : ''
+  const exp = article.experience ? escapeHtml(article.experience) : ''
   const jobType = article.job_type ? escapeHtml(article.job_type) : ''
   const pubDate = article.publish_date ? escapeHtml(article.publish_date) : ''
   const lastDate = article.last_date ? escapeHtml(article.last_date) : ''
   const excerpt = article.excerpt ? escapeHtml(article.excerpt) : ''
   const officialLink = article.official_link ? escapeHtml(article.official_link) : ''
+  const applyLink = article.apply_link ? escapeHtml(article.apply_link) : ''
   const contentHtml = renderContentBlocks(article.content, article.title)
 
-  let orgLabel = 'Organization'
-  let locLabel = 'Location'
-  let qualLabel = 'Qualification'
-  let salaryLabel = 'Salary / Scale'
-  let jobTypeLabel = 'Job Type'
-  let dateLabel = 'Last Date to Apply'
-  let actionBtnText = 'Official Website / Apply Link ↗'
-  let typeBadge = categoryLabel
+  const typeBadge = cType === 'job' ? categoryLabel : escapeHtml(labels.badgeLabel)
+  const actionBtnText = labels.actionBtnText ? escapeHtml(labels.actionBtnText) : ''
+  const officialBtnText = escapeHtml(labels.officialBtnText || 'Official Website / Gazette ↗')
+  const displaySalary = labels.salLabel && salary ? salary : ''
+  const displayLastDate = (cType === 'guide' || article.no_deadline) ? '' : lastDate
 
-  if (cType === 'notification') {
-    orgLabel = 'Issuing Authority'
-    locLabel = 'Jurisdiction / Scope'
-    qualLabel = 'Protected Beneficiaries'
-    salaryLabel = 'Notified Rates / Mandate'
-    jobTypeLabel = 'Regulatory Mandate'
-    dateLabel = 'Effective Date'
-    actionBtnText = 'View Official Notification / Gazette ↗'
-    typeBadge = 'Official Notification'
-  } else if (cType === 'scheme') {
-    orgLabel = 'Administering Department'
-    locLabel = 'Coverage Area'
-    qualLabel = 'Eligibility Criteria'
-    salaryLabel = 'Assistance / Grant'
-    jobTypeLabel = 'Public Scheme'
-    dateLabel = 'Application Window'
-    actionBtnText = 'Official Scheme Portal ↗'
-    typeBadge = 'Government Scheme'
-  } else if (cType === 'admission') {
-    orgLabel = 'University / Institute'
-    locLabel = 'Campus Location'
-    qualLabel = 'Required Prior Education'
-    salaryLabel = 'Program / Fee Scale'
-    jobTypeLabel = 'Admission Track'
-    dateLabel = 'Admission Deadline'
-    actionBtnText = 'Official Admission Portal ↗'
-    typeBadge = 'Admission Notice'
-  } else if (cType === 'scholarship') {
-    orgLabel = 'Awarding Body'
-    locLabel = 'Eligible Region'
-    qualLabel = 'Eligibility Criteria'
-    salaryLabel = 'Funding Coverage'
-    jobTypeLabel = 'Scholarship Type'
-    dateLabel = 'Submission Deadline'
-    actionBtnText = 'Official Scholarship Portal ↗'
-    typeBadge = 'Scholarship Program'
-  } else if (cType === 'guide') {
-    orgLabel = 'Administering Department'
-    locLabel = 'Jurisdiction / Scope'
-    qualLabel = 'Target Beneficiaries'
-    salaryLabel = ''
-    jobTypeLabel = 'Guide Category'
-    dateLabel = 'Effective Window'
-    actionBtnText = 'Official Portal / Guidelines ↗'
-    typeBadge = 'Official Guide'
-  }
-
-  const displaySalary = (cType === 'guide' || cType === 'notification') ? '' : salary
-  const displayLastDate = (cType === 'guide') ? '' : lastDate
-
-  const specsBox = (org || loc || qual || displaySalary || jobType || displayLastDate) ? `
+  const specsBox = (org || loc || qual || pos || exp || displaySalary || jobType || displayLastDate) ? `
     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 bg-paper border border-line mb-6 text-xs" style="background:#faf9f6;border:1px solid #e7e5e4;padding:16px;margin-bottom:24px;">
-      ${org ? `<div><span style="color:#78716c;display:block;">${orgLabel}</span><strong style="color:#1c1917;">${org}</strong></div>` : ''}
-      ${loc ? `<div><span style="color:#78716c;display:block;">${locLabel}</span><strong style="color:#1c1917;">${loc}</strong></div>` : ''}
-      ${qual ? `<div><span style="color:#78716c;display:block;">${qualLabel}</span><strong style="color:#1c1917;">${qual}</strong></div>` : ''}
-      ${displaySalary ? `<div><span style="color:#78716c;display:block;">${salaryLabel}</span><strong style="color:#1c1917;">${displaySalary}</strong></div>` : ''}
-      ${jobType ? `<div><span style="color:#78716c;display:block;">${jobTypeLabel}</span><strong style="color:#1c1917;">${jobType}</strong></div>` : ''}
-      ${displayLastDate ? `<div><span style="color:#78716c;display:block;">${dateLabel}</span><strong style="color:#1c1917;">${displayLastDate}</strong></div>` : ''}
+      ${org ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.orgLabel)}</span><strong style="color:#1c1917;">${org}</strong></div>` : ''}
+      ${loc ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.locLabel)}</span><strong style="color:#1c1917;">${loc}</strong></div>` : ''}
+      ${qual ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.qualLabel)}</span><strong style="color:#1c1917;">${qual}</strong></div>` : ''}
+      ${pos ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.posLabel)}</span><strong style="color:#1c1917;">${pos}</strong></div>` : ''}
+      ${exp && labels.expLabel ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.expLabel)}</span><strong style="color:#1c1917;">${exp}</strong></div>` : ''}
+      ${displaySalary ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.salLabel)}</span><strong style="color:#059669;">${displaySalary}</strong></div>` : ''}
+      ${jobType ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.typeLabel)}</span><strong style="color:#1c1917;">${jobType}</strong></div>` : ''}
+      ${displayLastDate ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.dateLabel)}</span><strong style="color:#1c1917;">${displayLastDate}</strong></div>` : ''}
     </div>` : ''
 
-  let statusBanner = ''
-  if (cType === 'notification') {
-    statusBanner = `
-      <div style="background:#ecfdf5;border:1px solid #a7f3d0;padding:16px;margin-bottom:24px;border-radius:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-        <div>
-          <strong style="color:#065f46;display:block;font-size:14px;">Official Statutory Notification (In Force)</strong>
-          <span style="color:#047857;font-size:12px;">This is an enforceable gazette notification, not a job vacancy. No application fee or job submission is required.</span>
-        </div>
-        ${officialLink ? `<a href="${officialLink}" target="_blank" rel="noopener noreferrer" style="background:#059669;color:#ffffff;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;border-radius:4px;">${actionBtnText}</a>` : ''}
-      </div>`
-  } else if (cType === 'guide') {
-    statusBanner = `
-      <div style="background:#f0fdf4;border:1px solid #bbf7d0;padding:16px;margin-bottom:24px;border-radius:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-        <div>
-          <strong style="color:#166534;display:block;font-size:14px;">Official Public Information &amp; Verification Guide</strong>
-          <span style="color:#15803d;font-size:12px;">This is an authoritative informational guide and procedural walkthrough, not an employment vacancy. Follow designated official government links.</span>
-        </div>
-        ${officialLink ? `<a href="${officialLink}" target="_blank" rel="noopener noreferrer" style="background:#059669;color:#ffffff;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;border-radius:4px;">${actionBtnText}</a>` : ''}
-      </div>`
-  }
+  const primaryCtaHref = (applyLink && actionBtnText) ? applyLink : officialLink
+  const primaryCtaLabel = (applyLink && actionBtnText) ? actionBtnText : officialBtnText
+
+  const statusBanner = `
+    <div style="background:#ecfdf5;border:1px solid #a7f3d0;padding:16px;margin-bottom:24px;border-radius:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div>
+        <strong style="color:#065f46;display:block;font-size:14px;">${escapeHtml(statusInfo.bannerText)}${displayLastDate ? ` — ${escapeHtml(labels.dateLabel)}: ${displayLastDate}` : ''}</strong>
+        <span style="color:#047857;font-size:12px;">${escapeHtml(statusInfo.bannerSub)}</span>
+      </div>
+      ${primaryCtaHref ? `<a href="${primaryCtaHref}" target="_blank" rel="noopener noreferrer" style="background:#059669;color:#ffffff;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;border-radius:4px;">${primaryCtaLabel}</a>` : ''}
+    </div>`
 
   const transparencyNote = `
     <div style="background:#faf9f6;border-left:4px solid #059669;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#44403c;">
       <strong>Official Source &amp; Editorial Transparency:</strong> Official notification details and schedules are verified from government gazettes and administrative records. CareerDost provides editorial analysis and practical guidance to assist citizens.
     </div>`
 
-  const actionButtons = officialLink ? `
+  const recordTypeLabel = cType === 'job'
+    ? 'Verified CareerDost Recruitment Record'
+    : `Verified CareerDost ${escapeHtml(labels.badgeLabel)} Record`
+
+  const actionButtons = (officialLink || (applyLink && actionBtnText)) ? `
     <div style="background:#faf9f6;border:1px solid #e7e5e4;padding:20px;margin-bottom:32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
       <div>
-        <strong style="font-size:12px;text-transform:uppercase;letter-spacing:0.05em;display:block;">Official Source Link</strong>
-        <span style="font-size:12px;color:#78716c;">Verified CareerDost Notification Record</span>
+        <strong style="font-size:12px;text-transform:uppercase;letter-spacing:0.05em;display:block;">Official Source &amp; Portal Links</strong>
+        <span style="font-size:12px;color:#78716c;">${recordTypeLabel}</span>
       </div>
-      <div>
-        <a href="${officialLink}" target="_blank" rel="noopener noreferrer" style="background:#059669;color:#ffffff;padding:8px 20px;font-size:12px;font-weight:600;text-decoration:none;border-radius:2px;">${actionBtnText}</a>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        ${officialLink ? `<a href="${officialLink}" target="_blank" rel="noopener noreferrer" style="border:1px solid #d6d3d1;background:#ffffff;color:#1c1917;padding:8px 16px;font-size:12px;font-weight:600;text-decoration:none;border-radius:2px;">${officialBtnText}</a>` : ''}
+        ${(applyLink && actionBtnText && applyLink !== officialLink) ? `<a href="${applyLink}" target="_blank" rel="noopener noreferrer" style="background:#059669;color:#ffffff;padding:8px 20px;font-size:12px;font-weight:600;text-decoration:none;border-radius:2px;">${actionBtnText}</a>` : ''}
       </div>
     </div>` : ''
 
@@ -611,7 +507,7 @@ function generateJobHtml(article, canonical) {
       </header>
       <main class="flex-1">
         <article class="container-x py-8 sm:py-12 max-w-4xl font-sans">
-          <nav class="text-xs text-inksoft mb-6 flex items-center gap-1.5 flex-wrap">
+          <nav class="text-xs text-inksoft mb-6 flex items-center gap-1.5 flex-wrap" aria-label="Breadcrumb">
             <a href="/" class="hover:text-green">Home</a>
             <span>/</span>
             <a href="/category/${categorySlug}" class="hover:text-green">${categoryLabel}</a>
@@ -623,9 +519,11 @@ function generateJobHtml(article, canonical) {
               <a href="/category/${categorySlug}" class="bg-green/10 text-green text-xs font-sans font-bold px-3 py-1 rounded-full border border-green/20">
                 ${typeBadge}
               </a>
+              ${article.is_verified ? '<span class="bg-emerald-100 text-emerald-800 text-xs font-sans font-bold px-3 py-1 rounded-full border border-emerald-300">✓ Official Source Verified</span>' : ''}
               <span class="text-xs font-sans text-inksoft">
                 Published: ${pubDate}
               </span>
+              <span class="text-xs font-sans text-inksoft">• By CareerDost Editorial Desk</span>
             </div>
             <h1 class="font-serif text-2xl sm:text-4xl font-bold text-ink leading-tight mb-4">
               ${title}
@@ -1149,9 +1047,9 @@ export async function onRequest(context) {
             .prepare(
               `SELECT id, slug, title, short_description, content, seo_title, meta_description,
                       featured_image, image_alt, category, organization, location,
-                      qualification, positions, job_type, salary, publish_date,
-                      deadline, no_deadline, official_link, apply_link, is_verified,
-                      status
+                      qualification, positions, experience, job_type, salary, publish_date,
+                      deadline, no_deadline, official_link, apply_link, is_verified, featured,
+                      status, created_at
                FROM daily_updates WHERE slug = ? LIMIT 1`
             )
             .bind(slug)
@@ -1168,6 +1066,7 @@ export async function onRequest(context) {
               .on('title', { element: (e) => e.setInnerContent(pageTitle) })
               .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
               .on('link[rel="canonical"]', { element: (e) => e.setAttribute('href', canonical) })
+              .on('meta[property="og:type"]', { element: (e) => e.setAttribute('content', 'article') })
               .on('meta[property="og:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
               .on('meta[property="og:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
               .on('meta[property="og:url"]', { element: (e) => e.setAttribute('content', canonical) })
@@ -1329,7 +1228,7 @@ export async function onRequest(context) {
             const ogImage = getAbsoluteUrl(article.featured_image)
             const jobHtml = generateJobHtml(article, canonical)
 
-            const cType = detectContentTypeEdge(article.category_slug, article.title, article.slug, article.job_type)
+            const cType = getContentType(article)
             const isJob = isGenuineJobVacancy(article, cType)
 
             const mainSchema = isJob
@@ -1365,6 +1264,7 @@ export async function onRequest(context) {
               .on('title', { element: (e) => e.setInnerContent(pageTitle) })
               .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
               .on('link[rel="canonical"]', { element: (e) => e.setAttribute('href', canonical) })
+              .on('meta[property="og:type"]', { element: (e) => e.setAttribute('content', 'article') })
               .on('meta[property="og:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
               .on('meta[property="og:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
               .on('meta[property="og:url"]', { element: (e) => e.setAttribute('content', canonical) })
@@ -1597,6 +1497,77 @@ export async function onRequest(context) {
     const canonical = `${SITE_URL}/`
     const ogImage = DEFAULT_OG_IMAGE
 
+    let latestArticles = []
+    if (context.env?.DB) {
+      try {
+        const { results } = await context.env.DB
+          .prepare(
+            `SELECT slug, title, excerpt, category_slug, organization, location, publish_date, last_date
+             FROM articles WHERE status = 'published' ORDER BY publish_date DESC LIMIT 12`
+          )
+          .all()
+        latestArticles = results || []
+      } catch (err) {
+        console.warn('Homepage articles query error:', err)
+      }
+    }
+
+    const homeHtml = `
+      <div class="min-h-screen flex flex-col bg-paper font-sans">
+        <header class="border-b border-line bg-white">
+          <div class="container-x py-4 flex items-center justify-between">
+            <a href="/" class="font-serif text-2xl font-bold text-ink">CareerDost</a>
+            <nav class="flex items-center gap-4 text-sm">
+              <a href="/daily-updates">Daily Updates</a>
+              <a href="/category/government-jobs">Government Jobs</a>
+              <a href="/category/government-schemes">Government Schemes</a>
+              <a href="/category/scholarships">Scholarships</a>
+              <a href="/category/admissions">Admissions</a>
+              <a href="/about">About</a>
+            </nav>
+          </div>
+        </header>
+        <main class="container-x py-8 flex-1">
+          <section class="mb-8">
+            <h1 class="font-serif text-3xl font-bold text-ink mb-2">Pakistan Jobs, Sindh Government Schemes &amp; Verified Public Updates</h1>
+            <p class="text-inksoft text-base max-w-3xl">${escapeHtml(homeDesc)}</p>
+          </section>
+          <section class="mb-8">
+            <h2 class="font-serif text-xl font-bold text-ink mb-4">Browse Opportunity Categories</h2>
+            <ul class="grid sm:grid-cols-2 lg:grid-cols-5 gap-3 text-sm">
+              <li><a href="/category/government-jobs">Government Jobs in Pakistan</a></li>
+              <li><a href="/category/private-jobs">Private Sector Jobs</a></li>
+              <li><a href="/category/bank-jobs">Banking &amp; Finance Jobs</a></li>
+              <li><a href="/category/it-jobs">IT &amp; Software Jobs</a></li>
+              <li><a href="/category/internships">Graduate Internships</a></li>
+              <li><a href="/category/government-schemes">Government Schemes &amp; BISP</a></li>
+              <li><a href="/category/scholarships">Local &amp; International Scholarships</a></li>
+              <li><a href="/category/admissions">University Admissions</a></li>
+              <li><a href="/category/results">Merit Lists &amp; Exam Results</a></li>
+              <li><a href="/daily-updates">Daily Career &amp; Policy Updates</a></li>
+            </ul>
+          </section>
+          <section>
+            <h2 class="font-serif text-xl font-bold text-ink mb-4">Latest Verified Opportunities &amp; Official Updates</h2>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              ${latestArticles.map((a) => `
+                <article class="bg-white border border-line p-4 rounded-xs">
+                  <span class="text-xs font-bold text-green uppercase">${escapeHtml(a.category_slug || 'Update')}</span>
+                  <h3 class="font-serif text-base font-bold text-ink mt-1 mb-1">
+                    <a href="/jobs/${escapeHtml(a.slug)}">${escapeHtml(a.title)}</a>
+                  </h3>
+                  <p class="text-xs text-inksoft mb-2">${escapeHtml(a.organization || '')} • ${escapeHtml(a.location || 'Pakistan')}</p>
+                  <p class="text-xs text-inksoft">${escapeHtml(a.excerpt || '')}</p>
+                </article>
+              `).join('\n')}
+            </div>
+          </section>
+        </main>
+        <footer class="border-t border-line bg-white py-8 text-center text-xs text-inksoft">
+          <p>© 2026 CareerDost. Independent Pakistani Career, Education &amp; Public Information Platform.</p>
+        </footer>
+      </div>`
+
     return new HTMLRewriter()
       .on('title', { element: (e) => e.setInnerContent(homeTitle) })
       .on('meta[name="description"]', { element: (e) => e.setAttribute('content', homeDesc) })
@@ -1608,6 +1579,7 @@ export async function onRequest(context) {
       .on('meta[name="twitter:title"]', { element: (e) => e.setAttribute('content', homeTitle) })
       .on('meta[name="twitter:description"]', { element: (e) => e.setAttribute('content', homeDesc) })
       .on('meta[name="twitter:image"]', { element: (e) => e.setAttribute('content', ogImage) })
+      .on('#root', { element: (e) => e.setInnerContent(homeHtml, { html: true }) })
       .transform(response)
   }
 
@@ -1616,6 +1588,13 @@ export async function onRequest(context) {
     const pageTitle = 'About CareerDost — Pakistan Jobs, Schemes & Verification Policy'
     const pageDesc = 'Learn about CareerDost, an independent Pakistan-focused opportunity and public information platform covering Sindh schemes, federal jobs, scholarships, and admissions.'
     const canonical = `${SITE_URL}/about`
+    const aboutHtml = `
+      <main class="container-x py-10 max-w-3xl font-sans">
+        <h1 class="font-serif text-3xl font-bold text-ink mb-4">About CareerDost — Editorial &amp; Verification Policy</h1>
+        <p class="text-base text-ink leading-relaxed mb-4">CareerDost (https://careerdost.blog) is an independent Pakistani public-interest information platform dedicated to publishing verified government and private job notifications, federal and Sindh provincial welfare schemes, HEC and international scholarships, university admissions, and official regulatory updates.</p>
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">Source Attribution &amp; Fact-Checking Standards</h2>
+        <p class="text-base text-ink leading-relaxed mb-4">Every listing published by the CareerDost Editorial Desk is cross-checked against primary official gazettes, Press Information Department (PID) communiqués, FPSC/PPSC/SPSC portals, and accredited institutional websites. We clearly distinguish between confirmed recruitment or scheme announcements and unconfirmed proposals, and we never charge fees or act as a recruitment agency.</p>
+      </main>`
     return new HTMLRewriter()
       .on('title', { element: (e) => e.setInnerContent(pageTitle) })
       .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
@@ -1623,6 +1602,7 @@ export async function onRequest(context) {
       .on('meta[property="og:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
       .on('meta[property="og:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('meta[property="og:url"]', { element: (e) => e.setAttribute('content', canonical) })
+      .on('#root', { element: (e) => e.setInnerContent(aboutHtml, { html: true }) })
       .transform(response)
   }
 
@@ -1631,6 +1611,11 @@ export async function onRequest(context) {
     const pageTitle = 'Contact CareerDost — Official Editorial & Query Helpdesk'
     const pageDesc = 'Contact the CareerDost editorial desk to submit inquiries, report listing updates, or verify official government gazette sources.'
     const canonical = `${SITE_URL}/contact`
+    const contactHtml = `
+      <main class="container-x py-10 max-w-3xl font-sans">
+        <h1 class="font-serif text-3xl font-bold text-ink mb-4">Contact the CareerDost Editorial Desk</h1>
+        <p class="text-base text-ink leading-relaxed mb-4">Have a question about a published job notification, government scheme, or university admission update? Reach out to our editorial team at <strong>info@careerdost.blog</strong> for corrections, verification queries, or official press releases.</p>
+      </main>`
     return new HTMLRewriter()
       .on('title', { element: (e) => e.setInnerContent(pageTitle) })
       .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
@@ -1638,6 +1623,7 @@ export async function onRequest(context) {
       .on('meta[property="og:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
       .on('meta[property="og:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('meta[property="og:url"]', { element: (e) => e.setAttribute('content', canonical) })
+      .on('#root', { element: (e) => e.setInnerContent(contactHtml, { html: true }) })
       .transform(response)
   }
 
@@ -1654,7 +1640,7 @@ export async function onRequest(context) {
           .prepare(
             `SELECT id, slug, title, category, short_description, featured_image, image_alt,
                     official_link, apply_link, deadline, publish_date, organization,
-                    location, qualification, salary, is_verified, no_deadline
+                    location, qualification, experience, positions, job_type, salary, is_verified, no_deadline
              FROM daily_updates WHERE status = 'published' ORDER BY publish_date DESC LIMIT 24`
           )
           .all()
@@ -1683,6 +1669,9 @@ export async function onRequest(context) {
       organization: u.organization || '',
       location: u.location || '',
       qualification: u.qualification || '',
+      experience: u.experience || '',
+      positions: u.positions || '',
+      jobType: u.job_type || '',
       salary: u.salary || '',
       isVerified: Boolean(u.is_verified),
       noDeadline: Boolean(u.no_deadline),
@@ -1760,37 +1749,68 @@ export async function onRequest(context) {
   if (lowerPath === '/search') {
     const pageTitle = 'Search Pakistan Jobs, Admissions & Schemes — CareerDost'
     const canonical = `${SITE_URL}/search`
+    const searchHtml = `
+      <main class="container-x py-10 max-w-3xl font-sans">
+        <h1 class="font-serif text-3xl font-bold text-ink mb-4">Search Verified Pakistan Jobs, Schemes &amp; Scholarships</h1>
+        <p class="text-base text-inksoft mb-4">Browse by category below or use our interactive search to find verified opportunities across Pakistan.</p>
+      </main>`
     return new HTMLRewriter()
       .on('title', { element: (e) => e.setInnerContent(pageTitle) })
       .on('link[rel="canonical"]', { element: (e) => e.setAttribute('href', canonical) })
+      .on('head', { element: (e) => e.append('<meta name="robots" content="noindex, follow" />', { html: true }) })
+      .on('#root', { element: (e) => e.setInnerContent(searchHtml, { html: true }) })
       .transform(response)
   }
 
   // 10. Legal Pages: /privacy-policy, /disclaimer, /terms-and-conditions
   if (lowerPath === '/privacy-policy') {
     const pageTitle = 'Privacy Policy — CareerDost'
+    const pageDesc = 'Read the CareerDost Privacy Policy detailing how we protect user data, cookies, and privacy on careerdost.blog.'
     const canonical = `${SITE_URL}/privacy-policy`
+    const privacyHtml = `
+      <main class="container-x py-10 max-w-3xl font-sans">
+        <h1 class="font-serif text-3xl font-bold text-ink mb-4">Privacy Policy — CareerDost</h1>
+        <p class="text-base text-ink leading-relaxed mb-4">CareerDost respects your privacy. We do not collect sensitive personal financial or CNIC records, and we never sell personal data to third parties.</p>
+      </main>`
     return new HTMLRewriter()
       .on('title', { element: (e) => e.setInnerContent(pageTitle) })
+      .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('link[rel="canonical"]', { element: (e) => e.setAttribute('href', canonical) })
+      .on('#root', { element: (e) => e.setInnerContent(privacyHtml, { html: true }) })
       .transform(response)
   }
 
   if (lowerPath === '/disclaimer') {
     const pageTitle = 'Disclaimer Notice — CareerDost'
+    const pageDesc = 'Official editorial disclaimer for CareerDost.blog regarding government job advertisements, welfare schemes, and external portals.'
     const canonical = `${SITE_URL}/disclaimer`
+    const disclaimerHtml = `
+      <main class="container-x py-10 max-w-3xl font-sans">
+        <h1 class="font-serif text-3xl font-bold text-ink mb-4">Editorial Disclaimer — CareerDost</h1>
+        <p class="text-base text-ink leading-relaxed mb-4">CareerDost is an independent public-information website and is not affiliated with any government ministry, BISP, SPHF, or recruitment testing agency. Always verify details directly on the linked official government portal and never pay money to unauthorized agents.</p>
+      </main>`
     return new HTMLRewriter()
       .on('title', { element: (e) => e.setInnerContent(pageTitle) })
+      .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('link[rel="canonical"]', { element: (e) => e.setAttribute('href', canonical) })
+      .on('#root', { element: (e) => e.setInnerContent(disclaimerHtml, { html: true }) })
       .transform(response)
   }
 
   if (lowerPath === '/terms-and-conditions') {
     const pageTitle = 'Terms & Conditions — CareerDost'
+    const pageDesc = 'Terms and conditions for using CareerDost (https://careerdost.blog).'
     const canonical = `${SITE_URL}/terms-and-conditions`
+    const termsHtml = `
+      <main class="container-x py-10 max-w-3xl font-sans">
+        <h1 class="font-serif text-3xl font-bold text-ink mb-4">Terms &amp; Conditions — CareerDost</h1>
+        <p class="text-base text-ink leading-relaxed mb-4">By accessing CareerDost (https://careerdost.blog), you agree to use our verified informational guides and official portal references for lawful personal and educational purposes.</p>
+      </main>`
     return new HTMLRewriter()
       .on('title', { element: (e) => e.setInnerContent(pageTitle) })
+      .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('link[rel="canonical"]', { element: (e) => e.setAttribute('href', canonical) })
+      .on('#root', { element: (e) => e.setInnerContent(termsHtml, { html: true }) })
       .transform(response)
   }
 

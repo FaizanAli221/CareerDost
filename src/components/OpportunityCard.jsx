@@ -9,7 +9,7 @@ export default function OpportunityCard({ opportunity, showDeadlineBadge = true,
   if (!opportunity) return null
 
   const contentType = getContentType(opportunity)
-  const labels = getContentTypeLabels(contentType)
+  const labels = getContentTypeLabels(contentType, opportunity)
   const statusInfo = getContextualStatus(opportunity, contentType)
   const hasImage = opportunity.featuredImage && opportunity.featuredImage.trim().length > 0
 

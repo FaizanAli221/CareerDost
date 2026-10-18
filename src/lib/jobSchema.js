@@ -36,6 +36,9 @@ const NON_INDIVIDUAL_VACANCY_SLUGS = new Set([
   'pec-graduate-engineer-training-get-program-2026',
   'fpsc-latest-updates-adv3-2026-schedule',
   'bank-alfalah-jobs-internships-2026',
+  'jazz-careers-ai-associate-programme-2026',
+  'hbl-jobs-internships-the-league-2026',
+  'aku-karachi-jobs-traineeships-2026',
 ])
 
 /**
@@ -168,14 +171,10 @@ export function isGenuineJobVacancy(item, contentType = 'job') {
   if (!JOB_CATEGORIES.has(cat)) return false
 
   const title = String(item.title || '').toLowerCase().trim()
-  const seoTitle = String(item.seo_title || item.seoTitle || '').toLowerCase().trim()
   const jobType = String(item.job_type || item.jobType || '').toLowerCase().trim()
 
   if (
-    title.includes('guide') ||
     title.includes('ka tarika') ||
-    seoTitle.includes('guide') ||
-    jobType.includes('guide') ||
     jobType.includes('(expired)') ||
     title.includes('exam schedule') ||
     title.includes('roll no slip') ||
