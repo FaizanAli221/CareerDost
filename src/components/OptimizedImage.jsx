@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 /**
  * Optimized responsive image with native WebP format negotiation,
@@ -13,10 +13,12 @@ export default function OptimizedImage({
   priority = false,
   sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
 }) {
+  const [useFallback, setUseFallback] = useState(false)
+
   if (!src) return null
 
   const isJpg = /\.(jpe?g|png)$/i.test(src)
-  const webpSrc = isJpg ? src.replace(/\.(jpe?g|png)$/i, '.webp') : null
+  const webpSrc = (!useFallback && isJpg) ? src.replace(/\.(jpe?g|png)$/i, '.webp') : null
 
   return (
     <picture>
@@ -30,6 +32,11 @@ export default function OptimizedImage({
         decoding="async"
         fetchPriority={priority ? 'high' : 'auto'}
         className={className}
+        onError={() => {
+          if (!useFallback && webpSrc) {
+            setUseFallback(true)
+          }
+        }}
       />
     </picture>
   )
