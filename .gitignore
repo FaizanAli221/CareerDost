@@ -13,6 +13,7 @@ scratch/
 
 # Local Environment & SQLite DB
 careerdost.sqlite
+backups/
 .env
 .env.local
 .env.development.local

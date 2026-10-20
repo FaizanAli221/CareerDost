@@ -116,12 +116,20 @@ export default function Header() {
             ))}
           </div>
 
-          <Link
-            to="/admin"
-            className="text-xs text-inksoft hover:text-green whitespace-nowrap px-2 py-1 font-sans border border-line/60 hover:border-green"
-          >
-            Admin Panel
-          </Link>
+          <div className="flex items-center space-x-2 whitespace-nowrap">
+            <Link
+              to="/about"
+              className="text-xs text-inksoft hover:text-green px-2 py-1 font-sans transition-colors"
+            >
+              About &amp; Policy
+            </Link>
+            <Link
+              to="/contact"
+              className="text-xs text-inksoft hover:text-green px-2 py-1 font-sans border border-line/60 hover:border-green transition-colors"
+            >
+              Contact
+            </Link>
+          </div>
         </nav>
       </div>
 
@@ -170,7 +178,7 @@ export default function Header() {
           <div className="p-3 border-t border-line flex justify-between text-xs text-inksoft font-sans">
             <Link to="/about" onClick={() => setOpen(false)} className="hover:text-green">About Us</Link>
             <Link to="/contact" onClick={() => setOpen(false)} className="hover:text-green">Contact</Link>
-            <Link to="/admin" onClick={() => setOpen(false)} className="hover:text-green">Admin</Link>
+            <Link to="/privacy-policy" onClick={() => setOpen(false)} className="hover:text-green">Privacy Policy</Link>
           </div>
         </div>
       )}

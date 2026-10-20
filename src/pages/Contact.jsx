@@ -1,11 +1,13 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useSeo } from '../lib/useSeo'
 import { submitContactForm } from '../api/client'
 
 export default function Contact() {
   useSeo({
-    title: 'Contact Us — CareerDost',
-    description: 'Get in touch with the CareerDost team to report an outdated listing, suggest an official source, or ask a question.',
+    title: 'Contact CareerDost — Official Editorial & Query Helpdesk',
+    description:
+      'Contact the CareerDost editorial desk to report an outdated listing, submit an official corrigendum link, or ask a verification question.',
     canonical: '/contact',
   })
 
@@ -39,26 +41,73 @@ export default function Contact() {
     }
   }
 
+  const whatsappDirectHref = `https://wa.me/923173425680?text=${encodeURIComponent(
+    `Hello CareerDost Editorial Desk,\nSubject: ${formData.subject}\nName: ${formData.name}\nMessage: ${formData.message}`
+  )}`
+
   return (
-    <div className="container-x py-10 max-w-[640px] font-sans">
-      <h1 className="font-serif text-3xl font-bold text-ink mb-2">Contact Us</h1>
-      <p className="text-inksoft text-sm mb-4 leading-relaxed">
-        Report an outdated listing, suggest an official department source we should track, or reach out to our editorial team. We review every submission.
+    <div className="container-x py-10 max-w-3xl font-sans">
+      <h1 className="font-serif text-3xl font-bold text-ink mb-3">
+        Contact the CareerDost Editorial Desk
+      </h1>
+      <p className="text-inksoft text-base mb-6 leading-relaxed">
+        Have you spotted an updated deadline, an official departmental corrigendum, or a broken government
+        portal link? Reach out to the <strong>CareerDost Editorial Desk</strong> using our verified channels or
+        the inquiry form below.
       </p>
 
-      <div className="mb-8 p-4 border border-line bg-paper text-sm space-y-2">
-        <h2 className="font-semibold text-ink">Direct Contact &amp; Official Channels:</h2>
-        <div className="flex flex-col sm:flex-row gap-4 text-xs text-ink font-medium flex-wrap">
-          <a href="https://whatsapp.com/channel/0029VbDnzwFF1YlIkJax2P1o" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-green">
-            📢 <strong>WhatsApp Channel:</strong> Join Alerts
+      <div className="mb-8 p-5 border border-line bg-paper space-y-3">
+        <h2 className="font-serif text-lg font-bold text-ink">
+          Verified Official Communication Channels
+        </h2>
+        <p className="text-xs text-inksoft leading-relaxed">
+          For the fastest response on urgent deadline extensions, roll number slips, or verification requests,
+          connect with us via our verified channels:
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-ink font-medium pt-1">
+          <a
+            href="https://whatsapp.com/channel/0029VbDnzwFF1YlIkJax2P1o"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3 bg-white border border-line hover:border-green transition-colors flex flex-col gap-1"
+          >
+            <span className="text-inksoft uppercase tracking-wider text-[10px]">Broadcast Alerts</span>
+            <strong className="text-green">📢 Official WhatsApp Channel ↗</strong>
           </a>
-          <a href="https://wa.me/923173425680" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-green">
-            💬 <strong>WhatsApp Helpline:</strong> 03173425680
+          <a
+            href="https://wa.me/923173425680"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3 bg-white border border-line hover:border-green transition-colors flex flex-col gap-1"
+          >
+            <span className="text-inksoft uppercase tracking-wider text-[10px]">Editorial Helpdesk</span>
+            <strong className="text-ink">💬 WhatsApp: 0317-3425680 ↗</strong>
           </a>
-          <a href="https://facebook.com/CareerDost" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-green">
-            🌐 <strong>Facebook:</strong> CareerDost
+          <a
+            href="https://facebook.com/CareerDost"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3 bg-white border border-line hover:border-green transition-colors flex flex-col gap-1"
+          >
+            <span className="text-inksoft uppercase tracking-wider text-[10px]">Social Desk</span>
+            <strong className="text-ink">🌐 facebook.com/CareerDost ↗</strong>
           </a>
         </div>
+      </div>
+
+      <div className="mb-8 p-4 border-l-4 border-green bg-paper text-xs text-ink leading-relaxed">
+        <strong>Important Notice for Job &amp; Scheme Applicants:</strong> CareerDost is an independent
+        information portal and does <strong>not</strong> accept job CVs or BISP/welfare applications directly.
+        Please do not include sensitive personal records such as your CNIC number, bank account number, or
+        original transcripts in your message. See our{' '}
+        <Link to="/disclaimer" className="text-green underline font-medium">
+          Disclaimer
+        </Link>{' '}
+        and{' '}
+        <Link to="/privacy-policy" className="text-green underline font-medium">
+          Privacy Policy
+        </Link>
+        .
       </div>
 
       {error && (
@@ -68,13 +117,42 @@ export default function Contact() {
       )}
 
       {sent ? (
-        <div className="border border-green/30 bg-green-light text-green px-5 py-4 text-sm font-medium">
-          ✓ Thank you — your message has been received. Our team will review your query.
+        <div className="border border-green/30 bg-green-light text-ink p-6 space-y-4">
+          <div className="text-green font-bold text-base">
+            ✓ Thank you — your inquiry has been prepared for our editorial desk.
+          </div>
+          <p className="text-sm text-ink leading-relaxed">
+            Because CareerDost practices strict data minimization and does not store personal contact databases
+            on our servers, you can also forward your pre-filled message directly to our verified WhatsApp
+            Editorial Helpdesk below for immediate review:
+          </p>
+          <div className="flex flex-wrap gap-3 pt-1">
+            <a
+              href={whatsappDirectHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-green text-white px-5 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-green-dark transition-colors"
+            >
+              Send Directly via WhatsApp Helpdesk (0317-3425680) →
+            </a>
+            <button
+              type="button"
+              onClick={() => setSent(false)}
+              className="border border-line bg-white text-ink px-4 py-2.5 text-xs font-semibold hover:border-ink"
+            >
+              Submit Another Query
+            </button>
+          </div>
         </div>
       ) : (
-        <form onSubmit={onSubmit} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-4 bg-white border border-line p-6">
+          <h2 className="font-serif text-xl font-bold text-ink mb-2">
+            Submit an Editorial Query or Listing Correction
+          </h2>
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-ink mb-1">Full Name</label>
+            <label htmlFor="name" className="block text-sm font-medium text-ink mb-1">
+              Full Name
+            </label>
             <input
               id="name"
               name="name"
@@ -89,7 +167,9 @@ export default function Contact() {
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-ink mb-1">Email Address</label>
+            <label htmlFor="email" className="block text-sm font-medium text-ink mb-1">
+              Email Address
+            </label>
             <input
               id="email"
               name="email"
@@ -104,7 +184,9 @@ export default function Contact() {
           </div>
 
           <div>
-            <label htmlFor="subject" className="block text-sm font-medium text-ink mb-1">Subject</label>
+            <label htmlFor="subject" className="block text-sm font-medium text-ink mb-1">
+              Inquiry Category
+            </label>
             <select
               id="subject"
               name="subject"
@@ -113,14 +195,16 @@ export default function Contact() {
               className="w-full border border-line bg-white px-3 py-2.5 text-sm text-ink focus:border-green"
             >
               <option>Report an outdated listing or deadline</option>
-              <option>Suggest a new official source (FPSC/PPSC/University)</option>
-              <option>General query / Feedback</option>
-              <option>Official Inquiry</option>
+              <option>Suggest a new official source (FPSC/SPSC/PPSC/University)</option>
+              <option>General query / Editorial feedback</option>
+              <option>Report a suspicious third-party recruitment scam</option>
             </select>
           </div>
 
           <div>
-            <label htmlFor="message" className="block text-sm font-medium text-ink mb-1">Message</label>
+            <label htmlFor="message" className="block text-sm font-medium text-ink mb-1">
+              Message &amp; Official Source URL (if applicable)
+            </label>
             <textarea
               id="message"
               name="message"
@@ -129,7 +213,7 @@ export default function Contact() {
               rows={5}
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-              placeholder="Provide details or links relevant to your inquiry..."
+              placeholder="Include the CareerDost article URL and the official government/university notification link..."
               className="w-full border border-line bg-white px-3 py-2.5 text-sm text-ink placeholder:text-inksoft/60 focus:border-green"
             />
           </div>
@@ -139,7 +223,7 @@ export default function Contact() {
             disabled={loading}
             className="border border-green bg-green text-white px-6 py-2.5 text-sm font-semibold hover:bg-green-dark transition-colors disabled:opacity-50"
           >
-            {loading ? 'Sending...' : 'Send Message'}
+            {loading ? 'Processing...' : 'Send Message'}
           </button>
         </form>
       )}

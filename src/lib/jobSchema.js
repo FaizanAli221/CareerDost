@@ -39,6 +39,15 @@ const NON_INDIVIDUAL_VACANCY_SLUGS = new Set([
   'jazz-careers-ai-associate-programme-2026',
   'hbl-jobs-internships-the-league-2026',
   'aku-karachi-jobs-traineeships-2026',
+  'unilever-pakistan-jobs-october-2026',
+  'samba-bank-relationship-associate-jobs-2026',
+  'systems-limited-associate-software-engineer-jobs-2026',
+  'mcb-bank-infosec-trainee-jobs-2026',
+  'maju-karachi-jobs-faculty-staff-2026',
+  'bahria-university-jobs-2026',
+  'devsinc-remote-qa-engineer',
+  'state-bank-officer-training-scheme-sbots-batch-27',
+  'lums-electronic-technician-jobs-2026',
 ])
 
 /**
@@ -164,6 +173,8 @@ const MONTH_MAP = {
 export function isGenuineJobVacancy(item, contentType = 'job') {
   if (!item || contentType !== 'job') return false
 
+  if (item.schemaType === 'Article' || item.schema_type === 'Article') return false
+
   const slug = String(item.slug || '').toLowerCase().trim()
   if (NON_INDIVIDUAL_VACANCY_SLUGS.has(slug)) return false
 
@@ -182,6 +193,15 @@ export function isGenuineJobVacancy(item, contentType = 'job') {
   ) {
     return false
   }
+
+  const rawLastDate = item.last_date || item.lastDate || item.deadline
+  const rawNoDeadline = Boolean(item.no_deadline || item.noDeadline)
+  const validThrough = normalizeValidThrough(rawLastDate, rawNoDeadline)
+  if (!validThrough) return false
+
+  // Suppress active JobPosting schema when application deadline has passed
+  const todayIso = new Date().toISOString().slice(0, 10)
+  if (validThrough < todayIso) return false
 
   return true
 }

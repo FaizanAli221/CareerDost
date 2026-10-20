@@ -149,19 +149,42 @@ function generateSitemap() {
     lastmod: todayStr
   }))
 
+  const EXCLUDED_SLUGS = new Set([
+    'httpswwwnjpgovpk',
+    'systems-limited-hiring-software-engineers',
+    'hbl-management-trainee-officer-2026',
+    'benazir-income-support-programme-2026',
+    'nts-nat-result-september-2026',
+    'commonwealth-scholarships-2027-28-pakistan-hec-csc-uk',
+    'cbd-punjab-paid-internship-2026-youth-career-program',
+    'sindh-pink-scooty-scheme-2026-online-registration-eligibility',
+    'shaikh-ayaz-university-spring-2027-admissions-apply-online',
+    'lums-nano-physics-research-associate-jobs-2026',
+    'lums-lahore-jobs-advancement-it-staff-2026',
+    'virtual-university-admissions-2026-deadline-tomorrow',
+    'nts-nat-2026-october-test-roll-number-slips-uploaded'
+  ])
+
   let articleUrlsList = []
   try {
     if (fs.existsSync('careerdost.sqlite')) {
       const db = new Database('careerdost.sqlite')
       const rows = db.prepare("SELECT slug, publish_date, updated_at FROM articles WHERE status = 'published' ORDER BY publish_date DESC").all()
       if (rows && rows.length > 0) {
-        articleUrlsList = rows.map(r => ({ slug: r.slug, date: r.publish_date || r.updated_at }))
+        articleUrlsList = rows
+          .filter(r => !EXCLUDED_SLUGS.has(r.slug))
+          .map(r => ({
+            slug: r.slug,
+            date: (r.updated_at ? String(r.updated_at).split(' ')[0].split('T')[0] : null) || r.publish_date
+          }))
       }
     }
   } catch {}
 
   if (articleUrlsList.length === 0) {
-    articleUrlsList = listings.map(l => ({ slug: l.slug, date: l.publishDate }))
+    articleUrlsList = listings
+      .filter(l => !EXCLUDED_SLUGS.has(l.slug))
+      .map(l => ({ slug: l.slug, date: l.updatedAt || l.publishDate }))
   }
 
   const jobUrls = articleUrlsList.map(l => ({
@@ -171,20 +194,25 @@ function generateSitemap() {
     lastmod: formatLastModDate(l.date)
   }))
 
-  let updateUrlsList = publishedDailyUpdates
+  let updateUrlsList = publishedDailyUpdates.filter(u => !EXCLUDED_SLUGS.has(u.slug))
   try {
     if (fs.existsSync('careerdost.sqlite')) {
       const db = new Database('careerdost.sqlite')
-      const rows = db.prepare("SELECT slug, publish_date FROM daily_updates WHERE status = 'published' ORDER BY publish_date DESC").all()
+      const rows = db.prepare("SELECT slug, publish_date, updated_at FROM daily_updates WHERE status = 'published' ORDER BY publish_date DESC").all()
       if (rows && rows.length > 0) {
-        updateUrlsList = rows.map(r => ({ slug: r.slug, date: r.publish_date }))
+        updateUrlsList = rows
+          .filter(r => !EXCLUDED_SLUGS.has(r.slug))
+          .map(r => ({
+            slug: r.slug,
+            date: (r.updated_at ? String(r.updated_at).split(' ')[0].split('T')[0] : null) || r.publish_date
+          }))
       }
     }
   } catch {}
 
   const existingJobSlugs = new Set(articleUrlsList.map(a => a.slug))
   const updateUrls = updateUrlsList
-    .filter(u => !existingJobSlugs.has(u.slug))
+    .filter(u => !existingJobSlugs.has(u.slug) && !EXCLUDED_SLUGS.has(u.slug))
     .map(u => ({
       loc: `/daily-updates/${u.slug}`,
       priority: '0.8',
@@ -230,8 +258,12 @@ function generateSitemap() {
   fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), xml, 'utf8')
   console.log(`Generated sitemap.xml with ${allUrls.length} public URLs at public/sitemap.xml`)
 
-  // Write robots.txt with dedicated directives for search and GEO/AEO citation bots
+  // Write robots.txt with dedicated directives for search, AdSense, and GEO/AEO citation bots
   const robotsTxt = `# CareerDost (https://careerdost.blog) — Robots Configuration
+
+# Google AdSense Crawler
+User-agent: Mediapartners-Google
+Allow: /
 
 # Primary Web Search Engines
 User-agent: Googlebot

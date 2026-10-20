@@ -73,12 +73,12 @@ export default function Home() {
   const [closingSoon, setClosingSoon] = useState([])
   const [loading, setLoading] = useState(true)
   const [belowFoldLoaded, setBelowFoldLoaded] = useState(false)
-  const [feedReady, setFeedReady] = useState(false)
+  const [feedReady] = useState(true)
   const navigate = useNavigate()
 
   useSeo({
-    title: 'CareerDost | Pakistan Jobs, Sindh Govt Schemes & Latest Updates',
-    description: 'CareerDost provides the latest Pakistan jobs, Sindh government schemes, BISP updates, scholarships, admissions, and public information with official source links.',
+    title: 'CareerDost — Verified Pakistan Jobs, Scholarships & Government Schemes',
+    description: "CareerDost (Career Dost) provides verified Pakistan jobs, Sindh government schemes, BISP updates, bank careers, scholarships, and admissions with direct official links.",
     canonical: '/',
     jsonLd: {
       '@context': 'https://schema.org',
@@ -87,7 +87,12 @@ export default function Home() {
           '@type': 'WebSite',
           '@id': `${SITE_URL}/#website`,
           name: 'CareerDost',
-          url: SITE_URL,
+          alternateName: [
+            'Career Dost',
+            'CareerDost Pakistan',
+            'Career Dost Pakistan'
+          ],
+          url: `${SITE_URL}/`,
           description: 'Pakistan-focused jobs, education, government schemes, and public updates platform',
           publisher: {
             '@id': `${SITE_URL}/#organization`,
@@ -103,12 +108,21 @@ export default function Home() {
           '@type': 'Organization',
           '@id': `${SITE_URL}/#organization`,
           name: 'CareerDost',
-          url: SITE_URL,
+          alternateName: [
+            'Career Dost',
+            'CareerDost Pakistan'
+          ],
+          url: `${SITE_URL}/`,
           description: 'Pakistan-focused jobs, education, government schemes, and public updates platform',
           logo: {
             '@type': 'ImageObject',
-            url: `${SITE_URL}/favicon.svg`,
+            '@id': `${SITE_URL}/#logo`,
+            url: `${SITE_URL}/logo.png`,
+            caption: 'CareerDost Pakistan Logo',
+            width: 512,
+            height: 512,
           },
+          image: `${SITE_URL}/logo.png`,
           sameAs: [
             'https://whatsapp.com/channel/0029VbDnzwFF1YlIkJax2P1o',
             'https://facebook.com/CareerDost',
@@ -130,11 +144,6 @@ export default function Home() {
 
   useEffect(() => {
     let isMounted = true
-
-    // Schedule feed mounting on next frame / idle to keep initial paint task < 50ms
-    const idleHandle = (typeof requestIdleCallback !== 'undefined')
-      ? requestIdleCallback(() => isMounted && setFeedReady(true), { timeout: 120 })
-      : setTimeout(() => isMounted && setFeedReady(true), 40)
 
     // Phase 1: Prioritize above-the-fold content (Daily Updates and Government Jobs)
     Promise.allSettled([
@@ -188,11 +197,6 @@ export default function Home() {
 
     return () => {
       isMounted = false
-      if (typeof cancelIdleCallback !== 'undefined') {
-        cancelIdleCallback(idleHandle)
-      } else {
-        clearTimeout(idleHandle)
-      }
       if (typeof window !== 'undefined') {
         window.removeEventListener('scroll', triggerBelowFold)
         window.removeEventListener('touchstart', triggerBelowFold)
@@ -222,7 +226,7 @@ export default function Home() {
             </div>
 
             <h1 className="font-serif text-3xl sm:text-5xl font-bold text-ink leading-tight mb-4">
-              Pakistan Jobs, Sindh Govt Schemes &amp; Latest Updates
+              <span className="text-green block sm:inline">CareerDost: </span>Pakistan Jobs, Scholarships &amp; Government Schemes
             </h1>
 
             <p className="font-sans text-sm sm:text-base text-inksoft leading-relaxed mb-8 max-w-2xl mx-auto">
@@ -296,7 +300,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3, 4, 5: MAIN FEED SECTIONS (Progressively rendered after initial paint) */}
+      {/* 3, 4, 5: MAIN FEED SECTIONS */}
       {feedReady && (
         <>
           {/* 3. LATEST UPDATES (TODAY'S BULLETINS) */}
@@ -314,8 +318,8 @@ export default function Home() {
                 <LoadingGrid count={6} cols="grid sm:grid-cols-2 lg:grid-cols-3" />
               ) : (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {dailyUpdates.slice(0, 6).map((item) => (
-                    <UpdateCard key={item.slug} updateItem={item} />
+                  {dailyUpdates.slice(0, 6).map((item, idx) => (
+                    <UpdateCard key={item.slug} updateItem={item} priority={idx < 2} />
                   ))}
                 </div>
               )}
@@ -343,8 +347,8 @@ export default function Home() {
               <p className="text-sm font-sans text-inksoft text-center py-8">No government vacancies listed currently.</p>
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {govJobs.map((item) => (
-                  <OpportunityCard key={item.slug} opportunity={item} />
+                {govJobs.map((item, idx) => (
+                  <OpportunityCard key={item.slug} opportunity={item} priority={idx < 2} />
                 ))}
               </div>
             )}

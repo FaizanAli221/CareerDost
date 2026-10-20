@@ -171,6 +171,7 @@ export default function ArticlePage() {
 
     let mainSchema
     if (!qualifiesForJobPosting) {
+      const modDate = listing.updatedAt || (listing.updated_at ? String(listing.updated_at).split(' ')[0].split('T')[0] : null) || listing.publishDate
       mainSchema = {
         '@type': 'Article',
         headline: listing.title || 'Opportunity',
@@ -179,7 +180,7 @@ export default function ArticlePage() {
           listing.excerpt ||
           (Array.isArray(listing.content) ? listing.content.join(' ') : String(listing.content || '')),
         datePublished: listing.publishDate || undefined,
-        dateModified: listing.publishDate || undefined,
+        dateModified: modDate || undefined,
         mainEntityOfPage: {
           '@type': 'WebPage',
           '@id': getAbsoluteUrl(`/jobs/${slug}`),
@@ -255,6 +256,7 @@ export default function ArticlePage() {
 
   const hasImage = listing.featuredImage && listing.featuredImage.trim().length > 0
   const applyDestination = listing.applyLink || listing.officialLink
+  const verifiedDateRaw = listing.updatedAt || (listing.updated_at ? String(listing.updated_at).split(' ')[0].split('T')[0] : null) || listing.publishDate
 
   return (
     <div className="container-x py-6 sm:py-8 font-sans">
@@ -289,7 +291,15 @@ export default function ArticlePage() {
 
           {/* Top Meta Line */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-inksoft mb-4 pb-4 border-b border-line">
+            <span>By <Link to="/about#editorial-policy" className="font-semibold text-ink hover:text-green underline">CareerDost Editorial Desk</Link></span>
+            <span>•</span>
             <span>Published: <strong className="text-ink">{formatDate(listing.publishDate)}</strong></span>
+            {verifiedDateRaw && verifiedDateRaw !== listing.publishDate && (
+              <>
+                <span>•</span>
+                <span>Verified: <strong className="text-ink">{formatDate(verifiedDateRaw)}</strong></span>
+              </>
+            )}
             {listing.organization && (
               <>
                 <span>•</span>

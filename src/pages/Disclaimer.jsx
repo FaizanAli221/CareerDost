@@ -1,43 +1,84 @@
+import { Link } from 'react-router-dom'
 import SimplePage from '../components/SimplePage'
 import { useSeo } from '../lib/useSeo'
 
 export default function Disclaimer() {
   useSeo({
     title: 'Disclaimer Notice — CareerDost',
-    description: 'CareerDost is an independent information portal. Read our disclaimer before applying to any listing.',
+    description:
+      'Read the official CareerDost editorial disclaimer regarding non-affiliation with government agencies, official source verification, and anti-recruitment fraud rules.',
     canonical: '/disclaimer',
   })
 
   return (
-    <SimplePage title="Disclaimer" updated="26 September 2026">
+    <SimplePage title="Editorial Disclaimer" updated="18 October 2026">
       <p>
-        CareerDost is an independent information portal. We are not affiliated with, endorsed by,
-        or officially connected to any government department, bank, university or private company
-        whose vacancies, scholarships or results are listed on this site, unless explicitly stated.
+        <strong>CareerDost</strong> (accessible at{' '}
+        <a href="https://careerdost.blog" className="text-green underline font-medium">
+          https://careerdost.blog
+        </a>
+        ) is an independent Pakistani public-interest career, education, and welfare information portal. Please
+        read this Disclaimer carefully before acting on any job notification, government scheme guide,
+        scholarship notice, or university admission report published on this website.
       </p>
-      <h2>No guarantee of accuracy</h2>
+
+      <h2>1. Independent Publication &amp; Non-Affiliation Notice</h2>
       <p>
-        We make a genuine effort to summarise official notifications accurately and to update or
-        remove listings once they close. However, details such as eligibility criteria, salary and
-        deadlines can change after publication. Always cross-check the information on this site
-        against the official notification or website before making any decision.
+        CareerDost is <strong>not affiliated with, endorsed by, or officially connected to</strong> any federal
+        or provincial government ministry, public service commission (including FPSC, PPSC, SPSC, KPPSC, or
+        BPSC), testing agency (NTS, ETC HEC, PTS, STS), social safety-net authority (BISP 8171, Benazir Hari
+        Card, SPHF), regulatory body (SBP, NADRA, FBR, NEPRA), commercial bank, or university whose notices are
+        summarized on this site. All institutional names and trademarks belong to their respective owners and
+        are referenced strictly for factual identification and public reporting under fair-dealing principles.
       </p>
-      <h2>Not a recruiting agency</h2>
+
+      <h2>2. Official Source Verification &amp; Final Authority</h2>
       <p>
-        CareerDost does not process applications, does not conduct interviews or tests, and does
-        not charge any fee for job seekers to view or apply to listings. If anyone claims to
-        represent CareerDost and asks for payment in exchange for a job, scholarship or admission,
-        please report it to us immediately.
+        Every article published by the CareerDost Editorial Desk is prepared by reviewing official press
+        releases, newspaper gazettes, and accredited institutional portals. We clearly distinguish between
+        confirmed open recruitment or registration drives, expired historical notices, and policy proposals
+        still awaiting cabinet or regulatory approval.
       </p>
-      <h2>External links</h2>
       <p>
-        Listings link to official third-party websites for applying. We are not responsible for
-        the content, accuracy or availability of these external sites.
+        However, government departments, employers, and universities may modify eligibility criteria, test
+        schedules, age relaxations, or closing dates at any time without prior notice to third-party
+        publications. <strong>Always verify all details directly on the official portal linked inside each
+        article before submitting documents or depositing an official bank challan.</strong>
       </p>
-      <h2>No professional advice</h2>
+
+      <h2>3. Not a Recruiting Agency — Zero Fee &amp; Anti-Scam Warning</h2>
       <p>
-        Content on CareerDost, including result and scheme information, is provided for general
-        informational purposes and should not be treated as legal, financial or career advice.
+        CareerDost does <strong>not</strong> recruit candidates, does <strong>not</strong> process job or
+        welfare scheme applications, does <strong>not</strong> issue offer letters or roll number slips, and{' '}
+        <strong>never charges any fee</strong> to readers.
+      </p>
+      <ul>
+        <li>
+          Never pay money, mobile wallet transfers ( JazzCash / Easypaisa ), or ”processing charges” to any
+          individual, WhatsApp number, or social media account claiming to guarantee a job, internship,
+          scholarship, or BISP/welfare payment.
+        </li>
+        <li>
+          Official examination or application fees in Pakistan are payable only through authorized bank challans
+          or verified 1Link / 1Bill government invoice channels specified on the employer&rsquo;s official
+          website.
+        </li>
+        <li>
+          If you spot a fraudulent link or an outdated listing, please alert us immediately via our{' '}
+          <Link to="/contact" className="text-green underline font-medium">
+            Contact Us
+          </Link>{' '}
+          page.
+        </li>
+      </ul>
+
+      <h2>4. External Websites &amp; No Professional Advice</h2>
+      <p>
+        Outbound links to official departmental websites, university admission portals, and employer career
+        pages are provided strictly as a public service. CareerDost does not control external websites and cannot
+        guarantee their uptime or security. Furthermore, articles covering tax deadlines, statutory minimum
+        wages, banking circulars, or public subsidies are published for general public awareness and do not
+        constitute formal legal, tax, financial, or career counseling advice.
       </p>
     </SimplePage>
   )

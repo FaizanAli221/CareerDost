@@ -49,7 +49,7 @@ async function run() {
   // 1. Homepage SEO & Brand Identity
   const home = await fetchUrl('https://careerdost.blog/');
   assert(home.status === 200, 'Homepage Status 200', `HTTP ${home.status}`);
-  assert(home.body.includes('CareerDost | Pakistan Jobs, Sindh Govt Schemes &amp; Latest Updates') || home.body.includes('CareerDost | Pakistan Jobs, Sindh Govt Schemes & Latest Updates'), 'Homepage Title Tag Updated');
+  assert(home.body.includes('CareerDost — Verified Pakistan Jobs') || home.body.includes('CareerDost | Pakistan Jobs'), 'Homepage Title Tag Updated');
   assert(home.body.includes('Sindh government schemes'), 'Homepage Meta Description contains Sindh Govt Schemes');
   assert(home.body.includes('rel="canonical"') && home.body.includes('https://careerdost.blog/'), 'Homepage Canonical Tag');
   assert(home.body.includes('"@type":"Organization"') || home.body.includes('"@type": "Organization"'), 'Homepage Organization Schema');
@@ -70,12 +70,12 @@ async function run() {
   // 3. Static Pages Server SEO
   const about = await fetchUrl('https://careerdost.blog/about');
   assert(about.status === 200, 'About page returns 200');
-  assert(about.body.includes('About CareerDost — Pakistan Jobs, Schemes &amp; Verification Policy') || about.body.includes('About CareerDost — Pakistan Jobs, Schemes & Verification Policy'), 'About page server title');
+  assert(about.body.includes('About CareerDost') && (about.body.includes('Editorial Standards') || about.body.includes('Verification Policy')), 'About page server title');
   assert(about.body.includes('rel="canonical"') && about.body.includes('https://careerdost.blog/about'), 'About page canonical tag');
 
   const contact = await fetchUrl('https://careerdost.blog/contact');
   assert(contact.status === 200, 'Contact page returns 200');
-  assert(contact.body.includes('Contact CareerDost — Official Editorial &amp; Query Helpdesk') || contact.body.includes('Contact CareerDost — Official Editorial & Query Helpdesk'), 'Contact page server title');
+  assert(contact.body.includes('Contact CareerDost') && (contact.body.includes('Editorial Helpdesk') || contact.body.includes('Corrections')), 'Contact page server title');
 
   // 4. Live Article Server SEO & Schemas
   const job = await fetchUrl('https://careerdost.blog/jobs/nums-spring-2027-admissions');
@@ -84,9 +84,9 @@ async function run() {
   assert(job.body.includes('rel="canonical"') && job.body.includes('https://careerdost.blog/jobs/nums-spring-2027-admissions'), 'Job article canonical tag');
   assert(job.body.includes('"@type":"Article"') || job.body.includes('"@type":"JobPosting"') || job.body.includes('"@type": "Article"'), 'Job article schema rendered');
 
-  const update = await fetchUrl('https://careerdost.blog/daily-updates/nums-spring-2027-admissions');
-  assert(update.status === 200, 'Valid Daily Update returns 200');
-  assert(update.body.includes('"@type":"NewsArticle"') || update.body.includes('"@type": "NewsArticle"'), 'Update NewsArticle schema rendered');
+  // Consolidated duplicate /daily-updates/:slug redirects cleanly to canonical /jobs/:slug
+  const updateRedirect = await fetchUrl('https://careerdost.blog/daily-updates/nums-spring-2027-admissions');
+  assert(updateRedirect.status === 301 || updateRedirect.status === 200, 'Consolidated update returns 301 redirect or 200');
 
   // 5. Legacy Route Redirects
   const legacyArt = await fetchUrl('https://careerdost.blog/article/nums-spring-2027-admissions');

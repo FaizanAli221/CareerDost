@@ -84,7 +84,7 @@ app.use('*', async (c, next) => {
     seedAttempted = true
     try {
       const db = getDb(c)
-      await seedDatabase(db)
+      await seedDatabase(db, c.env)
     } catch (err) {
       console.warn('Database initialization note:', err.message)
     }

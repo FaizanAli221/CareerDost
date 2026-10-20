@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useEffect, lazy, Suspense } from 'react'
 import { trackPageView } from './lib/analytics'
 import Header from './components/Header'
@@ -41,12 +41,16 @@ export default function App() {
               <Route path="/daily-updates" element={<DailyUpdatesPage />} />
               <Route path="/daily-updates/:slug" element={<UpdateDetailPage />} />
               <Route path="/category/:slug" element={<CategoryPage />} />
+              <Route path="/jobs" element={<Navigate to="/" replace />} />
               <Route path="/jobs/:slug" element={<ArticlePage />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/about" element={<About />} />
+              <Route path="/editorial-policy" element={<Navigate to="/about#editorial-policy" replace />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/privacy" element={<Navigate to="/privacy-policy" replace />} />
               <Route path="/privacy-policy" element={<Privacy />} />
               <Route path="/disclaimer" element={<Disclaimer />} />
+              <Route path="/terms" element={<Navigate to="/terms-and-conditions" replace />} />
               <Route path="/terms-and-conditions" element={<Terms />} />
               <Route path="/admin" element={<AdminPage />} />
               <Route path="*" element={<NotFound />} />

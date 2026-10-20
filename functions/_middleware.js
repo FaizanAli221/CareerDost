@@ -38,6 +38,28 @@ const KNOWN_STATIC_ROUTES = new Set([
   '/terms-and-conditions'
 ])
 
+const STATIC_ROUTE_REDIRECTS = new Map([
+  ['/privacy', '/privacy-policy'],
+  ['/terms', '/terms-and-conditions'],
+  ['/editorial-policy', '/about#editorial-policy'],
+  ['/jobs', '/'],
+])
+
+const CONSOLIDATED_SLUG_REDIRECTS = new Map([
+  ['systems-limited-hiring-software-engineers', '/jobs/systems-limited-associate-software-engineer-jobs-2026'],
+  ['hbl-management-trainee-officer-2026', '/jobs/hbl-jobs-internships-the-league-2026'],
+  ['benazir-income-support-programme-2026', '/jobs/bisp-8171-payment-check-2026-official-guide'],
+  ['nts-nat-result-september-2026', '/jobs/nts-latest-results-answer-keys-2026'],
+  ['commonwealth-scholarships-2027-28-pakistan-hec-csc-uk', '/jobs/hec-uk-commonwealth-scholarships-2027-28'],
+  ['cbd-punjab-paid-internship-2026-youth-career-program', '/jobs/punjab-cbd-youth-career-program-2026-internship'],
+  ['sindh-pink-scooty-scheme-2026-online-registration-eligibility', '/jobs/sindh-govt-electric-scooty-scheme-2026-women'],
+  ['shaikh-ayaz-university-spring-2027-admissions-apply-online', '/jobs/shaikh-ayaz-university-admissions-2027'],
+  ['lums-nano-physics-research-associate-jobs-2026', '/jobs/lums-electronic-technician-jobs-2026'],
+  ['lums-lahore-jobs-advancement-it-staff-2026', '/jobs/lums-electronic-technician-jobs-2026'],
+  ['virtual-university-admissions-2026-deadline-tomorrow', '/jobs/virtual-university-fall-2026-admissions'],
+  ['nts-nat-2026-october-test-roll-number-slips-uploaded', '/jobs/nts-nat-gat-roll-number-slip-2026'],
+])
+
 function getAbsoluteUrl(url) {
   if (!url) return DEFAULT_OG_IMAGE
   if (url.startsWith('http://') || url.startsWith('https://')) {
@@ -314,11 +336,12 @@ function generateDailyUpdateHtml(update, canonical) {
   const officialLink = update.official_link ? escapeHtml(update.official_link) : ''
   const contentHtml = renderContentBlocks(update.content, update.title)
 
-  const typeBadge = cType === 'job' ? category : escapeHtml(labels.badgeLabel)
-  const actionBtnText = labels.actionBtnText ? escapeHtml(labels.actionBtnText) : ''
-  const officialBtnText = escapeHtml(labels.officialBtnText || 'Official Website / Gazette ↗')
+  const typeBadge = cType === 'job' ? category : escapeHtml(labels.badge || 'Career Alert')
+  const actionBtnText = labels.ctaLabel ? escapeHtml(labels.ctaLabel) : ''
+  const officialBtnText = escapeHtml(labels.ctaSecondary || labels.ctaLabel || 'Official Website / Gazette ↗')
   const displaySalary = labels.salLabel && salary ? salary : ''
   const displayDeadline = (cType === 'guide' || update.no_deadline) ? '' : deadline
+  const updatedDate = update.updated_at ? escapeHtml(String(update.updated_at).split(' ')[0].split('T')[0]) : pubDate
 
   const specsBox = (org || loc || qual || pos || displaySalary || jobType || displayDeadline) ? `
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-paper border border-line mb-6 text-xs" style="background:#faf9f6;border:1px solid #e7e5e4;padding:16px;margin-bottom:24px;">
@@ -331,16 +354,24 @@ function generateDailyUpdateHtml(update, canonical) {
       ${displayDeadline ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.dateLabel)}</span><strong style="color:#1c1917;">${displayDeadline}</strong></div>` : ''}
     </div>` : ''
 
-  const primaryCtaHref = (applyLink && actionBtnText) ? applyLink : officialLink
-  const primaryCtaLabel = (applyLink && actionBtnText) ? actionBtnText : officialBtnText
+  const primaryCtaHref = (applyLink && actionBtnText && !statusInfo.isExpired) ? applyLink : officialLink
+  const primaryCtaLabel = statusInfo.isExpired
+    ? 'View Archived Official Portal ↗'
+    : ((applyLink && actionBtnText) ? actionBtnText : officialBtnText)
+
+  const bannerBg = statusInfo.isExpired ? '#f5f5f4' : '#ecfdf5'
+  const bannerBorder = statusInfo.isExpired ? '#d6d3d1' : '#a7f3d0'
+  const bannerTitleColor = statusInfo.isExpired ? '#44403c' : '#065f46'
+  const bannerSubColor = statusInfo.isExpired ? '#57534e' : '#047857'
+  const bannerBtnBg = statusInfo.isExpired ? '#57534e' : '#059669'
 
   const statusBanner = `
-    <div style="background:#ecfdf5;border:1px solid #a7f3d0;padding:16px;margin-bottom:24px;border-radius:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+    <div style="background:${bannerBg};border:1px solid ${bannerBorder};padding:16px;margin-bottom:24px;border-radius:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
       <div>
-        <strong style="color:#065f46;display:block;font-size:14px;">${escapeHtml(statusInfo.bannerText)}${displayDeadline ? ` — ${escapeHtml(labels.dateLabel)}: ${displayDeadline}` : ''}</strong>
-        <span style="color:#047857;font-size:12px;">${escapeHtml(statusInfo.bannerSub)}</span>
+        <strong style="color:${bannerTitleColor};display:block;font-size:14px;">${escapeHtml(statusInfo.label || statusInfo.status || 'OFFICIAL NOTICE')}${displayDeadline ? ` — ${escapeHtml(labels.dateLabel)}: ${displayDeadline}` : ''}</strong>
+        <span style="color:${bannerSubColor};font-size:12px;">${escapeHtml(statusInfo.description || '')}</span>
       </div>
-      ${primaryCtaHref ? `<a href="${primaryCtaHref}" target="_blank" rel="noopener noreferrer" style="background:#059669;color:#ffffff;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;border-radius:4px;">${primaryCtaLabel}</a>` : ''}
+      ${primaryCtaHref ? `<a href="${primaryCtaHref}" target="_blank" rel="noopener noreferrer" style="background:${bannerBtnBg};color:#ffffff;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;border-radius:4px;">${primaryCtaLabel}</a>` : ''}
     </div>`
 
   const transparencyNote = `
@@ -352,11 +383,11 @@ function generateDailyUpdateHtml(update, canonical) {
     <div style="background:#faf9f6;border:1px solid #e7e5e4;padding:20px;margin-bottom:32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
       <div>
         <strong style="font-size:12px;text-transform:uppercase;letter-spacing:0.05em;display:block;">Verified Official Source</strong>
-        <span style="font-size:12px;color:#78716c;">Verified CareerDost ${escapeHtml(labels.badgeLabel)} Record</span>
+        <span style="font-size:12px;color:#78716c;">Verified CareerDost ${escapeHtml(labels.badge || 'Public')} Record</span>
       </div>
       <div style="display:flex;gap:12px;flex-wrap:wrap;">
         ${officialLink ? `<a href="${officialLink}" target="_blank" rel="noopener noreferrer" style="border:1px solid #d6d3d1;background:#ffffff;color:#1c1917;padding:8px 16px;font-size:12px;font-weight:600;text-decoration:none;">${officialBtnText}</a>` : ''}
-        ${(applyLink && actionBtnText && applyLink !== officialLink) ? `<a href="${applyLink}" target="_blank" rel="noopener noreferrer" style="background:#059669;color:#ffffff;padding:8px 20px;font-size:12px;font-weight:600;text-decoration:none;">${actionBtnText}</a>` : ''}
+        ${(!statusInfo.isExpired && applyLink && actionBtnText && applyLink !== officialLink) ? `<a href="${applyLink}" target="_blank" rel="noopener noreferrer" style="background:#059669;color:#ffffff;padding:8px 20px;font-size:12px;font-weight:600;text-decoration:none;">${actionBtnText}</a>` : ''}
       </div>
     </div>` : ''
 
@@ -391,6 +422,7 @@ function generateDailyUpdateHtml(update, canonical) {
               <span class="text-xs font-sans text-inksoft">
                 Published: ${pubDate}
               </span>
+              ${updatedDate && updatedDate !== pubDate ? `<span class="text-xs font-sans text-inksoft">• Verified: ${updatedDate}</span>` : ''}
               <span class="text-xs font-sans text-inksoft">• By CareerDost Editorial Desk</span>
             </div>
             <h1 class="font-serif text-2xl sm:text-4xl font-bold text-ink leading-tight mb-4">
@@ -435,15 +467,16 @@ function generateJobHtml(article, canonical) {
   const exp = article.experience ? escapeHtml(article.experience) : ''
   const jobType = article.job_type ? escapeHtml(article.job_type) : ''
   const pubDate = article.publish_date ? escapeHtml(article.publish_date) : ''
+  const updatedDate = article.updated_at ? escapeHtml(String(article.updated_at).split(' ')[0].split('T')[0]) : pubDate
   const lastDate = article.last_date ? escapeHtml(article.last_date) : ''
   const excerpt = article.excerpt ? escapeHtml(article.excerpt) : ''
   const officialLink = article.official_link ? escapeHtml(article.official_link) : ''
   const applyLink = article.apply_link ? escapeHtml(article.apply_link) : ''
   const contentHtml = renderContentBlocks(article.content, article.title)
 
-  const typeBadge = cType === 'job' ? categoryLabel : escapeHtml(labels.badgeLabel)
-  const actionBtnText = labels.actionBtnText ? escapeHtml(labels.actionBtnText) : ''
-  const officialBtnText = escapeHtml(labels.officialBtnText || 'Official Website / Gazette ↗')
+  const typeBadge = cType === 'job' ? categoryLabel : escapeHtml(labels.badge || 'Public Notice')
+  const actionBtnText = labels.ctaLabel ? escapeHtml(labels.ctaLabel) : ''
+  const officialBtnText = escapeHtml(labels.ctaSecondary || labels.ctaLabel || 'Official Website / Gazette ↗')
   const displaySalary = labels.salLabel && salary ? salary : ''
   const displayLastDate = (cType === 'guide' || article.no_deadline) ? '' : lastDate
 
@@ -459,16 +492,24 @@ function generateJobHtml(article, canonical) {
       ${displayLastDate ? `<div><span style="color:#78716c;display:block;">${escapeHtml(labels.dateLabel)}</span><strong style="color:#1c1917;">${displayLastDate}</strong></div>` : ''}
     </div>` : ''
 
-  const primaryCtaHref = (applyLink && actionBtnText) ? applyLink : officialLink
-  const primaryCtaLabel = (applyLink && actionBtnText) ? actionBtnText : officialBtnText
+  const primaryCtaHref = (applyLink && actionBtnText && !statusInfo.isExpired) ? applyLink : officialLink
+  const primaryCtaLabel = statusInfo.isExpired
+    ? 'View Archived Official Portal ↗'
+    : ((applyLink && actionBtnText) ? actionBtnText : officialBtnText)
+
+  const bannerBg = statusInfo.isExpired ? '#f5f5f4' : '#ecfdf5'
+  const bannerBorder = statusInfo.isExpired ? '#d6d3d1' : '#a7f3d0'
+  const bannerTitleColor = statusInfo.isExpired ? '#44403c' : '#065f46'
+  const bannerSubColor = statusInfo.isExpired ? '#57534e' : '#047857'
+  const bannerBtnBg = statusInfo.isExpired ? '#57534e' : '#059669'
 
   const statusBanner = `
-    <div style="background:#ecfdf5;border:1px solid #a7f3d0;padding:16px;margin-bottom:24px;border-radius:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+    <div style="background:${bannerBg};border:1px solid ${bannerBorder};padding:16px;margin-bottom:24px;border-radius:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
       <div>
-        <strong style="color:#065f46;display:block;font-size:14px;">${escapeHtml(statusInfo.bannerText)}${displayLastDate ? ` — ${escapeHtml(labels.dateLabel)}: ${displayLastDate}` : ''}</strong>
-        <span style="color:#047857;font-size:12px;">${escapeHtml(statusInfo.bannerSub)}</span>
+        <strong style="color:${bannerTitleColor};display:block;font-size:14px;">${escapeHtml(statusInfo.label || statusInfo.status || 'OFFICIAL NOTICE')}${displayLastDate ? ` — ${escapeHtml(labels.dateLabel)}: ${displayLastDate}` : ''}</strong>
+        <span style="color:${bannerSubColor};font-size:12px;">${escapeHtml(statusInfo.description || '')}</span>
       </div>
-      ${primaryCtaHref ? `<a href="${primaryCtaHref}" target="_blank" rel="noopener noreferrer" style="background:#059669;color:#ffffff;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;border-radius:4px;">${primaryCtaLabel}</a>` : ''}
+      ${primaryCtaHref ? `<a href="${primaryCtaHref}" target="_blank" rel="noopener noreferrer" style="background:${bannerBtnBg};color:#ffffff;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;border-radius:4px;">${primaryCtaLabel}</a>` : ''}
     </div>`
 
   const transparencyNote = `
@@ -478,7 +519,7 @@ function generateJobHtml(article, canonical) {
 
   const recordTypeLabel = cType === 'job'
     ? 'Verified CareerDost Recruitment Record'
-    : `Verified CareerDost ${escapeHtml(labels.badgeLabel)} Record`
+    : `Verified CareerDost ${escapeHtml(labels.badge || 'Public')} Record`
 
   const actionButtons = (officialLink || (applyLink && actionBtnText)) ? `
     <div style="background:#faf9f6;border:1px solid #e7e5e4;padding:20px;margin-bottom:32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
@@ -488,7 +529,7 @@ function generateJobHtml(article, canonical) {
       </div>
       <div style="display:flex;gap:12px;flex-wrap:wrap;">
         ${officialLink ? `<a href="${officialLink}" target="_blank" rel="noopener noreferrer" style="border:1px solid #d6d3d1;background:#ffffff;color:#1c1917;padding:8px 16px;font-size:12px;font-weight:600;text-decoration:none;border-radius:2px;">${officialBtnText}</a>` : ''}
-        ${(applyLink && actionBtnText && applyLink !== officialLink) ? `<a href="${applyLink}" target="_blank" rel="noopener noreferrer" style="background:#059669;color:#ffffff;padding:8px 20px;font-size:12px;font-weight:600;text-decoration:none;border-radius:2px;">${actionBtnText}</a>` : ''}
+        ${(!statusInfo.isExpired && applyLink && actionBtnText && applyLink !== officialLink) ? `<a href="${applyLink}" target="_blank" rel="noopener noreferrer" style="background:#059669;color:#ffffff;padding:8px 20px;font-size:12px;font-weight:600;text-decoration:none;border-radius:2px;">${actionBtnText}</a>` : ''}
       </div>
     </div>` : ''
 
@@ -523,6 +564,7 @@ function generateJobHtml(article, canonical) {
               <span class="text-xs font-sans text-inksoft">
                 Published: ${pubDate}
               </span>
+              ${updatedDate && updatedDate !== pubDate ? `<span class="text-xs font-sans text-inksoft">• Verified: ${updatedDate}</span>` : ''}
               <span class="text-xs font-sans text-inksoft">• By CareerDost Editorial Desk</span>
             </div>
             <h1 class="font-serif text-2xl sm:text-4xl font-bold text-ink leading-tight mb-4">
@@ -909,6 +951,20 @@ export async function onRequest(context) {
     })
   }
 
+  // 0b. Permanent 301 redirects for static route aliases (/privacy, /terms, /editorial-policy, /jobs)
+  if (STATIC_ROUTE_REDIRECTS.has(lowerPath)) {
+    return Response.redirect(`${SITE_URL}${STATIC_ROUTE_REDIRECTS.get(lowerPath)}`, 301)
+  }
+
+  // 0c. Permanent 301 redirects for consolidated duplicate slugs across all article/update prefixes
+  const routePrefixMatch = lowerPath.match(/^\/(jobs|daily-updates|article|articles|updates)\/([^/]+)$/)
+  if (routePrefixMatch) {
+    const candidateSlug = routePrefixMatch[2]
+    if (CONSOLIDATED_SLUG_REDIRECTS.has(candidateSlug)) {
+      return Response.redirect(`${SITE_URL}${CONSOLIDATED_SLUG_REDIRECTS.get(candidateSlug)}`, 301)
+    }
+  }
+
   // 1. Static files & API routes pass directly to asset/function handlers
   if (
     normalizedPath.startsWith('/api/') ||
@@ -917,10 +973,18 @@ export async function onRequest(context) {
     /\.[a-z0-9]+$/i.test(normalizedPath)
   ) {
     const res = await context.next()
-    if (normalizedPath.startsWith('/images/') && res.headers.get('content-type')?.includes('text/html')) {
+    const isNonHtmlStaticPath =
+      normalizedPath.startsWith('/images/') ||
+      normalizedPath.startsWith('/assets/') ||
+      (!normalizedPath.startsWith('/api/') && /\.[a-z0-9]+$/i.test(normalizedPath) && !/\.html?$/i.test(normalizedPath))
+    if (isNonHtmlStaticPath && res.headers.get('content-type')?.includes('text/html')) {
       return new Response('Not Found', {
         status: 404,
-        headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-cache, no-store' }
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-cache, no-store',
+          'X-Robots-Tag': 'noindex, nofollow',
+        }
       })
     }
     return res
@@ -1049,7 +1113,7 @@ export async function onRequest(context) {
                       featured_image, image_alt, category, organization, location,
                       qualification, positions, experience, job_type, salary, publish_date,
                       deadline, no_deadline, official_link, apply_link, is_verified, featured,
-                      status, created_at
+                      status, created_at, updated_at
                FROM daily_updates WHERE slug = ? LIMIT 1`
             )
             .bind(slug)
@@ -1061,6 +1125,7 @@ export async function onRequest(context) {
             const canonical = `${SITE_URL}/daily-updates/${slug}`
             const ogImage = getAbsoluteUrl(update.featured_image)
             const dailyHtml = generateDailyUpdateHtml(update, canonical)
+            const modDate = update.updated_at ? String(update.updated_at).split(' ')[0].split('T')[0] : update.publish_date
 
             const rewriter = new HTMLRewriter()
               .on('title', { element: (e) => e.setInnerContent(pageTitle) })
@@ -1087,7 +1152,7 @@ export async function onRequest(context) {
                         headline: update.title,
                         description: update.meta_description || update.short_description,
                         datePublished: update.publish_date,
-                        dateModified: update.publish_date,
+                        dateModified: modDate,
                         image: ogImage,
                         mainEntityOfPage: {
                           '@type': 'WebPage',
@@ -1154,6 +1219,7 @@ export async function onRequest(context) {
                     deadline: update.deadline || '',
                     noDeadline: Boolean(update.no_deadline),
                     publishDate: update.publish_date || update.created_at,
+                    updatedAt: modDate,
                     organization: update.organization || '',
                     location: update.location || '',
                     qualification: update.qualification || '',
@@ -1215,7 +1281,7 @@ export async function onRequest(context) {
               `SELECT id, slug, title, excerpt, content, seo_title, meta_description, featured_image, image_alt,
                       category_slug, organization, location, qualification, salary, experience, positions,
                       publish_date, last_date, no_deadline, job_type, apply_link, official_link, is_verified,
-                      status
+                      status, updated_at
                FROM articles WHERE slug = ? LIMIT 1`
             )
             .bind(slug)
@@ -1227,6 +1293,7 @@ export async function onRequest(context) {
             const canonical = `${SITE_URL}/jobs/${slug}`
             const ogImage = getAbsoluteUrl(article.featured_image)
             const jobHtml = generateJobHtml(article, canonical)
+            const modDate = article.updated_at ? String(article.updated_at).split(' ')[0].split('T')[0] : article.publish_date
 
             const cType = getContentType(article)
             const isJob = isGenuineJobVacancy(article, cType)
@@ -1238,7 +1305,7 @@ export async function onRequest(context) {
                   headline: article.title,
                   description: article.meta_description || article.excerpt,
                   datePublished: article.publish_date,
-                  dateModified: article.publish_date,
+                  dateModified: modDate,
                   image: ogImage,
                   mainEntityOfPage: {
                     '@type': 'WebPage',
@@ -1322,6 +1389,7 @@ export async function onRequest(context) {
                     lastDate: article.last_date,
                     noDeadline: Boolean(article.no_deadline),
                     publishDate: article.publish_date,
+                    updatedAt: modDate,
                     officialLink: article.official_link,
                     applyLink: article.apply_link || '',
                     isVerified: Boolean(article.is_verified),
@@ -1492,8 +1560,8 @@ export async function onRequest(context) {
 
   // 5. Homepage: /
   if (lowerPath === '/') {
-    const homeTitle = 'CareerDost | Pakistan Jobs, Sindh Govt Schemes & Latest Updates'
-    const homeDesc = 'CareerDost provides the latest Pakistan jobs, Sindh government schemes, BISP updates, scholarships, admissions, and public information with official source links.'
+    const homeTitle = 'CareerDost — Verified Pakistan Jobs, Scholarships & Government Schemes'
+    const homeDesc = "CareerDost (Career Dost) provides verified Pakistan jobs, Sindh government schemes, BISP updates, bank careers, scholarships, and admissions with direct official links."
     const canonical = `${SITE_URL}/`
     const ogImage = DEFAULT_OG_IMAGE
 
@@ -1529,7 +1597,7 @@ export async function onRequest(context) {
         </header>
         <main class="container-x py-8 flex-1">
           <section class="mb-8">
-            <h1 class="font-serif text-3xl font-bold text-ink mb-2">Pakistan Jobs, Sindh Government Schemes &amp; Verified Public Updates</h1>
+            <h1 class="font-serif text-3xl font-bold text-ink mb-2"><span class="text-green">CareerDost: </span>Pakistan Jobs, Scholarships &amp; Government Schemes</h1>
             <p class="text-inksoft text-base max-w-3xl">${escapeHtml(homeDesc)}</p>
           </section>
           <section class="mb-8">
@@ -1585,15 +1653,31 @@ export async function onRequest(context) {
 
   // 6. About Page: /about
   if (lowerPath === '/about') {
-    const pageTitle = 'About CareerDost — Pakistan Jobs, Schemes & Verification Policy'
-    const pageDesc = 'Learn about CareerDost, an independent Pakistan-focused opportunity and public information platform covering Sindh schemes, federal jobs, scholarships, and admissions.'
+    const pageTitle = 'About CareerDost — Editorial Standards, Verification Policy & Public Mission'
+    const pageDesc = 'Learn about CareerDost (https://careerdost.blog), our editorial verification methodology, primary source standards, Corrections Policy, and anti-fraud principles for Pakistan jobs, schemes, and scholarships.'
     const canonical = `${SITE_URL}/about`
     const aboutHtml = `
-      <main class="container-x py-10 max-w-3xl font-sans">
-        <h1 class="font-serif text-3xl font-bold text-ink mb-4">About CareerDost — Editorial &amp; Verification Policy</h1>
-        <p class="text-base text-ink leading-relaxed mb-4">CareerDost (https://careerdost.blog) is an independent Pakistani public-interest information platform dedicated to publishing verified government and private job notifications, federal and Sindh provincial welfare schemes, HEC and international scholarships, university admissions, and official regulatory updates.</p>
-        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">Source Attribution &amp; Fact-Checking Standards</h2>
-        <p class="text-base text-ink leading-relaxed mb-4">Every listing published by the CareerDost Editorial Desk is cross-checked against primary official gazettes, Press Information Department (PID) communiqués, FPSC/PPSC/SPSC portals, and accredited institutional websites. We clearly distinguish between confirmed recruitment or scheme announcements and unconfirmed proposals, and we never charge fees or act as a recruitment agency.</p>
+      <main class="container-x py-10 max-w-4xl font-sans">
+        <nav class="text-xs text-inksoft mb-4" aria-label="Breadcrumb"><a href="/">Home</a> / <span>About &amp; Editorial Policy</span></nav>
+        <h1 class="font-serif text-3xl sm:text-4xl font-bold text-ink mb-4">About CareerDost &amp; Editorial Verification Standards</h1>
+        <p class="text-base text-ink leading-relaxed mb-4">CareerDost (<a href="https://careerdost.blog">https://careerdost.blog</a>) is an independent digital career, education, and public-information publication serving students, fresh graduates, job seekers, and citizens across Pakistan. We translate complex federal and provincial government notifications, public service commission gazettes, university admission circulars, corporate hiring announcements, and social welfare directives into clear, structured, and verifiable guides.</p>
+        <p class="text-base text-ink leading-relaxed mb-6">CareerDost is strictly an independent informational platform. We are not affiliated with any federal or provincial ministry, public service commission (FPSC, PPSC, SPSC, KPPSC, BPSC), testing agency (NTS, STS-IBA, ETS, PTS), university, or private employer. We do not act as a recruitment broker, never collect job applications, and never charge fees to candidates.</p>
+
+        <section id="editorial-policy" class="mb-8">
+          <h2 class="font-serif text-2xl font-bold text-ink mt-6 mb-3">Editorial Policy &amp; 4-Step Verification Workflow</h2>
+          <ol class="list-decimal pl-5 space-y-2 text-base text-ink mb-4">
+            <li><strong>Primary Source Traceability:</strong> Every listing is cross-checked against the issuing organization's official domain (such as <code>.gov.pk</code>, <code>.edu.pk</code>, or verified corporate portals), Press Information Department (PID) releases, or accredited testing agency portals.</li>
+            <li><strong>Eligibility &amp; Criteria Extraction:</strong> Our editorial desk extracts concrete candidate parameters including BPS pay scales or corporate grades, HEC academic equivalency requirements, age limits, provincial/regional domicile quotas, and required documents.</li>
+            <li><strong>Status &amp; Deadline Transparency:</strong> Each article displays a live contextual status indicator distinguishing open recruitment windows from expired notices, rolling career portals, statutory notifications, and unconfirmed policy proposals.</li>
+            <li><strong>Historical Preservation &amp; Archival Value:</strong> When a deadline passes, we mark the opportunity as <strong>Expired / Closed</strong> while preserving the verified eligibility criteria, syllabus structure, and application procedure as a reference for future cohorts.</li>
+          </ol>
+        </section>
+
+        <section class="mb-8">
+          <h2 class="font-serif text-2xl font-bold text-ink mt-6 mb-3">Corrections, Updates &amp; Anti-Fraud Policy</h2>
+          <p class="text-base text-ink leading-relaxed mb-3">When an issuing authority extends a closing date, issues a corrigendum, or updates examination schedules, the CareerDost Editorial Desk updates the relevant guide and records the verification date. Readers can report outdated links or inaccuracies via our <a href="/contact">Contact &amp; Editorial Helpdesk</a>.</p>
+          <p class="text-base text-ink leading-relaxed">Legitimate employers and government welfare programmes in Pakistan only collect statutory examination or challan fees through designated bank branches or official 1bill channels—never through personal mobile wallets or unauthorized middlemen.</p>
+        </section>
       </main>`
     return new HTMLRewriter()
       .on('title', { element: (e) => e.setInnerContent(pageTitle) })
@@ -1602,19 +1686,30 @@ export async function onRequest(context) {
       .on('meta[property="og:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
       .on('meta[property="og:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('meta[property="og:url"]', { element: (e) => e.setAttribute('content', canonical) })
+      .on('meta[name="twitter:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
+      .on('meta[name="twitter:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('#root', { element: (e) => e.setInnerContent(aboutHtml, { html: true }) })
       .transform(response)
   }
 
   // 7. Contact Page: /contact
   if (lowerPath === '/contact') {
-    const pageTitle = 'Contact CareerDost — Official Editorial & Query Helpdesk'
-    const pageDesc = 'Contact the CareerDost editorial desk to submit inquiries, report listing updates, or verify official government gazette sources.'
+    const pageTitle = 'Contact CareerDost — Editorial Helpdesk, Corrections & Source Verification'
+    const pageDesc = 'Contact the CareerDost Editorial Desk to report broken official portal links, submit corrigendum updates, or request a factual review of any published listing.'
     const canonical = `${SITE_URL}/contact`
     const contactHtml = `
-      <main class="container-x py-10 max-w-3xl font-sans">
-        <h1 class="font-serif text-3xl font-bold text-ink mb-4">Contact the CareerDost Editorial Desk</h1>
-        <p class="text-base text-ink leading-relaxed mb-4">Have a question about a published job notification, government scheme, or university admission update? Reach out to our editorial team at <strong>info@careerdost.blog</strong> for corrections, verification queries, or official press releases.</p>
+      <main class="container-x py-10 max-w-4xl font-sans">
+        <nav class="text-xs text-inksoft mb-4" aria-label="Breadcrumb"><a href="/">Home</a> / <span>Contact Us</span></nav>
+        <h1 class="font-serif text-3xl sm:text-4xl font-bold text-ink mb-4">Contact the CareerDost Editorial Desk</h1>
+        <p class="text-base text-ink leading-relaxed mb-4">Use our on-page editorial inquiry and correction tool to report an updated closing deadline, flag a broken official portal link, or request a factual check on any job notification, scholarship, admission circular, or public welfare guide published on CareerDost (<a href="https://careerdost.blog">https://careerdost.blog</a>).</p>
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">Important Applicant &amp; Privacy Notice</h2>
+        <p class="text-base text-ink leading-relaxed mb-4">CareerDost is an independent informational publication and is not a recruitment agency or government department. We do not accept CVs, job applications, or registration forms. Please submit applications directly on the official employer, university, or government portal linked inside each article. Do not share sensitive personal data such as CNIC numbers, bank account details, or passwords.</p>
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">How Editorial Correction Reviews Work</h2>
+        <ul class="list-disc pl-5 space-y-2 text-base text-ink mb-4">
+          <li><strong>Deadline &amp; Corrigendum Updates:</strong> Include the CareerDost article URL and a link to the official corrigendum or department notice.</li>
+          <li><strong>Broken Portal Links:</strong> Report if a government, university, or testing agency portal URL has changed or moved offline.</li>
+          <li><strong>Fraud &amp; Impersonation Alerts:</strong> Flag suspicious third-party links or unauthorized fee demands so we can add an advisory warning.</li>
+        </ul>
       </main>`
     return new HTMLRewriter()
       .on('title', { element: (e) => e.setInnerContent(pageTitle) })
@@ -1623,6 +1718,8 @@ export async function onRequest(context) {
       .on('meta[property="og:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
       .on('meta[property="og:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('meta[property="og:url"]', { element: (e) => e.setAttribute('content', canonical) })
+      .on('meta[name="twitter:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
+      .on('meta[name="twitter:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('#root', { element: (e) => e.setInnerContent(contactHtml, { html: true }) })
       .transform(response)
   }
@@ -1764,52 +1861,97 @@ export async function onRequest(context) {
 
   // 10. Legal Pages: /privacy-policy, /disclaimer, /terms-and-conditions
   if (lowerPath === '/privacy-policy') {
-    const pageTitle = 'Privacy Policy — CareerDost'
-    const pageDesc = 'Read the CareerDost Privacy Policy detailing how we protect user data, cookies, and privacy on careerdost.blog.'
+    const pageTitle = 'Privacy Policy — Cookies, Analytics & Advertising Disclosures | CareerDost'
+    const pageDesc = 'Official Privacy Policy for CareerDost (https://careerdost.blog) covering Google Analytics 4 (GA4), Google AdSense advertising cookies, Zanderio AI assistant storage, and user opt-out rights.'
     const canonical = `${SITE_URL}/privacy-policy`
     const privacyHtml = `
-      <main class="container-x py-10 max-w-3xl font-sans">
-        <h1 class="font-serif text-3xl font-bold text-ink mb-4">Privacy Policy — CareerDost</h1>
-        <p class="text-base text-ink leading-relaxed mb-4">CareerDost respects your privacy. We do not collect sensitive personal financial or CNIC records, and we never sell personal data to third parties.</p>
+      <main class="container-x py-10 max-w-4xl font-sans">
+        <nav class="text-xs text-inksoft mb-4" aria-label="Breadcrumb"><a href="/">Home</a> / <span>Privacy Policy</span></nav>
+        <h1 class="font-serif text-3xl sm:text-4xl font-bold text-ink mb-4">Privacy Policy — CareerDost</h1>
+        <p class="text-sm text-inksoft mb-4">Effective Date: January 1, 2026 • Last Reviewed: October 18, 2026</p>
+        <p class="text-base text-ink leading-relaxed mb-4">CareerDost (<a href="https://careerdost.blog">https://careerdost.blog</a>) respects your privacy. We do not require visitor registration to read our guides, and we never request or store sensitive personal identifiers such as CNIC numbers, bank account numbers, BISP/8171 dynamic survey records, or passwords.</p>
+
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">1. Log Files &amp; Cloudflare Edge Security</h2>
+        <p class="text-base text-ink leading-relaxed mb-4">CareerDost is hosted on Cloudflare Pages. Standard technical request metadata (IP address, browser type, timestamp, referring/exit pages) is processed transiently for DDoS mitigation, security, and aggregate diagnostics.</p>
+
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">2. Google Analytics 4 (GA4) Measurement</h2>
+        <p class="text-base text-ink leading-relaxed mb-4">We use Google Analytics 4 (Measurement ID: <code>G-489C8F8SNJ</code>) to understand aggregate readership trends, page views, and device types. Google Analytics sets first-party cookies (such as <code>_ga</code>) to distinguish unique sessions without identifying individual visitors. You can opt out via the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">Google Analytics Opt-out Browser Add-on</a>.</p>
+
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">3. Third-Party Advertising &amp; Google AdSense Cookies</h2>
+        <p class="text-base text-ink leading-relaxed mb-3">CareerDost may display advertisements served by Google AdSense and certified third-party advertising partners:</p>
+        <ul class="list-disc pl-5 space-y-2 text-base text-ink mb-4">
+          <li>Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to CareerDost or other websites on the internet.</li>
+          <li>Google's use of advertising cookies enables it and its partners to serve advertisements to our visitors based on their visit to <code>careerdost.blog</code> and/or other sites on the internet.</li>
+          <li>Users may opt out of personalized advertising by visiting <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer">Google Ads Settings (adssettings.google.com)</a> or <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer">www.aboutads.info/choices</a>. See also <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">How Google uses information from sites or apps that use our services</a>.</li>
+        </ul>
+
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">4. On-Page AI Assistant Widget (Zanderio AI)</h2>
+        <p class="text-base text-ink leading-relaxed mb-4">CareerDost provides an optional interactive assistant widget powered by Zanderio AI (<code>zanderio.ai</code>). When you open and interact with the chat widget, your query text and browser session state (via <code>localStorage</code> and <code>sessionStorage</code>) are processed to generate responses. Do not enter CNIC numbers, financial credentials, or confidential personal data into the chat widget.</p>
+
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">5. External Government, University &amp; Employer Links</h2>
+        <p class="text-base text-ink leading-relaxed mb-4">Our articles link to official government portals (<code>.gov.pk</code>), universities (<code>.edu.pk</code>), testing agencies, and corporate career sites. Once you leave CareerDost, the destination website's privacy policy governs your session.</p>
       </main>`
     return new HTMLRewriter()
       .on('title', { element: (e) => e.setInnerContent(pageTitle) })
       .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('link[rel="canonical"]', { element: (e) => e.setAttribute('href', canonical) })
+      .on('meta[property="og:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
+      .on('meta[property="og:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
+      .on('meta[property="og:url"]', { element: (e) => e.setAttribute('content', canonical) })
+      .on('meta[name="twitter:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
+      .on('meta[name="twitter:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('#root', { element: (e) => e.setInnerContent(privacyHtml, { html: true }) })
       .transform(response)
   }
 
   if (lowerPath === '/disclaimer') {
-    const pageTitle = 'Disclaimer Notice — CareerDost'
-    const pageDesc = 'Official editorial disclaimer for CareerDost.blog regarding government job advertisements, welfare schemes, and external portals.'
+    const pageTitle = 'Editorial & Public Non-Affiliation Disclaimer — CareerDost'
+    const pageDesc = 'Official Editorial Disclaimer for CareerDost (https://careerdost.blog) regarding non-affiliation with government agencies, primary source verification, and applicant anti-fraud precautions.'
     const canonical = `${SITE_URL}/disclaimer`
     const disclaimerHtml = `
-      <main class="container-x py-10 max-w-3xl font-sans">
-        <h1 class="font-serif text-3xl font-bold text-ink mb-4">Editorial Disclaimer — CareerDost</h1>
-        <p class="text-base text-ink leading-relaxed mb-4">CareerDost is an independent public-information website and is not affiliated with any government ministry, BISP, SPHF, or recruitment testing agency. Always verify details directly on the linked official government portal and never pay money to unauthorized agents.</p>
+      <main class="container-x py-10 max-w-4xl font-sans">
+        <nav class="text-xs text-inksoft mb-4" aria-label="Breadcrumb"><a href="/">Home</a> / <span>Disclaimer</span></nav>
+        <h1 class="font-serif text-3xl sm:text-4xl font-bold text-ink mb-4">Editorial &amp; Public Information Disclaimer — CareerDost</h1>
+        <p class="text-base text-ink leading-relaxed mb-4">CareerDost (<a href="https://careerdost.blog">https://careerdost.blog</a>) is an independent private informational website and is <strong>not</strong> affiliated with, endorsed by, or operated by the Government of Pakistan, any provincial government (Sindh, Punjab, Khyber Pakhtunkhwa, Balochistan, Gilgit-Baltistan, or AJK), BISP (8171), SPHF, HEC, FPSC, PPSC, SPSC, KPPSC, BPSC, NTS, STS-IBA, or any commercial bank or employer mentioned on this site.</p>
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">No Recruitment, Placement, or Fee Collection</h2>
+        <p class="text-base text-ink leading-relaxed mb-4">CareerDost does not issue job offer letters, conduct recruitment tests, process welfare payments, or charge fees to candidates. Always verify dates, challan procedures, and eligibility rules directly on the linked official government or employer portal before applying, and never send money to individuals or mobile wallets claiming guaranteed selection.</p>
       </main>`
     return new HTMLRewriter()
       .on('title', { element: (e) => e.setInnerContent(pageTitle) })
       .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('link[rel="canonical"]', { element: (e) => e.setAttribute('href', canonical) })
+      .on('meta[property="og:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
+      .on('meta[property="og:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
+      .on('meta[property="og:url"]', { element: (e) => e.setAttribute('content', canonical) })
+      .on('meta[name="twitter:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
+      .on('meta[name="twitter:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('#root', { element: (e) => e.setInnerContent(disclaimerHtml, { html: true }) })
       .transform(response)
   }
 
   if (lowerPath === '/terms-and-conditions') {
-    const pageTitle = 'Terms & Conditions — CareerDost'
-    const pageDesc = 'Terms and conditions for using CareerDost (https://careerdost.blog).'
+    const pageTitle = 'Terms & Conditions of Use — CareerDost'
+    const pageDesc = 'Terms and Conditions governing visitor access, acceptable use, intellectual property, and liability limitations on CareerDost (https://careerdost.blog).'
     const canonical = `${SITE_URL}/terms-and-conditions`
     const termsHtml = `
-      <main class="container-x py-10 max-w-3xl font-sans">
-        <h1 class="font-serif text-3xl font-bold text-ink mb-4">Terms &amp; Conditions — CareerDost</h1>
-        <p class="text-base text-ink leading-relaxed mb-4">By accessing CareerDost (https://careerdost.blog), you agree to use our verified informational guides and official portal references for lawful personal and educational purposes.</p>
+      <main class="container-x py-10 max-w-4xl font-sans">
+        <nav class="text-xs text-inksoft mb-4" aria-label="Breadcrumb"><a href="/">Home</a> / <span>Terms &amp; Conditions</span></nav>
+        <h1 class="font-serif text-3xl sm:text-4xl font-bold text-ink mb-4">Terms &amp; Conditions of Use — CareerDost</h1>
+        <p class="text-base text-ink leading-relaxed mb-4">By accessing CareerDost (<a href="https://careerdost.blog">https://careerdost.blog</a>), you agree to use our editorial summaries, eligibility breakdowns, and official portal directories for lawful personal, academic, and career-planning purposes.</p>
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">Independent Informational Nature &amp; Applicant Responsibility</h2>
+        <p class="text-base text-ink leading-relaxed mb-4">CareerDost provides independent editorial guidance and does not process job, admission, scholarship, or welfare applications. Visitors are solely responsible for confirming closing dates, age limits, domicile rules, and application procedures on the official issuing authority's website before submitting documents or statutory bank challans.</p>
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">Intellectual Property &amp; Governing Law</h2>
+        <p class="text-base text-ink leading-relaxed mb-4">Original editorial articles, structured tables, and site design on CareerDost may not be scraped or republished in bulk without written permission. Official logos and government notifications remain the property of their respective institutions. These terms are governed by the applicable laws of Pakistan.</p>
       </main>`
     return new HTMLRewriter()
       .on('title', { element: (e) => e.setInnerContent(pageTitle) })
       .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('link[rel="canonical"]', { element: (e) => e.setAttribute('href', canonical) })
+      .on('meta[property="og:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
+      .on('meta[property="og:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
+      .on('meta[property="og:url"]', { element: (e) => e.setAttribute('content', canonical) })
+      .on('meta[name="twitter:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
+      .on('meta[name="twitter:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('#root', { element: (e) => e.setInnerContent(termsHtml, { html: true }) })
       .transform(response)
   }

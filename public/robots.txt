@@ -1,5 +1,9 @@
 # CareerDost (https://careerdost.blog) — Robots Configuration
 
+# Google AdSense Crawler
+User-agent: Mediapartners-Google
+Allow: /
+
 # Primary Web Search Engines
 User-agent: Googlebot
 Allow: /

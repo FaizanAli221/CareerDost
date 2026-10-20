@@ -217,6 +217,14 @@ export default function UpdateDetailPage() {
           <span className="text-xs font-sans text-inksoft">
             Published: {formatDate(updateItem.publishDate)}
           </span>
+          {updateItem.updatedAt && updateItem.updatedAt !== updateItem.publishDate && (
+            <span className="text-xs font-sans text-inksoft">
+              • Verified: {formatDate(updateItem.updatedAt)}
+            </span>
+          )}
+          <span className="text-xs font-sans text-inksoft">
+            • By <Link to="/about#editorial-policy" className="font-semibold text-ink hover:text-green underline">CareerDost Editorial Desk</Link>
+          </span>
         </div>
 
         <h1 className="font-serif text-2xl sm:text-4xl font-bold text-ink leading-tight mb-4">

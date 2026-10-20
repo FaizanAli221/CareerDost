@@ -5,7 +5,17 @@ import { ArticleModel } from './models/Article.js'
 import { AdminModel } from './models/Admin.js'
 import { DailyUpdateModel } from './models/DailyUpdate.js'
 
-export async function seedDatabase(db) {
+export async function seedDatabase(db, env = {}) {
+  // Fast path: if articles and admins tables already exist and are populated, skip cold-start reseeding
+  try {
+    const existingCount = await db.prepare('SELECT COUNT(*) AS cnt FROM articles').first()
+    if (existingCount && Number(existingCount.cnt) > 0) {
+      return
+    }
+  } catch {
+    // Table does not exist yet; proceed with schema creation and initial seed
+  }
+
   try {
     await db.exec(`
       CREATE TABLE IF NOT EXISTS categories (
@@ -153,30 +163,32 @@ export async function seedDatabase(db) {
     console.warn('Category seeding note:', err.message)
   }
 
-  // 3. Seed Articles (Ensure all listings exist in DB)
+  // 3. Seed Articles only when empty (never overwrite existing DB articles on cold start)
   try {
     for (const item of listings) {
       const existing = await ArticleModel.getBySlug(db, item.slug)
       if (!existing) {
         await ArticleModel.create(db, item)
-      } else {
-        await ArticleModel.update(db, item.slug, item)
       }
     }
   } catch (err) {
     console.warn('Article seeding note:', err.message)
   }
 
-  // 4. Seed Admin user if empty
+  // 4. Seed Admin user if empty and INITIAL_ADMIN_USERNAME + INITIAL_ADMIN_PASSWORD are provided via environment
   try {
     const existingAdmins = await AdminModel.getAll(db)
     if (existingAdmins.length === 0) {
-      await AdminModel.create(db, {
-        username: '4330426358809',
-        email: '4330426358809',
-        password: 'Faizan2345',
-        role: 'superadmin',
-      })
+      const initUser = env?.INITIAL_ADMIN_USERNAME || (typeof process !== 'undefined' && process.env?.INITIAL_ADMIN_USERNAME)
+      const initPass = env?.INITIAL_ADMIN_PASSWORD || (typeof process !== 'undefined' && process.env?.INITIAL_ADMIN_PASSWORD)
+      if (initUser && initPass) {
+        await AdminModel.create(db, {
+          username: String(initUser).trim(),
+          email: String(initUser).trim(),
+          password: String(initPass),
+          role: 'superadmin',
+        })
+      }
     }
   } catch (err) {
     console.warn('Admin seeding note:', err.message)

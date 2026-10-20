@@ -75,11 +75,11 @@ export default function Footer() {
           <div className="text-xs font-semibold uppercase tracking-wider text-inksoft mb-3">Company &amp; Legal</div>
           <ul className="space-y-2 text-xs text-ink">
             <li><Link to="/about" className="hover:text-green transition-colors">About CareerDost</Link></li>
+            <li><Link to="/about#editorial-policy" className="hover:text-green transition-colors">Editorial &amp; Verification Policy</Link></li>
             <li><Link to="/contact" className="hover:text-green transition-colors">Contact Us</Link></li>
             <li><Link to="/privacy-policy" className="hover:text-green transition-colors">Privacy Policy</Link></li>
             <li><Link to="/disclaimer" className="hover:text-green transition-colors">Disclaimer Notice</Link></li>
             <li><Link to="/terms-and-conditions" className="hover:text-green transition-colors">Terms &amp; Conditions</Link></li>
-            <li><Link to="/admin" className="text-inksoft hover:text-green transition-colors">Admin Portal</Link></li>
           </ul>
         </div>
       </div>

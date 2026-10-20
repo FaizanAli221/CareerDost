@@ -211,8 +211,8 @@ export default function DailyUpdatesPage() {
       ) : (
         <div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {updates.slice(0, visibleCount).map((item) => (
-              <UpdateCard key={item.slug} updateItem={item} />
+            {updates.slice(0, visibleCount).map((item, idx) => (
+              <UpdateCard key={item.slug} updateItem={item} priority={idx < 2} />
             ))}
           </div>
           {updates.length > visibleCount && (
