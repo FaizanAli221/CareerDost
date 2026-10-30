@@ -589,7 +589,6 @@ function generateJobHtml(article, canonical) {
             </div>` : ''}
             ${specsBox}
           </header>
-          ${guideBanner}
           ${statusBanner}
           ${transparencyNote}
           <div class="font-sans text-ink text-base leading-relaxed space-y-5 mb-10 border-b border-line pb-8">
