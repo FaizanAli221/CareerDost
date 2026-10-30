@@ -12,6 +12,9 @@ import { useSeo } from '../lib/useSeo'
 import { getAbsoluteUrl } from '../lib/config'
 import { trackApplyNowClick, trackOfficialSourceClick } from '../lib/analytics'
 import { getContentType, getContentTypeLabels, getContextualStatus } from '../lib/contentType'
+import { listings } from '../data/listings'
+
+const KNOWN_ARTICLE_SLUGS = new Set(listings.map((l) => l.slug))
 
 function formatDate(dateStr) {
   if (!dateStr) return ''
@@ -44,6 +47,14 @@ export default function UpdateDetailPage() {
   const labels = useMemo(() => getContentTypeLabels(contentType, updateItem), [contentType, updateItem])
   const statusInfo = useMemo(() => getContextualStatus(updateItem, contentType), [updateItem, contentType])
 
+  const hasMatchingArticle = useMemo(() => {
+    if (updateItem?.hasArticle === true) return true
+    if (updateItem?.hasArticle === false) return false
+    return KNOWN_ARTICLE_SLUGS.has(slug)
+  }, [updateItem, slug])
+
+  const canonicalPath = hasMatchingArticle ? `/jobs/${slug}` : `/daily-updates/${slug}`
+
   const jsonLdSchema = React.useMemo(() => {
     if (!updateItem) return null
     return {
@@ -57,13 +68,21 @@ export default function UpdateDetailPage() {
           dateModified: updateItem.updatedAt || updateItem.publishDate,
           mainEntityOfPage: {
             '@type': 'WebPage',
-            '@id': getAbsoluteUrl(`/daily-updates/${slug}`),
+            '@id': getAbsoluteUrl(canonicalPath),
           },
-          author: {
-            '@type': 'Organization',
-            name: 'CareerDost',
-            url: getAbsoluteUrl('/'),
-          },
+          author: [
+            {
+              '@type': 'Person',
+              name: 'Faizan Ali',
+              jobTitle: 'Founder & Lead Editor',
+              url: getAbsoluteUrl('/about#editorial-team'),
+            },
+            {
+              '@type': 'Organization',
+              name: 'CareerDost Editorial Desk',
+              url: getAbsoluteUrl('/about#editorial-policy'),
+            },
+          ],
           publisher: {
             '@type': 'Organization',
             name: 'CareerDost',
@@ -94,18 +113,18 @@ export default function UpdateDetailPage() {
               '@type': 'ListItem',
               position: 3,
               name: updateItem.title,
-              item: getAbsoluteUrl(`/daily-updates/${slug}`),
+              item: getAbsoluteUrl(canonicalPath),
             },
           ],
         },
       ],
     }
-  }, [updateItem, slug])
+  }, [updateItem, slug, canonicalPath])
 
   useSeo({
     title: updateItem ? `${updateItem.seoTitle || updateItem.title} — CareerDost` : 'Daily Update — CareerDost',
     description: updateItem ? updateItem.metaDescription || updateItem.shortDescription : 'Verified Pakistan daily update.',
-    canonical: `/daily-updates/${slug}`,
+    canonical: canonicalPath,
     ogImage: updateItem?.featuredImage ? getAbsoluteUrl(updateItem.featuredImage) : getAbsoluteUrl('/images/hec-commonwealth-scholarship-2027.jpg'),
     jsonLd: jsonLdSchema,
   })
@@ -223,7 +242,7 @@ export default function UpdateDetailPage() {
             </span>
           )}
           <span className="text-xs font-sans text-inksoft">
-            • By <Link to="/about#editorial-policy" className="font-semibold text-ink hover:text-green underline">CareerDost Editorial Desk</Link>
+            • By <Link to="/about#editorial-team" className="font-semibold text-ink hover:text-green underline">Faizan Ali &amp; CareerDost Editorial Desk</Link>
           </span>
         </div>
 
@@ -259,6 +278,26 @@ export default function UpdateDetailPage() {
 
       {/* Concise Key Information Summary Box */}
       <KeyInfoSummary item={updateItem} type={contentType} labels={labels} statusInfo={statusInfo} />
+
+      {/* Link to Full Article Guide if available */}
+      {hasMatchingArticle && (
+        <div className="bg-emerald-50 border border-emerald-300 p-4 mb-8 rounded-xs text-xs sm:text-sm font-sans flex items-center justify-between gap-4 shadow-xs">
+          <div className="space-y-1">
+            <strong className="text-emerald-950 font-bold block text-sm">
+              Comprehensive Editorial Guide &amp; Details Available
+            </strong>
+            <p className="text-emerald-800 text-xs leading-relaxed">
+              CareerDost has published an in-depth editorial guide for this opportunity featuring full eligibility matrices, required documents checklist, syllabus breakdown, and step-by-step application procedures.
+            </p>
+          </div>
+          <Link
+            to={`/jobs/${slug}`}
+            className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-4 py-2 text-xs rounded-xs whitespace-nowrap shadow-xs transition-colors shrink-0"
+          >
+            Read Full Guide →
+          </Link>
+        </div>
+      )}
 
       {/* Contextual Status Alert Box */}
       <div className={`border p-4 mb-8 rounded-xs text-xs sm:text-sm font-sans flex items-center justify-between gap-4 shadow-xs ${statusInfo.badgeClass}`}>

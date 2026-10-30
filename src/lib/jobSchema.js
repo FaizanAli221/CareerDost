@@ -133,6 +133,18 @@ const VERIFIED_EMPLOYER_ADDRESSES = {
     addressRegion: 'Islamabad Capital Territory',
     addressCountry: 'PK',
   },
+  'punjab-police-jobs-2026-rajanpur-rahim-yar-khan-constables': [
+    {
+      addressLocality: 'Rahim Yar Khan',
+      addressRegion: 'Punjab',
+      addressCountry: 'PK',
+    },
+    {
+      addressLocality: 'Rajanpur',
+      addressRegion: 'Punjab',
+      addressCountry: 'PK',
+    },
+  ],
 }
 
 const CITY_TO_REGION = [
@@ -324,11 +336,21 @@ export function buildBaseSalarySchema(salaryStr) {
 export function buildJobLocationSchema(item) {
   const slug = String(item?.slug || '').toLowerCase().trim()
   if (VERIFIED_EMPLOYER_ADDRESSES[slug]) {
+    const verified = VERIFIED_EMPLOYER_ADDRESSES[slug]
+    if (Array.isArray(verified)) {
+      return verified.map((addr) => ({
+        '@type': 'Place',
+        address: {
+          '@type': 'PostalAddress',
+          ...addr,
+        },
+      }))
+    }
     return {
       '@type': 'Place',
       address: {
         '@type': 'PostalAddress',
-        ...VERIFIED_EMPLOYER_ADDRESSES[slug],
+        ...verified,
       },
     }
   }

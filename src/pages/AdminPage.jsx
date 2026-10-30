@@ -304,7 +304,7 @@ export default function AdminPage() {
         canonicalUrl: upd.canonicalUrl || `${SITE_PRODUCTION_URL}/daily-updates/${upd.slug}`,
         ogTitle: upd.ogTitle || upd.seoTitle || upd.title || '',
         ogDescription: upd.ogDescription || upd.metaDescription || upd.shortDescription || '',
-        status: upd.status || 'published',
+        status: upd.status || 'draft',
       })
     } else {
       setEditingUpdate(null)
@@ -337,7 +337,7 @@ export default function AdminPage() {
         canonicalUrl: `${SITE_PRODUCTION_URL}/daily-updates/`,
         ogTitle: '',
         ogDescription: '',
-        status: 'published',
+        status: 'draft',
       })
     }
     setActiveTab('updateForm')
@@ -438,17 +438,34 @@ export default function AdminPage() {
     const slug = (targetForm.slug || generateSlug(title)).trim()
     const category = targetForm.category || 'Career Opportunity'
 
-    // Clean, high-CTR SEO Title between 45 and 58 characters
-    let cleanT = title.replace(/\s*\|\s*CareerDost\s*$/i, '').replace(/\s*—\s*CareerDost\s*$/i, '').trim()
-    if (cleanT.includes('–') || cleanT.includes('—') || cleanT.includes(' - ')) {
-      const parts = cleanT.split(/\s*[–—-]\s*/)
-      if (parts[0].trim().length >= 15 && `${parts[0].trim()} — CareerDost`.length <= 60) {
-        cleanT = parts[0].trim()
-      }
-    }
-    let suggestedTitle = `${cleanT} — CareerDost`
+    // Clean, high-CTR SEO Title between 45 and 60 characters on clean word boundaries
+    let cleanT = title.replace(/\s*\|\s*CareerDost\s*$/i, '').replace(/\s*[—–-]\s*CareerDost\s*$/i, '').trim()
+    const suffix = ' — CareerDost'
+    const maxBase = 60 - suffix.length
+    let suggestedTitle = `${cleanT}${suffix}`
     if (suggestedTitle.length > 60) {
-      suggestedTitle = cleanT.slice(0, 46).trim() + ' — CareerDost'
+      const clauseParts = cleanT.split(/\s*[:|–—-]\s*/)
+      if (clauseParts[0] && clauseParts[0].trim().length >= 20 && clauseParts[0].trim().length <= maxBase) {
+        const candidate = clauseParts[0].trim().replace(/[,:;\-–—([]+$/, '').trim()
+        if (!candidate.includes('(') || candidate.includes(')')) {
+          suggestedTitle = `${candidate}${suffix}`
+        }
+      }
+      if (suggestedTitle.length > 60) {
+        const words = cleanT.split(/\s+/)
+        let acc = ''
+        for (const w of words) {
+          const next = acc ? `${acc} ${w}` : w
+          if (next.length > maxBase) break
+          acc = next
+        }
+        if (!acc) acc = cleanT.slice(0, maxBase)
+        acc = acc.replace(/\s*\([^)]*$/, '').trim()
+        acc = acc.replace(/[,:;\-–—/&+]+$/, '').trim()
+        acc = acc.replace(/\s+(?:and|or|for|in|at|to|of|via|with|by|the|a|an)$/i, '').trim()
+        acc = acc.replace(/[,:;\-–—/&+]+$/, '').trim()
+        suggestedTitle = `${acc}${suffix}`
+      }
     }
 
     // High-CTR Meta Description between 140 and 155 characters
@@ -479,7 +496,11 @@ export default function AdminPage() {
     setFormMsg('✨ Automatic SEO & Image Alt suggestions generated based on verified content.')
   }
 
-  const handleSaveUpdate = async (targetStatus = 'published') => {
+  const handleSaveUpdate = async (requestedStatus = null) => {
+    const targetStatus =
+      requestedStatus === 'published' || requestedStatus === 'draft'
+        ? requestedStatus
+        : editingUpdate?.status || 'draft'
     setFormMsg('')
     if (targetStatus === 'published') {
       const validation = validatePrePublish(updateForm, false, updates, editingUpdate?.slug)
@@ -579,7 +600,7 @@ export default function AdminPage() {
         canonicalUrl: art.canonicalUrl || `${SITE_PRODUCTION_URL}/jobs/${art.slug}`,
         ogTitle: art.ogTitle || art.seoTitle || art.title || '',
         ogDescription: art.ogDescription || art.metaDescription || art.excerpt || '',
-        status: art.status || 'published',
+        status: art.status || 'draft',
       })
     } else {
       setEditingArticle(null)
@@ -612,13 +633,17 @@ export default function AdminPage() {
         canonicalUrl: `${SITE_PRODUCTION_URL}/jobs/`,
         ogTitle: '',
         ogDescription: '',
-        status: 'published',
+        status: 'draft',
       })
     }
     setActiveTab('articleForm')
   }
 
-  const handleSaveArticle = async (targetStatus = 'published') => {
+  const handleSaveArticle = async (requestedStatus = null) => {
+    const targetStatus =
+      requestedStatus === 'published' || requestedStatus === 'draft'
+        ? requestedStatus
+        : editingArticle?.status || 'draft'
     setFormMsg('')
     if (targetStatus === 'published') {
       const validation = validatePrePublish(articleForm, true, articles, editingArticle?.slug)
@@ -1691,6 +1716,23 @@ export default function AdminPage() {
                 >
                   📢 Callout Notice
                 </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const notice = '> [!NOTE]\n> **Status Notice (Application Window Closed):**\n> - **Hiring Authority:** ' + (updateForm.organization || 'Department') + '.\n> - **Closing Date:** ' + (updateForm.deadline || 'Closing Date') + '.\n> - **Current Selection Stage:** Scrutiny of applicant profiles and test/interview scheduling.\n\n'
+                    setUpdateForm({ ...updateForm, content: notice + (updateForm.content || '') })
+                  }}
+                  className="px-2.5 py-1 bg-amber-50 border border-amber-300 text-amber-900 hover:bg-amber-100 font-bold"
+                >
+                  ⏰ Closed Notice
+                </button>
+              </div>
+
+              <div className="p-3 bg-paper border-l-4 border-green text-[11px] text-inksoft leading-relaxed space-y-0.5">
+                <strong className="text-ink font-bold block">Editorial Quality Guidance:</strong>
+                <p>• Verify announcement facts against official department gazettes, NTS, FPSC, or university portals.</p>
+                <p>• Provide verified eligibility criteria, required documents, and confirmed testing dates.</p>
+                <p>• For expired notices, insert a Closed Status Notice explaining ongoing or upcoming stages.</p>
               </div>
 
               <textarea
@@ -1813,6 +1855,15 @@ export default function AdminPage() {
               </div>
 
               <div className="flex items-center gap-3">
+                {editingUpdate && (
+                  <button
+                    type="button"
+                    onClick={() => handleSaveUpdate()}
+                    className="border border-line bg-paper text-ink px-5 py-2.5 text-xs font-bold hover:border-green transition-colors"
+                  >
+                    💾 Save Changes ({editingUpdate.status === 'published' ? 'Keep Published' : 'Keep Draft'})
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => handleSaveUpdate('draft')}
@@ -2144,6 +2195,23 @@ export default function AdminPage() {
                 >
                   📢 Notice Box
                 </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const notice = '> [!NOTE]\n> **Recruitment Status Notice (Application Window Closed):**\n> - **Hiring Authority:** ' + (articleForm.organization || 'Department') + '.\n> - **Closing Date:** ' + (articleForm.lastDate || 'Closing Date') + '.\n> - **Current Selection Stage:** Scrutiny of applicant profiles and screening test/interview scheduling.\n\n'
+                    setArticleForm({ ...articleForm, content: notice + (articleForm.content || '') })
+                  }}
+                  className="px-2.5 py-1 bg-amber-50 border border-amber-300 text-amber-900 hover:bg-amber-100 font-bold"
+                >
+                  ⏰ Closed Notice
+                </button>
+              </div>
+
+              <div className="p-3 bg-paper border-l-4 border-green text-[11px] text-inksoft leading-relaxed space-y-0.5">
+                <strong className="text-ink font-bold block">Editorial Quality Guidance:</strong>
+                <p>• Verify facts, quotas, and qualifications against official gazettes or institutional portals.</p>
+                <p>• Include step-by-step application instructions, required document checklists, and candidate FAQs.</p>
+                <p>• For expired opportunities, insert a Closed Status Notice explaining ongoing or upcoming cycles.</p>
               </div>
 
               <textarea
@@ -2355,6 +2423,15 @@ export default function AdminPage() {
               </div>
 
               <div className="flex items-center gap-3">
+                {editingArticle && (
+                  <button
+                    type="button"
+                    onClick={() => handleSaveArticle()}
+                    className="border border-line bg-paper text-ink px-5 py-2.5 text-xs font-bold hover:border-green transition-colors"
+                  >
+                    💾 Save Changes ({editingArticle.status === 'published' ? 'Keep Published' : 'Keep Draft'})
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => handleSaveArticle('draft')}

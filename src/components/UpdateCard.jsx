@@ -3,6 +3,18 @@ import { Link } from 'react-router-dom'
 import CategoryFallbackImage from './CategoryFallbackImage'
 import OptimizedImage from './OptimizedImage'
 import { getContentType, getContentTypeLabels, getContextualStatus } from '../lib/contentType'
+import { listings } from '../data/listings'
+
+const KNOWN_ARTICLE_SLUGS = new Set(listings.map((l) => l.slug))
+
+export function getUpdateTargetUrl(updateItem) {
+  if (!updateItem || !updateItem.slug) return '/daily-updates'
+  if (updateItem.targetUrl) return updateItem.targetUrl
+  if (updateItem.hasArticle === true) return `/jobs/${updateItem.slug}`
+  if (updateItem.hasArticle === false) return `/daily-updates/${updateItem.slug}`
+  if (KNOWN_ARTICLE_SLUGS.has(updateItem.slug)) return `/jobs/${updateItem.slug}`
+  return `/daily-updates/${updateItem.slug}`
+}
 
 function isRecent(publishDate, hours = 48) {
   if (!publishDate) return false
@@ -43,6 +55,8 @@ export default function UpdateCard({ updateItem, priority = false }) {
   const labels = getContentTypeLabels(contentType, updateItem)
   const statusInfo = getContextualStatus(updateItem, contentType)
   const hasImage = updateItem.featuredImage && updateItem.featuredImage.trim().length > 0
+
+  const targetUrl = getUpdateTargetUrl(updateItem)
 
   return (
     <article className="border border-line bg-white rounded-xs overflow-hidden flex flex-col justify-between hover:border-green hover:shadow-md transition-all group">
@@ -100,7 +114,7 @@ export default function UpdateCard({ updateItem, priority = false }) {
           </div>
 
           <h3 className="font-serif text-lg font-bold text-ink group-hover:text-green transition-colors leading-snug mb-2 line-clamp-2">
-            <Link to={`/daily-updates/${updateItem.slug}`}>{updateItem.title}</Link>
+            <Link to={targetUrl}>{updateItem.title}</Link>
           </h3>
 
           <p className="font-sans text-xs text-inksoft leading-relaxed line-clamp-3 mb-4">
@@ -112,7 +126,7 @@ export default function UpdateCard({ updateItem, priority = false }) {
       {/* View Details Footer */}
       <div className="p-4 sm:p-5 pt-0 mt-auto">
         <Link
-          to={`/daily-updates/${updateItem.slug}`}
+          to={targetUrl}
           className="inline-flex items-center justify-center w-full border border-line bg-paper text-ink font-sans text-xs font-semibold py-2 px-3 rounded-xs hover:bg-green hover:text-white hover:border-green transition-colors"
         >
           View Details →

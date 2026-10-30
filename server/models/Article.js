@@ -152,7 +152,7 @@ export class ArticleModel {
       ? JSON.stringify(data.content)
       : JSON.stringify([data.content || ''])
 
-    const status = data.status === 'draft' ? 'draft' : 'published'
+    const status = data.status === 'published' ? 'published' : 'draft'
 
     const res = await db
       .prepare(
@@ -199,13 +199,19 @@ export class ArticleModel {
     return res.success
   }
 
-  static async update(db, slug, data) {
+  static async update(db, slug, data, existingStatus = null) {
     const contentJson = Array.isArray(data.content)
       ? JSON.stringify(data.content)
       : JSON.stringify([data.content || ''])
 
     const newSlug = data.slug || slug
-    const status = data.status === 'draft' ? 'draft' : 'published'
+    let status = existingStatus
+    if (data.status === 'published' || data.status === 'draft') {
+      status = data.status
+    } else if (status !== 'published' && status !== 'draft') {
+      const current = await db.prepare('SELECT status FROM articles WHERE slug = ?').bind(slug).first()
+      status = current?.status === 'published' ? 'published' : 'draft'
+    }
 
     const res = await db
       .prepare(
@@ -254,10 +260,12 @@ export class ArticleModel {
   }
 
   static async updateStatus(db, slug, status) {
-    const validStatus = status === 'draft' ? 'draft' : 'published'
+    if (status !== 'draft' && status !== 'published') {
+      return false
+    }
     const res = await db
       .prepare('UPDATE articles SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE slug = ?')
-      .bind(validStatus, slug)
+      .bind(status, slug)
       .run()
     return res.success
   }

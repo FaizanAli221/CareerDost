@@ -1991,8 +1991,8 @@ export const listings = [
     "isVerified": true,
     "featured": true,
     "logoInitial": "RSU",
-    "featuredImage": "/images/sindh-education-rsu-consultant-jobs-2026.jpg",
-    "imageAlt": "Sindh Education RSU Consultant Jobs 2026 ASPIRE-AF Project Karachi",
+    "featuredImage": "/images/rsu-sindh-social-safeguard-specialist-2026.webp",
+    "imageAlt": "Sindh Education Jobs 2026 Social Safeguard Specialist RSU PECHS Karachi CareerDost",
     "excerpt": "School Education & Literacy Department Sindh has announced individual consultant vacancies under the World Bank-assisted ASPIRE-AF project at RSU Karachi. Positions include Social Safeguard Specialist and Foundational Learning Specialist (PPS-8/9). Apply by 25 October 2026.",
     "content": [
       "### Executive Opportunity Overview: RSU Sindh ASPIRE-AF Project 2026",
@@ -2000,6 +2000,7 @@ export const listings = [
       "Headquartered in **Karachi**, the Reform Support Unit serves as the strategic policy coordination and implementation backbone of Sindh's educational reform portfolio. Through the ASPIRE Additional Financing framework, the department is deploying specialized technical expertise to accelerate foundational literacy and numeracy, strengthen school monitoring, and enforce social and environmental safeguard standards across public schools in Sindh.",
       "**Important Experience Notice:** These vacancies are senior individual consultancy roles classified under Project Pay Scales **PPS-8 and PPS-9**. They require a minimum of **5 years of post-qualification professional experience** in development projects, education reform, or social safeguard compliance. These positions are strictly **not suitable for fresh graduates**.",
       "### Quick Summary Table: RSU Sindh Consultant Vacancies",
+      "![RSU Sindh Foundational Learning Specialist Jobs 2026 CareerDost](/images/rsu-sindh-foundational-learning-specialist-2026.webp)",
       "| Metric / Parameter | Official Specification |\n|:---|:---|\n| **Executing Agency** | Reform Support Unit (RSU), School Education & Literacy Department, Sindh |\n| **Project Name** | ASPIRE-AF (World Bank Assisted) |\n| **Positions Offered** | Social Safeguard Specialist / Consultant & Foundational Learning Specialist / Consultant |\n| **Pay Scale / Grade** | Project Pay Scale PPS-8 / PPS-9 (Market Competitive) |\n| **Job Location** | Karachi (RSU Sindh Head Office, PECHS Block-6) |\n| **Minimum Education** | 16-Year Master’s Degree in Social Sciences, Public Policy, Education, or related fields |\n| **Experience Required** | Minimum 5 Years of Relevant Post-Qualification Experience |\n| **Domicile Requirement** | Sindh Province |\n| **Advertisement Date** | 11 October 2026 |\n| **Application Deadline** | **25 October 2026** |\n| **Application Method** | By Post / Hand Submission to Chief Program Manager Office, RSU Karachi |",
       "### Detailed Breakdown of Vacancies & Key Responsibilities",
       "#### 1. Social Safeguard Specialist / Consultant (PPS-8 / PPS-9)",
@@ -2021,7 +2022,9 @@ export const listings = [
     "focusKeyword": "Sindh Education RSU Consultant Jobs 2026",
     "status": "published",
     "createdAt": "2026-10-19 05:37:09",
-    "updatedAt": "2026-10-19 06:16:29"
+    "updatedAt": "2026-10-19 06:16:29",
+    "ogTitle": "Sindh Education RSU Consultant Jobs 2026: Social Safeguard & Foundational Learning | CareerDost",
+    "ogDescription": "Reform Support Unit (RSU) Sindh ASPIRE-AF World Bank Project jobs 2026 for Social Safeguard Specialist and Foundational Learning Specialist. Apply before 25 October 2026."
   },
   {
     "id": 335,
@@ -2044,9 +2047,10 @@ export const listings = [
     "featured": true,
     "logoInitial": "SPSC",
     "featuredImage": "/images/spsc-jobs-2026-54-vacancies.webp",
-    "imageAlt": "SPSC Jobs 2026 54 Sindh Government Vacancies Consolidated Advertisement 05/2026 CareerDost",
+    "imageAlt": "SPSC Jobs 2026 Advertisement No 05/2026 Apply by 23 October CareerDost",
     "excerpt": "Sindh Public Service Commission (SPSC) announces Consolidated Advertisement No. 05/2026 with 54 gazetted vacancies in BPS-16, BPS-17, and BPS-18 across Sindh departments. Apply online before 23 October 2026.",
     "content": [
+      "> [!IMPORTANT]\n> **Final Application Alert: SPSC Advertisement No. 05/2026 Closing 23 October**\n> Online registration on the official SPSC portal (`spsc.gov.pk`) closes on **Friday, 23 October 2026 at 5:00 PM**. Candidates must generate their Rs. 500 1Bill Payment Slip ID (PSID) challan and complete their online application before the cutoff time. No manual or paper submissions are accepted.",
       "### Official Recruitment Notice: SPSC Advertisement No. 05/2026",
       "The **Sindh Public Service Commission (SPSC)**, Thandi Sarak, Hyderabad, has officially issued its **Consolidated Advertisement No. 05/2026 (Dated: 25.09.2026)** inviting online applications for **54 permanent government vacancies** across various provincial departments.",
       "The positions range from **Basic Pay Scale 16 (BPS-16)** to **Basic Pay Scale 18 (BPS-18)** and cover the Enquiries & Anti-Corruption Establishment, Home Department, Information Department, Planning & Development Department, and Law, Parliamentary Affairs & Criminal Prosecution Department.",
@@ -2070,7 +2074,9 @@ export const listings = [
     "focusKeyword": "SPSC Jobs 2026",
     "status": "published",
     "createdAt": "2026-10-11 06:36:48",
-    "updatedAt": "2026-10-13 06:38:36"
+    "updatedAt": "2026-10-13 06:38:36",
+    "ogTitle": "SPSC Jobs 2026: Advertisement No. 05/2026 – Apply Before 23 October | CareerDost",
+    "ogDescription": "Sindh Public Service Commission (SPSC) Consolidated Advertisement No. 05/2026 with 54 gazetted vacancies in BPS-16 to BPS-18. Online applications close 23 October 2026 at 5:00 PM via 1Bill PSID."
   },
   {
     "id": 334,
@@ -2140,7 +2146,7 @@ export const listings = [
     "featured": true,
     "logoInitial": "CPSD",
     "featuredImage": "/images/sindh-courts-bps-1-4-jobs-2026.webp",
-    "imageAlt": "Sindh Courts Jobs 2026 BPS 1 to 4 Vacancies Criminal Prosecution Services Department High Court Karachi CareerDost",
+    "imageAlt": "Sindh District Courts Jobs 2026 BPS-01 to BPS-04 Walk-in Interviews High Court Karachi CareerDost",
     "excerpt": "Criminal Prosecution Services Department Sindh announces BPS 1–4 vacancies (Circular 000000221) for 232 Head Office posts at High Court Karachi plus 28 District Courts. Walk-in interviews 19–31 October 2026.",
     "content": [
       "### Official Recruitment Circular: Criminal Prosecution Services Department, Sindh",
@@ -2165,7 +2171,9 @@ export const listings = [
     "focusKeyword": "Sindh Courts Jobs 2026",
     "status": "published",
     "createdAt": "2026-10-11 06:36:48",
-    "updatedAt": "2026-10-11 15:49:37"
+    "updatedAt": "2026-10-11 15:49:37",
+    "ogTitle": "Sindh District Courts Jobs 2026: BPS-01 to BPS-04 Walk-in Interview Schedule | CareerDost",
+    "ogDescription": "Criminal Prosecution Services Department Sindh Circular 000000221 for 232 Head Office posts at High Court Karachi and 28 District Courts. Walk-in interviews 19–31 October 2026."
   },
   {
     "id": 332,
@@ -2262,7 +2270,7 @@ export const listings = [
   {
     "id": 330,
     "slug": "spsc-cce-2026-screening-test-date",
-    "title": "SPSC CCE-2026 Screening Test Date Announced – Saturday 24 October",
+    "title": "SPSC CCE-2026 Screening Test on 28 November — Apply Online by 11 November Deadline",
     "category": "results",
     "organization": "Sindh Public Service Commission (SPSC)",
     "jobType": "Combined Competitive Examination (CCE-2026) Provincial Civil Service Screening Test",
@@ -2271,10 +2279,10 @@ export const listings = [
     "salary": "Provincial Civil Service (BPS-16 / BPS-17 Assistant Commissioner, Section Officer)",
     "experience": "Eligible Graduates with Sindh Domicile",
     "positions": "Combined Competitive Examination 2026 Screening Test",
-    "lastDate": "2026-10-24",
+    "lastDate": "2026-11-11",
     "noDeadline": false,
     "publishDate": "2026-10-11",
-    "officialLink": "https://spsc.gov.pk/recent-announcements/Sep2026/screenig2026.pdf",
+    "officialLink": "https://spsc.gov.pk",
     "applyLink": "https://spsc.gov.pk/candidate_portal/",
     "isVerified": true,
     "featured": true,
@@ -2283,26 +2291,20 @@ export const listings = [
     "imageAlt": "SPSC CCE 2026 Screening Test Date 24 October Sindh Public Service Commission Competitive Examination CareerDost",
     "excerpt": "SPSC officially confirms Saturday, 24 October 2026, as the Screening Test date for the Combined Competitive Examination (CCE-2026). Check official guidelines and portal update.",
     "content": [
-      "### Official Announcement: SPSC CCE-2026 Screening Test Date",
-      "The **Sindh Public Service Commission (SPSC)**, Thandi Sarak, Hyderabad, has issued an official **Press Release (Dated: 29th September 2026)** notifying that the **Screening Test for the Combined Competitive Examination (CCE-2026)** will be conducted on **Saturday, 24th October 2026**.",
-      "The CCE examination serves as the premier gateway for recruitment to prestigious executive positions in the Government of Sindh, including Assistant Commissioner (BPS-17), Section Officer (BPS-17), and Excise & Taxation Officer (BPS-17).",
-      "### Quick Summary Table",
-      "- **Commission:** Sindh Public Service Commission (SPSC)\n- **Examination:** Combined Competitive Examination (CCE-2026)\n- **Stage:** **Preliminary Screening Test (MCQ Based)**\n- **Official Test Date:** **Saturday, 24 October 2026**\n- **Notification Date:** 29 September 2026\n- **Testing Centers:** Karachi, Hyderabad, Sukkur, Larkana\n- **Roll Number Slip Status:** **To Be Issued on Candidate Portal Prior to Test**\n- **Official Notification:** [spsc.gov.pk screening2026.pdf](https://spsc.gov.pk/recent-announcements/Sep2026/screenig2026.pdf)\n- **Official Candidate Portal:** [spsc.gov.pk/candidate_portal](https://spsc.gov.pk/candidate_portal/)",
-      "### Roll Number Slip Status Clarification",
-      "> [!IMPORTANT]\n> **Roll Number Slip Status:** As of 11 October 2026, the SPSC examination branch has notified the **test date**; individualized roll number slips will be uploaded to the official Candidate Portal closer to the examination date.\n>\n> Candidates are advised to keep their CNIC and login passwords ready and check `spsc.gov.pk/candidate_portal` regularly for their assigned venue and shift timing.",
-      "### Screening Test Structure & Scope",
-      "The CCE Screening Test is an objective multiple-choice paper designed to short-list candidates for the Written Comprehensive Examination. The standard syllabus components comprise:\n1. **English General & Comprehension:** Grammar, vocabulary, sentence correction, synonyms/antonyms, and reading comprehension.\n2. **General Science & Ability:** Basic everyday science, mathematical reasoning, logical analytical deduction, and numerical ability.\n3. **Pakistan Affairs & History:** Movement history, constitutional milestones, post-independence developments, and current political structures.\n4. **Current Affairs & Global Issues:** National and international contemporary affairs, climate change, geopolitical events, and economic indicators.\n5. **Sindh Affairs & Heritage:** Geography, culture, history, administrative setup, and literature of Sindh.",
-      "### Essential Examination Day Instructions",
-      "- **Mandatory Original Documents:** Candidates must present their original Computerized National Identity Card (CNIC) and printed admit card slip.\n- **Stationery:** Use only blue or black transparent ballpoint pens. Pencils and markers are not allowed for filling OMR sheets.\n- **Electronic Devices Banned:** Mobile phones, digital watches, calculators, and Bluetooth accessories are strictly prohibited inside the center.",
-      "### Frequently Asked Questions (FAQ)",
-      "**Q1: When will the SPSC CCE-2026 Screening Test take place?**\nThe screening test is officially scheduled for **Saturday, 24 October 2026**.\n\n**Q2: Are CCE-2026 roll number slips currently available for download?**\nThe Commission releases admit slips a few days prior to the test on the official candidate portal (`spsc.gov.pk/candidate_portal`).\n\n**Q3: Which cities host CCE examination centers?**\nMajor examination centers are established in **Karachi, Hyderabad, Sukkur, and Larkana**.\n\n**Q4: What is the format of the screening test?**\nThe screening test consists of 100 multiple-choice questions (MCQs) covering General Knowledge, English, Current Affairs, Everyday Science, and Pakistan/Sindh Affairs."
+      "> [!IMPORTANT]\n> **Official SPSC Notification — Distinct Dates Clarification:**\n> - **Online Application Deadline:** **Wednesday, 11 November 2026** (Extended under Adv. No. 06/2026 amending Adv. No. 04/2026).\n> - **Screening Examination Date:** **Saturday, 28 November 2026** (Rescheduled from the earlier 24 October date).\n>\n> Candidates qualifying under the revised age limit (up to 33 years) or submitting fresh applications must complete their online registration and fee payment on `spsc.gov.pk` by **11 November 2026**.",
+      "### Official SPSC CCE-2026 Revised Schedule\nThe **Sindh Public Service Commission (SPSC)**, Thandi Sarak, Hyderabad, has issued an official notice confirming both the extended application submission window and the rescheduled examination date for CCE-2026 aspirants across Sindh. The CCE examination is the premier competitive gateway for recruitment to provincial executive cadres including Assistant Commissioner (BPS-17), Section Officer (BPS-17), and Excise & Taxation Officer (BPS-17).",
+      "### Quick Summary Table\n- **Commission:** Sindh Public Service Commission (SPSC)\n- **Examination:** Combined Competitive Examination (CCE-2026)\n- **Stage:** Preliminary Screening Test (MCQ Based)\n- **Online Application Deadline:** **Wednesday, 11 November 2026**\n- **Screening Examination Date:** **Saturday, 28 November 2026** (Rescheduled from 24 October)\n- **Official Notification Date:** 26 October 2026\n- **Testing Centers:** Karachi, Hyderabad, Sukkur, Larkana\n- **Application Portal:** [spsc.gov.pk/candidate_portal](https://spsc.gov.pk/candidate_portal/)\n- **Official Commission Website:** [spsc.gov.pk](https://spsc.gov.pk)\n- **Roll Number Slip Status:** Available on Candidate Portal prior to 28 November",
+      "### Roll Number Slip & Candidate Portal Status\n> [!NOTE]\n> **Admit Slips:** The SPSC examination branch will issue individualized roll number slips with assigned test centers and reporting shifts on `spsc.gov.pk/candidate_portal` approximately one week prior to the 28 November examination.\n>\n> Candidates must monitor the portal and download their slips before the test day.",
+      "### Screening Test Structure & Scoring Policy\nThe CCE Screening Test is a 100-mark objective multiple-choice paper designed to short-list candidates for the Written Comprehensive Examination:\n1. **English General & Comprehension:** Grammar, vocabulary, sentence correction, synonyms/antonyms, and reading comprehension.\n2. **General Science & Ability:** Basic everyday science, mathematical reasoning, logical analytical deduction, and numerical ability.\n3. **Pakistan Affairs & History:** Movement history, constitutional milestones, post-independence developments, and current political structures.\n4. **Current Affairs & Global Issues:** National and international contemporary affairs, climate change, geopolitical events, and economic indicators.\n5. **Sindh Affairs & Heritage:** Geography, culture, history, administrative setup, and literature of Sindh.\n\n*Scoring Terms:* Revised qualifying score is 33% (33 marks out of 100) with negative marking of 0.25 marks per incorrect response.",
+      "### Essential Examination Day Instructions\n- **Mandatory Original Documents:** Candidates must present their original Computerized National Identity Card (CNIC) and printed admit card slip.\n- **Stationery:** Use only blue or black transparent ballpoint pens. Pencils and markers are not allowed for filling OMR sheets.\n- **Electronic Devices Prohibited:** Mobile phones, digital watches, calculators, and Bluetooth accessories are strictly barred inside examination halls.",
+      "### Frequently Asked Questions (FAQ)\n**Q1: What is the application deadline for SPSC CCE-2026?**\nThe deadline to submit online applications on the SPSC candidate portal is **Wednesday, 11 November 2026**.\n\n**Q2: What is the date of the SPSC CCE-2026 Screening Test?**\nThe preliminary screening examination will be conducted on **Saturday, 28 November 2026** across major divisional centers.\n\n**Q3: When will CCE-2026 roll number slips be uploaded?**\nAdmit slips will be available for download on `spsc.gov.pk/candidate_portal` approximately one week prior to the 28 November test date.\n\n**Q4: Which cities host CCE examination centers?**\nMajor examination centers are established in **Karachi, Hyderabad, Sukkur, and Larkana**."
     ],
-    "seoTitle": "SPSC CCE-2026 Screening Test Date Announced – 24 October | CareerDost",
-    "metaDescription": "Sindh Public Service Commission (SPSC) announces CCE-2026 Screening Test date for Saturday, 24 October 2026. Roll number slip status, syllabus scope, and preparation tips.",
+    "seoTitle": "SPSC CCE-2026: Screening Test 28 Nov & Apply by 11 Nov Deadline | CareerDost",
+    "metaDescription": "SPSC CCE-2026 Screening Test rescheduled to 28 November 2026. Online application deadline extended to 11 November 2026. Verified schedule, age limit, and portal guide.",
     "focusKeyword": "SPSC CCE-2026",
     "status": "published",
     "createdAt": "2026-10-11 06:36:48",
-    "updatedAt": "2026-10-11 15:49:37"
+    "updatedAt": "2026-10-26 14:04:24"
   },
   {
     "id": 329,

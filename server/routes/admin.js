@@ -177,12 +177,12 @@ app.put('/articles/:slug', authMiddleware, async (c) => {
     return c.json({ success: false, error: 'Article not found.' }, 404)
   }
 
-  const validation = sanitizeArticleInput(body)
+  const validation = sanitizeArticleInput(body, existing.status)
   if (!validation.valid) {
     return c.json({ success: false, error: validation.errors.join(' ') }, 400)
   }
 
-  await ArticleModel.update(db, slug, validation.data)
+  await ArticleModel.update(db, slug, validation.data, existing.status)
   const updated = await ArticleModel.getBySlug(db, validation.data.slug || slug)
   return c.json({ success: true, data: updated })
 })
@@ -192,7 +192,10 @@ app.patch('/articles/:slug/status', authMiddleware, async (c) => {
   const db = getDb(c)
   const slug = c.req.param('slug')
   const body = await c.req.json()
-  const status = body.status === 'draft' ? 'draft' : 'published'
+  if (body.status !== 'draft' && body.status !== 'published') {
+    return c.json({ success: false, error: 'Explicit status ("draft" or "published") is required.' }, 400)
+  }
+  const status = body.status
 
   const existing = await ArticleModel.getBySlug(db, slug)
   if (!existing) {
@@ -315,12 +318,12 @@ app.put('/updates/:slug', authMiddleware, async (c) => {
     return c.json({ success: false, error: 'Daily update not found.' }, 404)
   }
 
-  const validation = sanitizeUpdateInput(body)
+  const validation = sanitizeUpdateInput(body, existing.status)
   if (!validation.valid) {
     return c.json({ success: false, error: validation.errors.join(' ') }, 400)
   }
 
-  await DailyUpdateModel.update(db, slug, validation.data)
+  await DailyUpdateModel.update(db, slug, validation.data, existing.status)
   const updated = await DailyUpdateModel.getBySlug(db, validation.data.slug || slug)
   return c.json({ success: true, data: updated })
 })
@@ -329,7 +332,10 @@ app.patch('/updates/:slug/status', authMiddleware, async (c) => {
   const db = getDb(c)
   const slug = c.req.param('slug')
   const body = await c.req.json()
-  const status = body.status === 'draft' ? 'draft' : 'published'
+  if (body.status !== 'draft' && body.status !== 'published') {
+    return c.json({ success: false, error: 'Explicit status ("draft" or "published") is required.' }, 400)
+  }
+  const status = body.status
 
   const existing = await DailyUpdateModel.getBySlug(db, slug)
   if (!existing) {

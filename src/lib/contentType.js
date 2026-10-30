@@ -245,10 +245,11 @@ export function getContentTypeLabels(type, item = null) {
         summaryTitle: 'Key Admissions Summary',
       }
       break
-    case 'result':
+    case 'result': {
+      const isExamNotice = item?.slug?.includes('spsc') || item?.slug?.includes('cce') || String(item?.title || '').toLowerCase().includes('screening test')
       res = {
-        badge: 'Results & Merit Lists',
-        badgeClass: 'bg-amber-100 text-amber-900 border-amber-300',
+        badge: isExamNotice ? 'Competitive Exam Notice' : 'Results & Merit Lists',
+        badgeClass: isExamNotice ? 'bg-emerald-100 text-emerald-900 border-emerald-300' : 'bg-amber-100 text-amber-900 border-amber-300',
         orgLabel: 'Conducting Body / Authority',
         typeLabel: 'Examination / Test',
         locLabel: 'Jurisdiction / Test Centers',
@@ -256,14 +257,15 @@ export function getContentTypeLabels(type, item = null) {
         expLabel: 'Test Series / Batch',
         posLabel: 'Merit List Scope',
         salLabel: 'Passing Marks / Score',
-        dateLabel: 'Result / Schedule Date',
-        ctaLabel: 'Check Result / Download Slip →',
+        dateLabel: isExamNotice ? 'Application Deadline' : 'Result / Schedule Date',
+        ctaLabel: isExamNotice ? 'Apply Online on SPSC Portal →' : 'Check Result / Download Slip →',
         ctaSecondary: 'Official Testing Agency Portal ↗',
-        howToApplyTitle: 'How to Check Your Result & Merit Score',
-        statusPrefix: 'Result Status',
-        summaryTitle: 'Key Results & Exam Summary',
+        howToApplyTitle: isExamNotice ? 'How to Apply & Examination Instructions' : 'How to Check Your Result & Merit Score',
+        statusPrefix: isExamNotice ? 'Application Window' : 'Result Status',
+        summaryTitle: isExamNotice ? 'Key Examination Schedule & Summary' : 'Key Results & Exam Summary',
       }
       break
+    }
     case 'scholarship':
       res = {
         badge: 'Scholarship',
@@ -418,6 +420,18 @@ export function getContextualStatus(item, type) {
   }
 
   if (type === 'result') {
+    const isExamNotice = slug.includes('spsc') || slug.includes('cce') || String(item?.title || '').toLowerCase().includes('screening test')
+    if (isExamNotice) {
+      return {
+        status: 'APPLICATIONS OPEN',
+        label: 'APPLICATION DEADLINE',
+        badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+        description: lastDate
+          ? `Online applications close on ${lastDate}. Screening test scheduled for Saturday, 28 November 2026.`
+          : 'Online application window open on SPSC candidate portal. Screening test on Saturday, 28 November 2026.',
+        isExpired: false,
+      }
+    }
     return {
       status: 'ANNOUNCED',
       label: 'OFFICIAL UPDATE',

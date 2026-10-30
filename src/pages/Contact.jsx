@@ -64,7 +64,14 @@ export default function Contact() {
           For the fastest response on urgent deadline extensions, roll number slips, or verification requests,
           connect with us via our verified channels:
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-ink font-medium pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs text-ink font-medium pt-1">
+          <a
+            href="mailto:editor@careerdost.blog"
+            className="p-3 bg-white border border-line hover:border-green transition-colors flex flex-col gap-1"
+          >
+            <span className="text-inksoft uppercase tracking-wider text-[10px]">Direct Email</span>
+            <strong className="text-green font-semibold">📧 editor@careerdost.blog ↗</strong>
+          </a>
           <a
             href="https://whatsapp.com/channel/0029VbDnzwFF1YlIkJax2P1o"
             target="_blank"
@@ -72,7 +79,7 @@ export default function Contact() {
             className="p-3 bg-white border border-line hover:border-green transition-colors flex flex-col gap-1"
           >
             <span className="text-inksoft uppercase tracking-wider text-[10px]">Broadcast Alerts</span>
-            <strong className="text-green">📢 Official WhatsApp Channel ↗</strong>
+            <strong className="text-green">📢 WhatsApp Channel ↗</strong>
           </a>
           <a
             href="https://wa.me/923173425680"
@@ -80,8 +87,8 @@ export default function Contact() {
             rel="noopener noreferrer"
             className="p-3 bg-white border border-line hover:border-green transition-colors flex flex-col gap-1"
           >
-            <span className="text-inksoft uppercase tracking-wider text-[10px]">Editorial Helpdesk</span>
-            <strong className="text-ink">💬 WhatsApp: 0317-3425680 ↗</strong>
+            <span className="text-inksoft uppercase tracking-wider text-[10px]">Helpline</span>
+            <strong className="text-ink">💬 0317-3425680 ↗</strong>
           </a>
           <a
             href="https://facebook.com/CareerDost"

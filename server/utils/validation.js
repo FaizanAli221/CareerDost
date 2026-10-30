@@ -42,7 +42,147 @@ export function sanitizeHtml(html) {
   return clean
 }
 
-export function sanitizeArticleInput(data) {
+export function resolveRecordStatus(inputStatus, existingStatus = null) {
+  if (inputStatus === 'published' || inputStatus === 'draft') {
+    return inputStatus
+  }
+  if (existingStatus === 'published' || existingStatus === 'draft') {
+    return existingStatus
+  }
+  return 'draft'
+}
+
+export function isBrokenSeoTitle(seoStr, rawTitleStr = '') {
+  if (!seoStr || seoStr.length < 15 || seoStr.length > 60) return true
+
+  const prefix = seoStr
+    .replace(/\s*\|\s*CareerDost\s*$/i, '')
+    .replace(/\s*[—–-]\s*CareerDost\s*$/i, '')
+    .trim()
+
+  if (!prefix || prefix.length < 5) return true
+
+  // 1. Unbalanced parentheses or brackets
+  const openParens = (prefix.match(/\(/g) || []).length
+  const closeParens = (prefix.match(/\)/g) || []).length
+  if (openParens !== closeParens) return true
+
+  const openBrackets = (prefix.match(/\[/g) || []).length
+  const closeBrackets = (prefix.match(/\]/g) || []).length
+  if (openBrackets !== closeBrackets) return true
+
+  // 2. Trailing punctuation or ellipsis before suffix
+  if (/[,:;\-–—/&+([\].]$/.test(prefix) || /\.\.\.$/.test(prefix)) return true
+
+  // 3. Dangling preposition, conjunction, or article at end of prefix
+  if (/\s+(?:and|or|for|in|at|to|of|via|with|by|from|on|as|into|the|a|an|&)$/i.test(prefix)) {
+    return true
+  }
+
+  // 4. Dangling single letter or single digit after space or punctuation (e.g. "& A", "October 2", "Engineers, S", "in S", "Age L")
+  if (/(?:\s|[,:;\-–—(/])[A-Za-z0-9]$/.test(prefix)) return true
+
+  // 5. Compare against rawTitleStr to detect any mid-word or mid-number cut
+  const cleanRaw = sanitizeString(rawTitleStr, 200)
+    .replace(/\s*\|\s*CareerDost\s*$/i, '')
+    .replace(/\s*[—–-]\s*CareerDost\s*$/i, '')
+    .trim()
+
+  if (cleanRaw) {
+    if (
+      cleanRaw.toLowerCase().startsWith(prefix.toLowerCase()) &&
+      cleanRaw.length > prefix.length &&
+      /[A-Za-z0-9]/.test(cleanRaw[prefix.length])
+    ) {
+      return true
+    }
+
+    const rawWords = cleanRaw
+      .split(/[\s,:;|/()[\]\–\—\-]+/)
+      .map((w) => w.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, '').toLowerCase())
+      .filter(Boolean)
+    const rawWordSet = new Set(rawWords)
+    const lastToken = prefix
+      .split(/\s+/)
+      .pop()
+      .replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, '')
+      .toLowerCase()
+
+    if (
+      lastToken &&
+      !rawWordSet.has(lastToken) &&
+      rawWords.some((w) => w.startsWith(lastToken) && w.length > lastToken.length)
+    ) {
+      return true
+    }
+  }
+
+  return false
+}
+
+export function buildCleanSeoTitle(rawTitle, existingSeoTitle = '') {
+  const trimmedSeo = sanitizeString(existingSeoTitle, 200)
+  if (!isBrokenSeoTitle(trimmedSeo, rawTitle)) {
+    return trimmedSeo
+  }
+
+  const fallbackSource = trimmedSeo
+    .replace(/\s*\|\s*CareerDost\s*$/i, '')
+    .replace(/\s*[—–-]\s*CareerDost\s*$/i, '')
+    .trim()
+  const cleanT = (
+    sanitizeString(rawTitle, 200)
+      .replace(/\s*\|\s*CareerDost\s*$/i, '')
+      .replace(/\s*[—–-]\s*CareerDost\s*$/i, '')
+      .trim() || fallbackSource
+  )
+
+  const suffix = ' — CareerDost'
+  const maxTotal = 60
+  const maxBase = maxTotal - suffix.length
+
+  if (`${cleanT}${suffix}`.length <= maxTotal && !isBrokenSeoTitle(`${cleanT}${suffix}`, cleanT)) {
+    return `${cleanT}${suffix}`
+  }
+
+  const clauseParts = cleanT.split(/\s*[:|–—-]\s*/)
+  if (
+    clauseParts[0] &&
+    clauseParts[0].trim().length >= 20 &&
+    clauseParts[0].trim().length <= maxBase
+  ) {
+    const candidate = clauseParts[0].trim().replace(/[,:;\-–—([]+$/, '').trim()
+    if (!candidate.includes('(') || candidate.includes(')')) {
+      return `${candidate}${suffix}`
+    }
+  }
+
+  const words = cleanT.split(/\s+/)
+  let acc = ''
+  for (const w of words) {
+    const next = acc ? `${acc} ${w}` : w
+    if (next.length > maxBase) break
+    acc = next
+  }
+
+  if (!acc) {
+    acc = cleanT.slice(0, maxBase)
+  }
+
+  // Strip unclosed parenthesis, trailing punctuation, dangling prepositions/conjunctions, or single trailing chars
+  acc = acc.replace(/\s*\([^)]*$/, '').trim()
+  acc = acc.replace(/[,:;\-–—/&+]+$/, '').trim()
+  while (
+    /\s+(?:and|or|for|in|at|to|of|via|with|by|from|on|as|into|the|a|an|&)$/i.test(acc) ||
+    /(?:\s|[,:;\-–—(/])[A-Za-z0-9]$/.test(acc)
+  ) {
+    acc = acc.replace(/\s+\S+$/, '').replace(/[,:;\-–—/&+]+$/, '').trim()
+  }
+
+  return `${acc}${suffix}`
+}
+
+export function sanitizeArticleInput(data, existingStatus = null) {
   const errors = []
 
   const title = sanitizeString(data.title, 200)
@@ -67,7 +207,7 @@ export function sanitizeArticleInput(data) {
   const salary = sanitizeString(data.salary, 100)
   const experience = sanitizeString(data.experience, 100)
   const positions = sanitizeString(data.positions, 100)
-  const lastDate = sanitizeString(data.lastDate || data.last_date, 20)
+  const lastDate = sanitizeString(data.lastDate || data.last_date, 120)
   const noDeadline = Boolean(data.noDeadline || data.no_deadline)
   const publishDate = sanitizeString(data.publishDate || data.publish_date, 30)
   const officialLink = sanitizeString(data.officialLink || data.official_link, 500)
@@ -100,13 +240,7 @@ export function sanitizeArticleInput(data) {
   }
 
   // Smart SEO Generation if missing or suboptimal
-  let seoTitle = sanitizeString(data.seoTitle || data.seo_title, 200)
-  if (!seoTitle || seoTitle.length < 15) {
-    seoTitle = title.includes('CareerDost') ? title : `${title} — CareerDost`
-    if (seoTitle.length > 60) {
-      seoTitle = title.slice(0, 46).trim() + ' — CareerDost'
-    }
-  }
+  const seoTitle = buildCleanSeoTitle(title, data.seoTitle || data.seo_title)
 
   let metaDescription = sanitizeString(data.metaDescription || data.meta_description, 300)
   if (!metaDescription || metaDescription.length < 50) {
@@ -129,7 +263,7 @@ export function sanitizeArticleInput(data) {
   const focusKeyword = sanitizeString(data.focusKeyword || data.focus_keyword, 100) || title.split(' ').slice(0, 4).join(' ')
   const ogTitle = sanitizeString(data.ogTitle || data.og_title, 200) || seoTitle
   const ogDescription = sanitizeString(data.ogDescription || data.og_description, 300) || metaDescription
-  const status = data.status === 'draft' ? 'draft' : 'published'
+  const status = resolveRecordStatus(data.status, existingStatus)
 
   return {
     valid: errors.length === 0,
@@ -198,7 +332,7 @@ export function sanitizeCategoryInput(data) {
   }
 }
 
-export function sanitizeUpdateInput(data) {
+export function sanitizeUpdateInput(data, existingStatus = null) {
   const errors = []
 
   const title = sanitizeString(data.title, 200)
@@ -232,7 +366,7 @@ export function sanitizeUpdateInput(data) {
   }
 
   const featuredImage = sanitizeString(data.featuredImage || data.featured_image, 1000)
-  const deadline = sanitizeString(data.deadline, 30)
+  const deadline = sanitizeString(data.deadline, 120)
   const noDeadline = Boolean(data.noDeadline || data.no_deadline)
   const publishDate = sanitizeString(data.publishDate || data.publish_date, 40) || new Date().toISOString()
 
@@ -260,13 +394,7 @@ export function sanitizeUpdateInput(data) {
   }
 
   // Smart SEO Generation for Daily Updates if missing or suboptimal
-  let seoTitle = sanitizeString(data.seoTitle || data.seo_title, 200)
-  if (!seoTitle || seoTitle.length < 15) {
-    seoTitle = title.includes('CareerDost') ? title : `${title} — CareerDost`
-    if (seoTitle.length > 60) {
-      seoTitle = title.slice(0, 46).trim() + ' — CareerDost'
-    }
-  }
+  const seoTitle = buildCleanSeoTitle(title, data.seoTitle || data.seo_title)
 
   let metaDescription = sanitizeString(data.metaDescription || data.meta_description, 300)
   if (!metaDescription || metaDescription.length < 50) {
@@ -289,7 +417,7 @@ export function sanitizeUpdateInput(data) {
   const focusKeyword = sanitizeString(data.focusKeyword || data.focus_keyword, 100) || title.split(' ').slice(0, 4).join(' ')
   const ogTitle = sanitizeString(data.ogTitle || data.og_title, 200) || seoTitle
   const ogDescription = sanitizeString(data.ogDescription || data.og_description, 300) || metaDescription
-  const status = data.status === 'draft' ? 'draft' : 'published'
+  const status = resolveRecordStatus(data.status, existingStatus)
 
   return {
     valid: errors.length === 0,

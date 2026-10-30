@@ -1,0 +1,1495 @@
+{
+  "total": 190,
+  "byCategory": {
+    "government-jobs": 54,
+    "it-jobs": 3,
+    "bank-jobs": 18,
+    "scholarships": 16,
+    "internships": 11,
+    "admissions": 34,
+    "government-schemes": 29,
+    "results": 12,
+    "private-jobs": 10,
+    "career-guides": 3
+  },
+  "needsContentEnrichment": [
+    {
+      "id": 1,
+      "slug": "fpsc-assistant-director-2026",
+      "title": "FPSC Assistant Director (BPS-17) Jobs 2026: General Recruitment & Exam Guide",
+      "words": 547,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-12",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 2,
+      "slug": "punjab-police-constable-recruitment-2026",
+      "title": "Punjab Police Constable Recruitment 2026: Physical Standards & Selection Guide",
+      "words": 520,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-05",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 3,
+      "slug": "nadra-data-entry-operator-2026",
+      "title": "NADRA Data Entry Operator / Junior Executive Jobs 2026: Walk-in Test Guide",
+      "words": 436,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-01",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 7,
+      "slug": "meezan-bank-teller-2026",
+      "title": "Meezan Bank Branch Teller / Customer Service Officer: Career & Selection Guide",
+      "words": 462,
+      "cat": "bank-jobs",
+      "lastDate": "2026-10-10",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 8,
+      "slug": "phec-phd-scholarship-2026",
+      "title": "Punjab HEC Fully Funded International PhD Scholarship 2026: Complete Application Guide",
+      "words": 541,
+      "cat": "scholarships",
+      "lastDate": "2026-11-01",
+      "isExpired": false,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 9,
+      "slug": "turkiye-burslari-scholarship-2026",
+      "title": "Türkiye Burslari Scholarship 2026–2027: Full Funding, Stipend & Pakistani Applicant Guide",
+      "words": 441,
+      "cat": "scholarships",
+      "lastDate": "2026-02-20",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 10,
+      "slug": "ufone-summer-internship-2026",
+      "title": "Ufone Summer Internship Program 2026: PTCL Group Selection & Eligibility Guide",
+      "words": 419,
+      "cat": "internships",
+      "lastDate": "2026-10-25",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 11,
+      "slug": "planning-commission-internship-2026",
+      "title": "Planning Commission Research Internship 2026: Young Development Fellows Guide",
+      "words": 381,
+      "cat": "internships",
+      "lastDate": "2026-10-18",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 12,
+      "slug": "nust-undergraduate-admissions-fall-2026",
+      "title": "NUST Undergraduate Admissions 2026: NET Schedule, Merit Formula & Programs Guide",
+      "words": 454,
+      "cat": "admissions",
+      "lastDate": "2026-10-30",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 13,
+      "slug": "punjab-medical-university-admissions-2026",
+      "title": "Punjab Medical Colleges MDCAT Admissions 2026: MBBS & BDS Centralized Induction Guide",
+      "words": 413,
+      "cat": "admissions",
+      "lastDate": "2026-10-22",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 15,
+      "slug": "punjab-rozgar-scheme-2026",
+      "title": "Punjab Rozgar Scheme 2026: Subsidized Business Loans & Online Application Guide",
+      "words": 551,
+      "cat": "government-schemes",
+      "lastDate": "2026-10-31",
+      "isExpired": false,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 16,
+      "slug": "bise-lahore-matric-result-2026",
+      "title": "BISE Lahore Matric (SSC Part-II) Result 2026: Official Check, SMS & Rechecking Guide",
+      "words": 506,
+      "cat": "results",
+      "lastDate": "2026-09-30",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 18,
+      "slug": "wapda-junior-engineer-2026",
+      "title": "WAPDA Junior Engineer (BPS-17) Jobs 2026: Civil & Electrical Recruitment Guide",
+      "words": 411,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-14",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 19,
+      "slug": "engro-management-trainee-2026",
+      "title": "Engro Management Trainee Program 2026: Selection Stages & Eligibility Guide",
+      "words": 432,
+      "cat": "private-jobs",
+      "lastDate": "2026-10-16",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 20,
+      "slug": "unilever-future-leaders-2026",
+      "title": "Unilever Future Leaders Programme (UFLP) 2026: Pakistan Selection & Career Guide",
+      "words": 367,
+      "cat": "private-jobs",
+      "lastDate": "2026-10-19",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 29,
+      "slug": "punjab-university-jobs-faculty-staff-2026",
+      "title": "Punjab University Jobs 2026 — Faculty & Staff Vacancies Online Application",
+      "words": 449,
+      "cat": "government-jobs",
+      "lastDate": "2026-11-30",
+      "isExpired": false,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 30,
+      "slug": "comsats-university-jobs-faculty-staff-2026",
+      "title": "COMSATS University Islamabad Jobs 2026 — Faculty & Administrative Positions",
+      "words": 309,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-25",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 31,
+      "slug": "university-of-chakwal-uoc-jobs-2026",
+      "title": "University of Chakwal (UOC) Jobs 2026: Teaching Faculty & Administrative Staff Guide",
+      "words": 578,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-15",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 32,
+      "slug": "air-university-islamabad-jobs-2026",
+      "title": "Air University Islamabad Jobs 2026: Faculty & Professional Staff Recruitment Guide",
+      "words": 488,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-20",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 34,
+      "slug": "sarhad-university-suit-peshawar-jobs-2026",
+      "title": "Sarhad University (SUIT) Peshawar Jobs 2026: Faculty & Pharmacy Recruitment Guide",
+      "words": 352,
+      "cat": "private-jobs",
+      "lastDate": "2026-10-02",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 36,
+      "slug": "times-university-multan-tum-jobs-2026",
+      "title": "TIMES University Multan Jobs 2026: Academic Faculty & Lecturer Recruitment Guide",
+      "words": 295,
+      "cat": "private-jobs",
+      "lastDate": "2026-10-01",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 38,
+      "slug": "university-of-lahore-uol-jobs-2026",
+      "title": "University of Lahore (UOL) Jobs 2026: Teaching Faculty & Hospital Staff Recruitment Guide",
+      "words": 347,
+      "cat": "private-jobs",
+      "lastDate": "2026-10-10",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 40,
+      "slug": "gwadar-shipyard-cfo-accounts-officer-jobs-2026",
+      "title": "Gwadar Shipyard CFO & Accounts Officer Jobs 2026 – Apply Online",
+      "words": 326,
+      "cat": "government-jobs",
+      "lastDate": "2026-09-29",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 41,
+      "slug": "gwadar-shipyard-assistant-jobs-2026",
+      "title": "Gwadar Shipyard Assistant Jobs 2026: Balochistan Quota Recruitment Guide via NJP",
+      "words": 306,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-10",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 42,
+      "slug": "imarat-finance-intern-jobs-2026",
+      "title": "IMARAT Finance Intern Jobs 2026: Corporate Accounts & Real Estate Finance Guide",
+      "words": 306,
+      "cat": "internships",
+      "lastDate": "2026-09-30",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 43,
+      "slug": "karachi-shipyard-technical-assistant-jobs-2026",
+      "title": "Karachi Shipyard (KS&EW) Technical Assistant Jobs 2026: Career & Eligibility Guide",
+      "words": 326,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-10",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 44,
+      "slug": "bank-of-punjab-relationship-officer-transaction-banking-2026",
+      "title": "Bank of Punjab (BOP) Relationship Officer Jobs 2026: Transaction Banking Guide",
+      "words": 312,
+      "cat": "bank-jobs",
+      "lastDate": "2026-10-06",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 45,
+      "slug": "bank-of-punjab-relationship-manager-officer-cfc-jobs-2026",
+      "title": "Bank of Punjab Relationship Manager & Officer Jobs 2026: Corporate & Finance Centers",
+      "words": 314,
+      "cat": "bank-jobs",
+      "lastDate": "2026-10-08",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 46,
+      "slug": "askari-bank-sr-officer-artificial-intelligence-jobs-2026",
+      "title": "Askari Bank AI Jobs 2026: Senior Officer Artificial Intelligence Recruitment Guide",
+      "words": 358,
+      "cat": "bank-jobs",
+      "lastDate": "2026-10-10",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 47,
+      "slug": "navttc-assistant-private-secretary-jobs-2026",
+      "title": "NAVTTC Assistant Private Secretary (BPS-16) Jobs 2026: Complete NJP Guide",
+      "words": 314,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-10",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 48,
+      "slug": "navttc-assistant-bps15-jobs-2026",
+      "title": "NAVTTC Assistant (BPS-15) Jobs 2026: 15 Vacancies Recruitment Guide via NJP",
+      "words": 304,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-10",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 49,
+      "slug": "navttc-director-bps18-jobs-2026",
+      "title": "NAVTTC Director (BPS-18) Jobs 2026: 10 Management Vacancies Guide via NJP",
+      "words": 308,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-10",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 62,
+      "slug": "pidcl-site-engineer-jobs-2026",
+      "title": "PIDCL Government Jobs 2026 – 5 Site Engineer Civil Vacancies",
+      "words": 503,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-11",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 64,
+      "slug": "fuuast-examination-forms-2026",
+      "title": "FUUAST Examination Forms 2026 – Submit Before October 15",
+      "words": 551,
+      "cat": "results",
+      "lastDate": "2026-10-15",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 74,
+      "slug": "uoh-haripur-admissions-2026-deadline-today",
+      "title": "University of Haripur Admissions Fall 2026 – Apply Online Today Before September 29",
+      "words": 377,
+      "cat": "admissions",
+      "lastDate": "2026-09-29",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 75,
+      "slug": "hec-peridot-research-program-phase-13-2026",
+      "title": "HEC PERIDOT Research Program Phase XIII: Franco-Pakistani Grant Guide",
+      "words": 342,
+      "cat": "scholarships",
+      "lastDate": "2026-09-30",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 76,
+      "slug": "pec-graduate-engineer-training-get-program-2026",
+      "title": "PEC Graduate Engineer Training (GET) Program 2026: Official Status & Next Batch Guide",
+      "words": 459,
+      "cat": "internships",
+      "lastDate": "2026-03-25",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 77,
+      "slug": "petrol-price-reduced-pakistan-september-2026",
+      "title": "Petrol Price Reduced in Pakistan – New Petrol & Diesel Prices From September 29, 2026",
+      "words": 434,
+      "cat": "results",
+      "lastDate": "2026-09-29",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 78,
+      "slug": "uhs-mdcat-2026-result-recount-review-portal",
+      "title": "UHS MDCAT 2026 Result Recount & Review Portal Open – Apply Online Before September 30",
+      "words": 416,
+      "cat": "results",
+      "lastDate": "2026-09-30",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 79,
+      "slug": "hec-usat-hat-registration-2026-etc-hec",
+      "title": "HEC USAT & HAT Registration 2026 – Apply Online Before October 2",
+      "words": 356,
+      "cat": "admissions",
+      "lastDate": "2026-10-02",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 80,
+      "slug": "sbbu-admissions-2026-deadline-extended",
+      "title": "SBBU Admissions 2026: Extended Schedule, Programs & Entry Test Guide",
+      "words": 328,
+      "cat": "admissions",
+      "lastDate": "2026-09-29",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 81,
+      "slug": "sbbu-fully-funded-scholarship-2026",
+      "title": "SBBU Fully Funded Scholarship 2026: 100% Tuition Fee Waiver & Eligibility Guide",
+      "words": 317,
+      "cat": "scholarships",
+      "lastDate": "2026-09-29",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 82,
+      "slug": "uet-lahore-jobs-2026-faculty-research",
+      "title": "UET Lahore Jobs 2026 – Faculty, Teaching & Research Opportunities",
+      "words": 354,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-31",
+      "isExpired": false,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 329,
+      "slug": "sbbu-naushahro-feroze-entry-test-2027",
+      "title": "SBBU Naushahro Feroze Entry Test 2027 – October 17–18 Schedule Announced",
+      "words": 518,
+      "cat": "admissions",
+      "lastDate": "2026-10-18",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 334,
+      "slug": "spsc-departmental-exam-slips-2026",
+      "title": "SPSC Departmental Exam Slips 2026 Available – Examinations Start 12 October",
+      "words": 565,
+      "cat": "results",
+      "lastDate": "2026-10-12",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 336,
+      "slug": "lums-electronic-technician-jobs-2026",
+      "title": "LUMS Laboratory for Nanophysics (NPL) Jobs 2026 — Electronic Technician (PPS-6) & Research Associate (PPS-7)",
+      "words": 546,
+      "cat": "private-jobs",
+      "lastDate": "2026-10-19",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 338,
+      "slug": "isra-university-ms-mphil-phd-spring-2027",
+      "title": "Isra University MS, MPhil & PhD Admissions Spring 2027",
+      "words": 356,
+      "cat": "admissions",
+      "lastDate": "2026-11-17",
+      "isExpired": false,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 339,
+      "slug": "isra-university-spring-2027-undergraduate-admissions",
+      "title": "Isra University Spring 2027 Admissions: Multi-Round Schedule & Programs Guide",
+      "words": 411,
+      "cat": "admissions",
+      "lastDate": "2026-11-17",
+      "isExpired": false,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 340,
+      "slug": "isra-university-mbbs-bds-scholarship-registration-2026",
+      "title": "Isra University MBBS & BDS Scholarship Registration 2026–27",
+      "words": 399,
+      "cat": "scholarships",
+      "lastDate": "",
+      "isExpired": false,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 341,
+      "slug": "fjwu-paid-lab-engineer-internship-2026",
+      "title": "FJWU Paid Internship 2026 – Apply Before 14 October",
+      "words": 385,
+      "cat": "internships",
+      "lastDate": "2026-10-14",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 342,
+      "slug": "gimhs-hyderabad-bsn-dpt-admissions-2026-phase-2",
+      "title": "GIMHS Hyderabad BS Nursing & DPT Admissions 2026 Phase-II",
+      "words": 397,
+      "cat": "admissions",
+      "lastDate": "2026-10-30",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 343,
+      "slug": "shaikh-ayaz-university-admissions-2027",
+      "title": "Shaikh Ayaz University Admissions 2027 Deadline Extended to 17 October",
+      "words": 575,
+      "cat": "admissions",
+      "lastDate": "2026-10-10",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 354,
+      "slug": "sindh-kisan-subsidy-2026-eligibility-payments",
+      "title": "Sindh Kisan Subsidy 2026: 25 Acre Tak Farmers Ke Liye Registration Aur Payment Rules",
+      "words": 450,
+      "cat": "government-schemes",
+      "lastDate": "Cabinet Policy Implementation Cycle",
+      "isExpired": false,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 507,
+      "slug": "niahs-hyderabad-bsn-nursing-admissions-2026-27",
+      "title": "National Institute of Allied Health Sciences (NIAHS) Hyderabad: BS Nursing Admissions 2026–27 via NTS",
+      "words": 484,
+      "cat": "admissions",
+      "lastDate": "2026-10-30",
+      "isExpired": true,
+      "hasClosedInBody": false
+    },
+    {
+      "id": 519,
+      "slug": "pseb-government-it-jobs-october-2026",
+      "title": "PSEB Jobs 2026 — Pakistan Software Export Board Government IT Vacancies",
+      "words": 579,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-25",
+      "isExpired": true,
+      "hasClosedInBody": false
+    }
+  ],
+  "needsClosedNotice": [
+    {
+      "id": 5,
+      "slug": "devsinc-remote-qa-engineer",
+      "title": "Devsinc Careers Pakistan 2026: QA Automation & Software Engineering Hiring Guide",
+      "words": 581,
+      "cat": "it-jobs",
+      "lastDate": "2026-10-15"
+    },
+    {
+      "id": 24,
+      "slug": "hec-uk-commonwealth-scholarships-2027-28",
+      "title": "HEC UK Commonwealth Scholarship 2027–28: Master’s & PhD Application Guide (Closing Today 20 October 2026)",
+      "words": 785,
+      "cat": "scholarships",
+      "lastDate": "2026-10-20"
+    },
+    {
+      "id": 25,
+      "slug": "punjab-university-phase2-admissions-2026-27",
+      "title": "Punjab University Phase 2 Admissions 2026-27 — Apply Online for Vacant Undergraduate Seats",
+      "words": 709,
+      "cat": "admissions",
+      "lastDate": "2026-09-28"
+    },
+    {
+      "id": 27,
+      "slug": "fpsc-latest-updates-adv3-2026-schedule",
+      "title": "FPSC Latest Updates 2026 — Consolidated Adv 3/2026 Exam Schedule & Roll No Slips",
+      "words": 585,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-10"
+    },
+    {
+      "id": 33,
+      "slug": "bahria-university-jobs-2026",
+      "title": "Bahria University Jobs 2026 — Faculty & Management Career Guide (Closed Oct 12)",
+      "words": 697,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-12"
+    },
+    {
+      "id": 37,
+      "slug": "maju-karachi-jobs-faculty-staff-2026",
+      "title": "Mohammad Ali Jinnah University (MAJU) Karachi Jobs 2026 — Faculty & Staff Career Guide (Closed Oct 15)",
+      "words": 756,
+      "cat": "private-jobs",
+      "lastDate": "2026-10-15"
+    },
+    {
+      "id": 51,
+      "slug": "uet-reciprocal-admissions-2026",
+      "title": "UET Reciprocal Admissions 2026 – 40 Engineering Seats Available",
+      "words": 876,
+      "cat": "admissions",
+      "lastDate": "2026-10-09"
+    },
+    {
+      "id": 52,
+      "slug": "virtual-university-fall-2026-admissions",
+      "title": "Virtual University Fall 2026 Admissions – Apply Before 10 October",
+      "words": 773,
+      "cat": "admissions",
+      "lastDate": "2026-10-10"
+    },
+    {
+      "id": 53,
+      "slug": "punjab-cbd-youth-career-program-2026-internship",
+      "title": "CBD Punjab Youth Career Program 2026 – Paid Internship for Fresh Graduates",
+      "words": 784,
+      "cat": "internships",
+      "lastDate": "2026-10-12"
+    },
+    {
+      "id": 56,
+      "slug": "uajk-admissions-2026-deadline-extended",
+      "title": "UAJK Admissions 2026 Deadline Extended – Last Date October 5",
+      "words": 767,
+      "cat": "admissions",
+      "lastDate": "2026-10-05"
+    },
+    {
+      "id": 57,
+      "slug": "punjab-auqaf-department-jobs-2026",
+      "title": "Punjab Auqaf Department Jobs 2026 – New Contract Vacancies",
+      "words": 702,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-15"
+    },
+    {
+      "id": 58,
+      "slug": "sbbu-affiliated-colleges-admissions-2026",
+      "title": "SBBU Affiliated Colleges Admissions 2026 – Apply Before October 28",
+      "words": 609,
+      "cat": "admissions",
+      "lastDate": "2026-10-28"
+    },
+    {
+      "id": 59,
+      "slug": "cadet-college-kohat-admissions-2026-63rd-entry",
+      "title": "Cadet College Kohat Admissions 2026 – 63rd Entry Registration & Test Date",
+      "words": 748,
+      "cat": "admissions",
+      "lastDate": "2026-10-15"
+    },
+    {
+      "id": 60,
+      "slug": "sessi-internship-programme-2026",
+      "title": "SESSI Internship Programme 2026 – 30 Internship Positions in Karachi",
+      "words": 898,
+      "cat": "internships",
+      "lastDate": "2026-10-10"
+    },
+    {
+      "id": 66,
+      "slug": "phsa-kp-bs-nursing-admissions-2026",
+      "title": "KP Government BS Nursing Admissions 2026–2030 – Apply Online",
+      "words": 765,
+      "cat": "admissions",
+      "lastDate": "2026-10-16"
+    },
+    {
+      "id": 69,
+      "slug": "ntisb-cyber-security-jobs-2026-national-job-portal",
+      "title": "Federal Government Cyber Security Jobs 2026 – NTISB Latest Vacancies",
+      "words": 851,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-12"
+    },
+    {
+      "id": 71,
+      "slug": "alkhidmat-foundation-jobs-2026-latest-vacancies-apply-online",
+      "title": "Alkhidmat Foundation Jobs 2026 – Latest Vacancies & How to Apply",
+      "words": 945,
+      "cat": "private-jobs",
+      "lastDate": "2026-10-08"
+    },
+    {
+      "id": 303,
+      "slug": "habib-university-admissions-2027",
+      "title": "Habib University Admissions 2027 Open – Scholarship, Entry Test & Apply Online",
+      "words": 1018,
+      "cat": "admissions",
+      "lastDate": "2026-10-21"
+    },
+    {
+      "id": 304,
+      "slug": "hec-jobs-2026",
+      "title": "HEC Jobs 2026 – 9 Government Vacancies, Apply Before October 14",
+      "words": 1278,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-14"
+    },
+    {
+      "id": 305,
+      "slug": "chevening-scholarship-2027-28-pakistan",
+      "title": "Chevening Scholarship 2027–28 Pakistan — Eligibility, Stipend & Application Guide (Closed Oct 6, 2026)",
+      "words": 1310,
+      "cat": "scholarships",
+      "lastDate": "2026-10-06"
+    },
+    {
+      "id": 306,
+      "slug": "sindh-agriculture-university-admissions-2027",
+      "title": "Sindh Agriculture University Admissions 2027 – Apply Online",
+      "words": 707,
+      "cat": "admissions",
+      "lastDate": "2026-10-30"
+    },
+    {
+      "id": 309,
+      "slug": "nums-spring-2027-admissions",
+      "title": "NUMS Spring 2027 Admissions Open – PhD, MPhil, MS, MSN & More",
+      "words": 1056,
+      "cat": "admissions",
+      "lastDate": "2026-10-30"
+    },
+    {
+      "id": 310,
+      "slug": "punjab-sti-jobs-2026-27",
+      "title": "Punjab STI Jobs 2026–27 – School Teacher Interns Apply Online",
+      "words": 1176,
+      "cat": "internships",
+      "lastDate": "2026-10-18"
+    },
+    {
+      "id": 311,
+      "slug": "szabist-scholarship-2026-27",
+      "title": "SZABIST Need-Based Scholarship 2026–27 – Eligibility & How to Apply",
+      "words": 865,
+      "cat": "scholarships",
+      "lastDate": "2026-10-21"
+    },
+    {
+      "id": 312,
+      "slug": "sindh-bs-nursing-admissions-2026-27",
+      "title": "BS Nursing Admissions 2026–27 in Sindh – Apply Online Through NTS",
+      "words": 813,
+      "cat": "admissions",
+      "lastDate": "2026-10-30"
+    },
+    {
+      "id": 313,
+      "slug": "nicvd-jobs-2026",
+      "title": "NICVD Jobs 2026 – Latest Healthcare Vacancies, Apply Online",
+      "words": 1019,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-11"
+    },
+    {
+      "id": 314,
+      "slug": "ismo-jobs-2026",
+      "title": "ISMO Jobs 2026 Pakistan — NTS Application & Eligibility Guide (Closed Oct 8, 2026)",
+      "words": 846,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-08"
+    },
+    {
+      "id": 315,
+      "slug": "sbbu-merit-list-2027",
+      "title": "SBBU Merit List 2027 Announced – Check BS Admission Result Online",
+      "words": 865,
+      "cat": "results",
+      "lastDate": "2026-10-22"
+    },
+    {
+      "id": 316,
+      "slug": "university-of-malakand-admissions-2026",
+      "title": "University of Malakand MS MPhil PhD Admissions 2026 – Apply Through NTS",
+      "words": 711,
+      "cat": "admissions",
+      "lastDate": "2026-10-12"
+    },
+    {
+      "id": 317,
+      "slug": "engineering-development-board-jobs-2026",
+      "title": "Engineering Development Board Jobs 2026 – 19 Government Vacancies",
+      "words": 848,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-21"
+    },
+    {
+      "id": 318,
+      "slug": "gepco-jobs-2026",
+      "title": "GEPCO Jobs 2026: Assistant Manager Vacancies via NTS (3 Days Remaining — Apply by 23 Oct)",
+      "words": 595,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-23"
+    },
+    {
+      "id": 319,
+      "slug": "security-papers-jobs-2026",
+      "title": "Security Papers Limited Jobs 2026 Karachi – Salary Up to Rs75,000",
+      "words": 693,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-11"
+    },
+    {
+      "id": 320,
+      "slug": "women-university-ajk-admissions-2026",
+      "title": "Women University AJK Admissions Fall 2026 — Programs & Merit Schedule (Closed Oct 9, 2026)",
+      "words": 873,
+      "cat": "admissions",
+      "lastDate": "2026-10-09"
+    },
+    {
+      "id": 321,
+      "slug": "nts-gat-subject-2026-vi",
+      "title": "NTS GAT Subject 2026-VI — 15 November Test Date, Roll Number Slip & Paper Pattern",
+      "words": 953,
+      "cat": "admissions",
+      "lastDate": "2026-10-19"
+    },
+    {
+      "id": 322,
+      "slug": "shifa-university-pharmd-admissions-2026",
+      "title": "Shifa University PharmD Admissions 2026 – Apply Before October 15",
+      "words": 647,
+      "cat": "admissions",
+      "lastDate": "2026-10-15"
+    },
+    {
+      "id": 323,
+      "slug": "punjab-ophthalmology-college-jobs-2026",
+      "title": "Punjab Ophthalmology College Jobs 2026 – Apply Online Through NTS",
+      "words": 658,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-20"
+    },
+    {
+      "id": 324,
+      "slug": "nts-nat-gat-roll-number-slip-2026",
+      "title": "NTS NAT & GAT Roll Number Slip 2026 – October 11 Test Details",
+      "words": 665,
+      "cat": "admissions",
+      "lastDate": "2026-10-11"
+    },
+    {
+      "id": 326,
+      "slug": "ministry-climate-change-jobs-2026",
+      "title": "Ministry of Climate Change Jobs 2026 – IT Specialist & Animator Vacancies on NJP",
+      "words": 652,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-19"
+    },
+    {
+      "id": 327,
+      "slug": "hec-irsip-batch-60-scholarship-2026",
+      "title": "HEC IRSIP Batch 60 Scholarship 2026 – Research Fellowship Applications Open",
+      "words": 628,
+      "cat": "scholarships",
+      "lastDate": "2026-10-30"
+    },
+    {
+      "id": 328,
+      "slug": "pnsc-jobs-2026-karachi-shipping",
+      "title": "PNSC Jobs 2026 Karachi – Latest Government Shipping Vacancies on NJP",
+      "words": 620,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-25"
+    },
+    {
+      "id": 331,
+      "slug": "quest-special-exams-timetable-2026",
+      "title": "QUEST Special Exams 2026 – Timetable and Exam Centres Announced",
+      "words": 613,
+      "cat": "results",
+      "lastDate": "2026-10-19"
+    },
+    {
+      "id": 332,
+      "slug": "quest-nawabshah-phd-me-ms-admissions-2026",
+      "title": "QUEST Nawabshah PhD, ME/MS Admissions 2026 – Apply Before 23 October",
+      "words": 611,
+      "cat": "admissions",
+      "lastDate": "2026-10-23"
+    },
+    {
+      "id": 335,
+      "slug": "spsc-jobs-2026-54-vacancies",
+      "title": "SPSC Jobs 2026 – 54 Government Vacancies, Apply Before 23 October",
+      "words": 1115,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-23"
+    },
+    {
+      "id": 345,
+      "slug": "sindh-hec-research-support-programme-2026-27",
+      "title": "Sindh HEC Research Grants 2026–27 Open – Up to Rs5 Million",
+      "words": 672,
+      "cat": "scholarships",
+      "lastDate": "2026-10-23"
+    },
+    {
+      "id": 454,
+      "slug": "10pearls-shine-virtual-internship-2026",
+      "title": "10Pearls Internship 2026: Free Online Internship for CS Students – Apply by 19 October",
+      "words": 1012,
+      "cat": "internships",
+      "lastDate": "19 October 2026"
+    },
+    {
+      "id": 466,
+      "slug": "kp-government-project-associate-internship-2026",
+      "title": "KP Government Project Associate Internship 2026: 5 Vacancies, Rs 25,000 Stipend & Portal Guide",
+      "words": 1151,
+      "cat": "internships",
+      "lastDate": "2026-10-28"
+    },
+    {
+      "id": 487,
+      "slug": "unilever-pakistan-jobs-october-2026",
+      "title": "Unilever Pakistan Jobs October 2026: Karachi & Lahore Batch Status (Closed 23–24 Oct) & Live Portal Guide",
+      "words": 987,
+      "cat": "private-jobs",
+      "lastDate": "2026-10-24"
+    },
+    {
+      "id": 498,
+      "slug": "phsa-paramedic-general-list-2026",
+      "title": "PHSA Paramedic Diploma General Lists 2026 Released – Check Your Name",
+      "words": 942,
+      "cat": "results",
+      "lastDate": "2026-10-15"
+    },
+    {
+      "id": 499,
+      "slug": "state-bank-officer-training-scheme-sbots-batch-27",
+      "title": "State Bank Officer Training Scheme (SBOTS) OG-2 Guide — Verified Batch Status, Eligibility & NIBAF Training",
+      "words": 899,
+      "cat": "bank-jobs",
+      "lastDate": "2026-09-14"
+    },
+    {
+      "id": 500,
+      "slug": "sindh-education-rsu-consultant-jobs-2026",
+      "title": "Sindh Education RSU Consultant Jobs 2026: Social Safeguard & Foundational Learning Specialists (PPS-8/9)",
+      "words": 978,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-25"
+    },
+    {
+      "id": 501,
+      "slug": "nbp-karachi-jobs-october-2026",
+      "title": "National Bank of Pakistan (NBP) Jobs October 2026: Executive & Unit Head Vacancies in Karachi (AVP to EVP)",
+      "words": 1054,
+      "cat": "bank-jobs",
+      "lastDate": "2026-10-30"
+    },
+    {
+      "id": 502,
+      "slug": "bank-of-punjab-karachi-manager-jobs-2026",
+      "title": "Bank of Punjab (BOP) Karachi Jobs 2026: Regional Manager Alliances & Projects Governance (Band-9)",
+      "words": 733,
+      "cat": "bank-jobs",
+      "lastDate": "Closing today — 29 October 2026"
+    },
+    {
+      "id": 503,
+      "slug": "karachi-metropolitan-university-vice-chancellor-jobs-2026",
+      "title": "Karachi Metropolitan University (KMU) Vice Chancellor Recruitment 2026: Sindh Universities & Boards Notice",
+      "words": 760,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-29"
+    },
+    {
+      "id": 505,
+      "slug": "nts-nat-xi-2026-november-registration-guide",
+      "title": "NTS NAT 11 (NAT-XI) November 2026: Test Date (15 Nov), Schedule & Roll Number Slip Guide",
+      "words": 691,
+      "cat": "admissions",
+      "lastDate": "2026-10-26 (Registration Closed)"
+    },
+    {
+      "id": 506,
+      "slug": "memon-college-of-nursing-karachi-bsn-admissions-2026-27",
+      "title": "Memon College of Nursing Karachi: BS Nursing Admissions 2026–27 via NTS (Batch-X)",
+      "words": 602,
+      "cat": "admissions",
+      "lastDate": "2026-10-30"
+    },
+    {
+      "id": 518,
+      "slug": "engineering-development-board-jobs-october-2026",
+      "title": "Engineering Development Board Jobs 2026 — Apply Online for IT, Accounts & Other Government Vacancies",
+      "words": 614,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-26"
+    },
+    {
+      "id": 525,
+      "slug": "irsa-jobs-2026-nts-telemetry-engineers-supervisors",
+      "title": "IRSA Jobs 2026 — 23 Vacancies for Engineers, Supervisors, GIS Analyst & Auditor | Apply via NTS",
+      "words": 1043,
+      "cat": "government-jobs",
+      "lastDate": "2026-10-26"
+    }
+  ],
+  "alreadyGood": [
+    {
+      "id": 26,
+      "slug": "nts-latest-results-answer-keys-2026",
+      "words": 596,
+      "cat": "results"
+    },
+    {
+      "id": 28,
+      "slug": "comsats-active-scholarships-international-opportunities-2026",
+      "words": 643,
+      "cat": "scholarships"
+    },
+    {
+      "id": 39,
+      "slug": "sindh-govt-electric-scooty-scheme-2026-women",
+      "words": 866,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 55,
+      "slug": "nust-net-2027-registration-series-1",
+      "words": 942,
+      "cat": "admissions"
+    },
+    {
+      "id": 70,
+      "slug": "pm-fuel-relief-scheme-2026-registration-eligibility",
+      "words": 600,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 72,
+      "slug": "teach-in-usa-bridgeusa-j1-teacher-program-eligibility-guide",
+      "words": 984,
+      "cat": "scholarships"
+    },
+    {
+      "id": 301,
+      "slug": "hec-outstanding-research-awards-2026-27",
+      "words": 788,
+      "cat": "scholarships"
+    },
+    {
+      "id": 302,
+      "slug": "swiss-government-excellence-scholarships-2027-pakistan",
+      "words": 979,
+      "cat": "scholarships"
+    },
+    {
+      "id": 308,
+      "slug": "nums-mdcat-result-2026",
+      "words": 731,
+      "cat": "results"
+    },
+    {
+      "id": 325,
+      "slug": "sbbu-ms-mphil-mba-merit-list-2027",
+      "words": 731,
+      "cat": "results"
+    },
+    {
+      "id": 330,
+      "slug": "spsc-cce-2026-screening-test-date",
+      "words": 888,
+      "cat": "results"
+    },
+    {
+      "id": 333,
+      "slug": "sindh-courts-bps-1-4-jobs-2026",
+      "words": 700,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 344,
+      "slug": "szabist-hyderabad-spring-2027-admissions",
+      "words": 621,
+      "cat": "admissions"
+    },
+    {
+      "id": 351,
+      "slug": "sindh-job-portal-2026-junior-clerk-jobs",
+      "words": 678,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 352,
+      "slug": "bisp-8171-payment-check-2026-official-guide",
+      "words": 840,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 353,
+      "slug": "sindh-minimum-wage-2026-workers-salary",
+      "words": 723,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 355,
+      "slug": "sindh-wheat-subsidy-benazir-hari-card-2026",
+      "words": 712,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 428,
+      "slug": "drap-medicine-barcode-requirements-2026",
+      "words": 721,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 439,
+      "slug": "sindh-mamta-programme-2026-october-dashboard",
+      "words": 895,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 440,
+      "slug": "benazir-hunarmand-programme-2026-karachi-guide",
+      "words": 774,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 441,
+      "slug": "pakistan-wheat-support-price-2026-27",
+      "words": 736,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 442,
+      "slug": "wheat-imports-karachi-october-2026",
+      "words": 708,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 444,
+      "slug": "nadra-digital-payments-2026",
+      "words": 815,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 445,
+      "slug": "zarkhez-e-asaan-digital-zarai-qarza-guide-2026",
+      "words": 1335,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 446,
+      "slug": "benazir-women-agricultural-worker-card-sindh-guide-2026",
+      "words": 1134,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 447,
+      "slug": "sindh-peoples-housing-flood-affectees-sphf-subsidy-guide-2026",
+      "words": 1143,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 448,
+      "slug": "sindh-solar-energy-project-ssep-home-solar-systems-subsidy-2026",
+      "words": 1266,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 449,
+      "slug": "sbp-housing-solar-financing-rules-circular-06-2026",
+      "words": 1367,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 450,
+      "slug": "wheat-seed-prices-2026-pakistan-nsdra-directives",
+      "words": 1255,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 451,
+      "slug": "fbr-tax-return-deadline-2026-extension-status-iris-filing-guide",
+      "words": 1237,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 455,
+      "slug": "mcb-bank-infosec-trainee-jobs-2026",
+      "words": 916,
+      "cat": "bank-jobs"
+    },
+    {
+      "id": 457,
+      "slug": "japan-jds-scholarship-2026-pakistan",
+      "words": 1041,
+      "cat": "scholarships"
+    },
+    {
+      "id": 458,
+      "slug": "bank-alfalah-jobs-internships-2026",
+      "words": 816,
+      "cat": "bank-jobs"
+    },
+    {
+      "id": 464,
+      "slug": "electricity-bills-november-2026-rs256-fuel-adjustment-explained",
+      "words": 2142,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 467,
+      "slug": "aku-karachi-jobs-traineeships-2026",
+      "words": 1048,
+      "cat": "private-jobs"
+    },
+    {
+      "id": 468,
+      "slug": "systems-limited-associate-software-engineer-jobs-2026",
+      "words": 925,
+      "cat": "it-jobs"
+    },
+    {
+      "id": 469,
+      "slug": "hbl-jobs-internships-the-league-2026",
+      "words": 939,
+      "cat": "bank-jobs"
+    },
+    {
+      "id": 470,
+      "slug": "jazz-careers-ai-associate-programme-2026",
+      "words": 891,
+      "cat": "it-jobs"
+    },
+    {
+      "id": 481,
+      "slug": "pakistan-plans-new-support-poor-flood-affected-families-what-is-confirmed",
+      "words": 2336,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 483,
+      "slug": "samba-bank-relationship-associate-jobs-2026",
+      "words": 901,
+      "cat": "bank-jobs"
+    },
+    {
+      "id": 486,
+      "slug": "ezy-business-applications-paid-internship-karachi-2026",
+      "words": 665,
+      "cat": "internships"
+    },
+    {
+      "id": 504,
+      "slug": "szabist-ihsan-trust-interest-free-loan-2026-27",
+      "words": 793,
+      "cat": "scholarships"
+    },
+    {
+      "id": 512,
+      "slug": "askari-bank-jobs-october-2026-karachi",
+      "words": 714,
+      "cat": "bank-jobs"
+    },
+    {
+      "id": 516,
+      "slug": "sindh-flood-housing-phase-3-financing-update-eib-sphf",
+      "words": 1121,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 517,
+      "slug": "ssgc-gasification-plan-46-sindh-villages-sanghar-shikarpur",
+      "words": 1074,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 524,
+      "slug": "pakistan-wheat-indicative-price-4500-2027",
+      "words": 1137,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 526,
+      "slug": "punjab-child-protection-welfare-bureau-cpwb-jobs-2026",
+      "words": 1011,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 527,
+      "slug": "nts-gat-general-viii-2026-registration-schedule-eligibility",
+      "words": 1040,
+      "cat": "admissions"
+    },
+    {
+      "id": 528,
+      "slug": "bank-al-habib-jobs-2026-karachi-fresh-graduates-apply-online",
+      "words": 1245,
+      "cat": "bank-jobs"
+    },
+    {
+      "id": 529,
+      "slug": "bank-of-punjab-jobs-2026-sukkur-relationship-manager-agri",
+      "words": 977,
+      "cat": "bank-jobs"
+    },
+    {
+      "id": 530,
+      "slug": "phsa-lhv-first-merit-list-2026-pdf-download-quotas",
+      "words": 1049,
+      "cat": "admissions"
+    },
+    {
+      "id": 531,
+      "slug": "sindh-government-jobs-2026-spsc-sts-vacancies-apply-online",
+      "words": 1136,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 532,
+      "slug": "samba-bank-universal-teller-jobs-2026-apply-online",
+      "words": 969,
+      "cat": "bank-jobs"
+    },
+    {
+      "id": 533,
+      "slug": "bank-al-habib-relationship-manager-jobs-2026-apply-online",
+      "words": 999,
+      "cat": "bank-jobs"
+    },
+    {
+      "id": 534,
+      "slug": "pm-youth-chromebooks-scheme-2026-eligibility-registration",
+      "words": 1084,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 535,
+      "slug": "punjab-last-mile-water-supply-project-2026",
+      "words": 1107,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 536,
+      "slug": "cga-junior-auditor-jobs-2026-njp-9862",
+      "words": 856,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 537,
+      "slug": "agp-junior-auditor-jobs-2026-njp-9878",
+      "words": 632,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 538,
+      "slug": "nbp-jobs-october-2026-karachi-hyderabad-rozeegpt",
+      "words": 720,
+      "cat": "bank-jobs"
+    },
+    {
+      "id": 539,
+      "slug": "danish-schools-expansion-sindh-2026",
+      "words": 1032,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 540,
+      "slug": "jhimpir-grid-battery-energy-storage-project-2026",
+      "words": 950,
+      "cat": "government-schemes"
+    },
+    {
+      "id": 541,
+      "slug": "cabinet-division-stenotypist-jobs-bps-14-2026",
+      "words": 929,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 543,
+      "slug": "ogra-balochistan-jobs-2026-apply-online-njp",
+      "words": 887,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 544,
+      "slug": "pakistan-railways-balochistan-quota-jobs-2026-njp",
+      "words": 875,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 545,
+      "slug": "cabinet-division-staff-car-driver-jobs-bps-04-2026",
+      "words": 786,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 546,
+      "slug": "hec-balochistan-jobs-2026-accountant-ldc-njp",
+      "words": 867,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 547,
+      "slug": "ministry-of-planning-jobs-2026-accountant-aps-pps-6",
+      "words": 824,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 548,
+      "slug": "ntc-jobs-2026-balochistan-assistant-divisional-engineer-aps",
+      "words": 1205,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 549,
+      "slug": "nepra-jobs-2026-balochistan-driver-security-guard-dispatch-rider",
+      "words": 1164,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 550,
+      "slug": "ministry-of-planning-jobs-october-2026",
+      "words": 917,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 551,
+      "slug": "pseb-creative-lead-jobs-2026",
+      "words": 914,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 552,
+      "slug": "meezan-bank-transaction-associates-batch-01-jobs-2026",
+      "words": 792,
+      "cat": "bank-jobs"
+    },
+    {
+      "id": 553,
+      "slug": "punjab-police-jobs-2026-rajanpur-rahim-yar-khan-constables",
+      "words": 980,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 554,
+      "slug": "ministry-of-foreign-affairs-jobs-2026-vacancies-apply-online",
+      "words": 1219,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 555,
+      "slug": "nhmp-jobs-2026-80-junior-patrol-officer-balochistan-apply-online",
+      "words": 1079,
+      "cat": "government-jobs"
+    },
+    {
+      "id": 556,
+      "slug": "spsc-exam-preparation-screening-challan-guide",
+      "words": 733,
+      "cat": "career-guides"
+    },
+    {
+      "id": 557,
+      "slug": "fpsc-online-application-challan-form-32a-guide",
+      "words": 801,
+      "cat": "career-guides"
+    },
+    {
+      "id": 558,
+      "slug": "national-job-portal-njp-pakistan-application-guide",
+      "words": 649,
+      "cat": "career-guides"
+    }
+  ]
+}

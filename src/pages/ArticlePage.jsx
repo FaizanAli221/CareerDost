@@ -185,11 +185,19 @@ export default function ArticlePage() {
           '@type': 'WebPage',
           '@id': getAbsoluteUrl(`/jobs/${slug}`),
         },
-        author: {
-          '@type': 'Organization',
-          name: 'CareerDost',
-          url: getAbsoluteUrl('/'),
-        },
+        author: [
+          {
+            '@type': 'Person',
+            name: 'Faizan Ali',
+            jobTitle: 'Founder & Lead Editor',
+            url: getAbsoluteUrl('/about#editorial-team'),
+          },
+          {
+            '@type': 'Organization',
+            name: 'CareerDost Editorial Desk',
+            url: getAbsoluteUrl('/about#editorial-policy'),
+          },
+        ],
         publisher: {
           '@type': 'Organization',
           name: 'CareerDost',
@@ -291,7 +299,7 @@ export default function ArticlePage() {
 
           {/* Top Meta Line */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-inksoft mb-4 pb-4 border-b border-line">
-            <span>By <Link to="/about#editorial-policy" className="font-semibold text-ink hover:text-green underline">CareerDost Editorial Desk</Link></span>
+            <span>By <Link to="/about#editorial-team" className="font-semibold text-ink hover:text-green underline">Faizan Ali &amp; CareerDost Editorial Desk</Link></span>
             <span>•</span>
             <span>Published: <strong className="text-ink">{formatDate(listing.publishDate)}</strong></span>
             {verifiedDateRaw && verifiedDateRaw !== listing.publishDate && (

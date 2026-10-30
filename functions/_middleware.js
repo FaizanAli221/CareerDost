@@ -43,9 +43,11 @@ const STATIC_ROUTE_REDIRECTS = new Map([
   ['/terms', '/terms-and-conditions'],
   ['/editorial-policy', '/about#editorial-policy'],
   ['/jobs', '/'],
+  ['/category/closing-soon', '/daily-updates'],
 ])
 
 const CONSOLIDATED_SLUG_REDIRECTS = new Map([
+  ['bank-alfalah-cso-jobs-2026', '/jobs/bank-alfalah-jobs-internships-2026'],
   ['systems-limited-hiring-software-engineers', '/jobs/systems-limited-associate-software-engineer-jobs-2026'],
   ['hbl-management-trainee-officer-2026', '/jobs/hbl-jobs-internships-the-league-2026'],
   ['benazir-income-support-programme-2026', '/jobs/bisp-8171-payment-check-2026-official-guide'],
@@ -316,7 +318,7 @@ function generate404Html(title, message) {
 </html>`
 }
 
-function generateDailyUpdateHtml(update, canonical) {
+function generateDailyUpdateHtml(update, canonical, hasArticle = false) {
   const title = escapeHtml(update.title || '')
   const rawCat = update.category || 'Daily Update'
   const cType = getContentType(update)
@@ -374,6 +376,15 @@ function generateDailyUpdateHtml(update, canonical) {
       ${primaryCtaHref ? `<a href="${primaryCtaHref}" target="_blank" rel="noopener noreferrer" style="background:${bannerBtnBg};color:#ffffff;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;border-radius:4px;">${primaryCtaLabel}</a>` : ''}
     </div>`
 
+  const guideBanner = hasArticle ? `
+    <div style="background:#ecfdf5;border:1px solid #a7f3d0;padding:16px;margin-bottom:24px;border-radius:2px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div>
+        <strong style="color:#065f46;display:block;font-size:14px;">Comprehensive Editorial Guide &amp; Details Available</strong>
+        <span style="color:#047857;font-size:12px;">CareerDost has published an in-depth editorial guide for this opportunity featuring full eligibility matrices, required documents checklist, syllabus breakdown, and step-by-step application procedures.</span>
+      </div>
+      <a href="/jobs/${escapeHtml(update.slug)}" style="background:#059669;color:#ffffff;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;border-radius:2px;">Read Full Guide →</a>
+    </div>` : ''
+
   const transparencyNote = `
     <div style="background:#faf9f6;border-left:4px solid #059669;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#44403c;">
       <strong>Official Source &amp; Editorial Transparency:</strong> Official facts, dates, and requirements are derived directly from public gazettes and government portals. CareerDost provides editorial analysis and practical guidance to assist citizens.
@@ -423,7 +434,7 @@ function generateDailyUpdateHtml(update, canonical) {
                 Published: ${pubDate}
               </span>
               ${updatedDate && updatedDate !== pubDate ? `<span class="text-xs font-sans text-inksoft">• Verified: ${updatedDate}</span>` : ''}
-              <span class="text-xs font-sans text-inksoft">• By CareerDost Editorial Desk</span>
+              <span class="text-xs font-sans text-inksoft">• By <a href="/about#editorial-team" style="color:#0f172a;font-weight:600;text-decoration:underline;">Faizan Ali &amp; CareerDost Editorial Desk</a></span>
             </div>
             <h1 class="font-serif text-2xl sm:text-4xl font-bold text-ink leading-tight mb-4">
               ${title}
@@ -435,6 +446,7 @@ function generateDailyUpdateHtml(update, canonical) {
             </div>` : ''}
             ${specsBox}
           </header>
+          ${guideBanner}
           ${statusBanner}
           ${transparencyNote}
           <div class="font-sans text-ink text-base leading-relaxed space-y-5 mb-10 border-b border-line pb-8">
@@ -565,7 +577,7 @@ function generateJobHtml(article, canonical) {
                 Published: ${pubDate}
               </span>
               ${updatedDate && updatedDate !== pubDate ? `<span class="text-xs font-sans text-inksoft">• Verified: ${updatedDate}</span>` : ''}
-              <span class="text-xs font-sans text-inksoft">• By CareerDost Editorial Desk</span>
+              <span class="text-xs font-sans text-inksoft">• By <a href="/about#editorial-team" style="color:#0f172a;font-weight:600;text-decoration:underline;">Faizan Ali &amp; CareerDost Editorial Desk</a></span>
             </div>
             <h1 class="font-serif text-2xl sm:text-4xl font-bold text-ink leading-tight mb-4">
               ${title}
@@ -577,6 +589,7 @@ function generateJobHtml(article, canonical) {
             </div>` : ''}
             ${specsBox}
           </header>
+          ${guideBanner}
           ${statusBanner}
           ${transparencyNote}
           <div class="font-sans text-ink text-base leading-relaxed space-y-5 mb-10 border-b border-line pb-8">
@@ -764,7 +777,7 @@ function generateCategoryHtml(slug, catMeta, articles, canonical) {
   `
 }
 
-function generateDailyUpdatesIndexHtml(updates, canonical) {
+function generateDailyUpdatesIndexHtml(updates, canonical, publishedArticleSlugs = new Set()) {
   const updatePills = [
     'All Updates',
     'Latest Jobs',
@@ -795,7 +808,8 @@ function generateDailyUpdatesIndexHtml(updates, canonical) {
     const upDesc = escapeHtml(up.short_description || up.meta_description || '')
     const upImg = up.featured_image ? getAbsoluteUrl(up.featured_image) : ''
     const upAlt = escapeHtml(up.image_alt || up.title || '')
-    const upUrl = `/daily-updates/${up.slug}`
+    const hasArticle = publishedArticleSlugs && publishedArticleSlugs.has(up.slug)
+    const upUrl = hasArticle ? `/jobs/${up.slug}` : `/daily-updates/${up.slug}`
 
     return `
       <article class="bg-white border border-line rounded-xs overflow-hidden shadow-xs hover:border-green transition-all flex flex-col justify-between" style="background:#ffffff;border:1px solid #e7e5e4;border-radius:2px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 1px 2px rgba(0,0,0,0.05);">
@@ -949,6 +963,96 @@ export async function onRequest(context) {
         'Cache-Control': 'public, max-age=86400',
       },
     })
+  }
+
+  // 0a. Dynamic D1-backed XML Sitemap handler (prevents serving stale build-time static public/sitemap.xml)
+  if (lowerPath === '/sitemap.xml' && context.env?.DB) {
+    try {
+      const todayStr = new Date().toISOString().split('T')[0]
+      const { results: allArticleRows } = await context.env.DB
+        .prepare(`SELECT slug, status, publish_date, updated_at FROM articles ORDER BY publish_date DESC, id DESC`)
+        .all()
+      const { results: publishedUpdateRows } = await context.env.DB
+        .prepare(`SELECT slug, publish_date, updated_at FROM daily_updates WHERE status = 'published' ORDER BY publish_date DESC, id DESC`)
+        .all()
+      const { results: categoryRows } = await context.env.DB
+        .prepare(`SELECT slug FROM categories ORDER BY id ASC`)
+        .all()
+
+      const allArticleSlugs = new Set((allArticleRows || []).map((r) => r.slug))
+      const staticPages = [
+        { loc: '/', priority: '1.0', changefreq: 'daily', lastmod: todayStr },
+        { loc: '/daily-updates', priority: '0.9', changefreq: 'daily', lastmod: todayStr },
+        { loc: '/about', priority: '0.5', changefreq: 'monthly', lastmod: todayStr },
+        { loc: '/contact', priority: '0.5', changefreq: 'monthly', lastmod: todayStr },
+        { loc: '/privacy-policy', priority: '0.3', changefreq: 'yearly', lastmod: todayStr },
+        { loc: '/disclaimer', priority: '0.3', changefreq: 'yearly', lastmod: todayStr },
+        { loc: '/terms-and-conditions', priority: '0.3', changefreq: 'yearly', lastmod: todayStr },
+      ]
+
+      const categoryList =
+        categoryRows && categoryRows.length > 0
+          ? categoryRows.map((c) => c.slug)
+          : Array.from(VALID_CATEGORIES)
+      const categoryUrls = categoryList.map((slug) => ({
+        loc: `/category/${slug}`,
+        priority: '0.8',
+        changefreq: 'daily',
+        lastmod: todayStr,
+      }))
+
+      const articleUrls = (allArticleRows || [])
+        .filter(
+          (r) =>
+            r.status === 'published' &&
+            r.slug !== 'httpswwwnjpgovpk' &&
+            !CONSOLIDATED_SLUG_REDIRECTS.has(r.slug)
+        )
+        .map((r) => ({
+          loc: `/jobs/${r.slug}`,
+          priority: '0.9',
+          changefreq: 'weekly',
+          lastmod: String(r.updated_at || r.publish_date || todayStr).split('T')[0].split(' ')[0],
+        }))
+
+      const updateUrls = (publishedUpdateRows || [])
+        .filter(
+          (u) =>
+            !allArticleSlugs.has(u.slug) &&
+            u.slug !== 'httpswwwnjpgovpk' &&
+            !CONSOLIDATED_SLUG_REDIRECTS.has(u.slug)
+        )
+        .map((u) => ({
+          loc: `/daily-updates/${u.slug}`,
+          priority: '0.8',
+          changefreq: 'daily',
+          lastmod: String(u.updated_at || u.publish_date || todayStr).split('T')[0].split(' ')[0],
+        }))
+
+      const seenLocs = new Set()
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`
+      for (const page of [...staticPages, ...categoryUrls, ...articleUrls, ...updateUrls]) {
+        if (seenLocs.has(page.loc)) continue
+        seenLocs.add(page.loc)
+        xml += `  <url>\n`
+        xml += `    <loc>${SITE_URL}${page.loc}</loc>\n`
+        if (page.lastmod) xml += `    <lastmod>${page.lastmod}</lastmod>\n`
+        if (page.changefreq) xml += `    <changefreq>${page.changefreq}</changefreq>\n`
+        xml += `    <priority>${page.priority}</priority>\n`
+        xml += `  </url>\n`
+      }
+      xml += `</urlset>`
+
+      return new Response(xml, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/xml; charset=utf-8',
+          'Cache-Control': 'public, max-age=300, s-maxage=300',
+        },
+      })
+    } catch {
+      // Fallback to static sitemap if D1 query fails
+    }
   }
 
   // 0b. Permanent 301 redirects for static route aliases (/privacy, /terms, /editorial-policy, /jobs)
@@ -1158,11 +1262,19 @@ export async function onRequest(context) {
                           '@type': 'WebPage',
                           '@id': canonical,
                         },
-                        author: {
-                          '@type': 'Organization',
-                          name: 'CareerDost',
-                          url: SITE_URL,
-                        },
+                        author: [
+                          {
+                            '@type': 'Person',
+                            name: 'Faizan Ali',
+                            jobTitle: 'Founder & Lead Editor',
+                            url: `${SITE_URL}/about#editorial-team`,
+                          },
+                          {
+                            '@type': 'Organization',
+                            name: 'CareerDost Editorial Desk',
+                            url: `${SITE_URL}/about#editorial-policy`,
+                          },
+                        ],
                         publisher: {
                           '@type': 'Organization',
                           name: 'CareerDost',
@@ -1311,11 +1423,19 @@ export async function onRequest(context) {
                     '@type': 'WebPage',
                     '@id': canonical,
                   },
-                  author: {
-                    '@type': 'Organization',
-                    name: 'CareerDost',
-                    url: SITE_URL,
-                  },
+                  author: [
+                    {
+                      '@type': 'Person',
+                      name: 'Faizan Ali',
+                      jobTitle: 'Founder & Lead Editor',
+                      url: `${SITE_URL}/about#editorial-team`,
+                    },
+                    {
+                      '@type': 'Organization',
+                      name: 'CareerDost Editorial Desk',
+                      url: `${SITE_URL}/about#editorial-policy`,
+                    },
+                  ],
                   publisher: {
                     '@type': 'Organization',
                     name: 'CareerDost',
@@ -1731,8 +1851,16 @@ export async function onRequest(context) {
     const canonical = `${SITE_URL}/daily-updates`
 
     let updates = []
+    let publishedArticleSlugs = new Set()
     if (context.env?.DB) {
       try {
+        const { results: artResults } = await context.env.DB
+          .prepare(`SELECT slug FROM articles WHERE status = 'published'`)
+          .all()
+        if (artResults && artResults.length > 0) {
+          publishedArticleSlugs = new Set(artResults.map((a) => a.slug))
+        }
+
         const { results } = await context.env.DB
           .prepare(
             `SELECT id, slug, title, category, short_description, featured_image, image_alt,
@@ -1749,12 +1877,13 @@ export async function onRequest(context) {
       }
     }
 
-    const updatesHtml = generateDailyUpdatesIndexHtml(updates, canonical)
+    const updatesHtml = generateDailyUpdatesIndexHtml(updates, canonical, publishedArticleSlugs)
 
     const clientUpdates = updates.map((u) => ({
       id: u.id,
       slug: u.slug,
       title: u.title,
+      hasArticle: publishedArticleSlugs.has(u.slug),
       category: u.category,
       shortDescription: u.short_description || '',
       featuredImage: u.featured_image || '',
