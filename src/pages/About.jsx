@@ -47,8 +47,8 @@ export default function About() {
       <ul>
         <li>
           <strong>Faizan Ali — Founder &amp; Lead Editor:</strong> Oversees editorial integrity, primary source cross-checking,
-          digital verification protocols, and technical architecture. Reachable directly for editorial inquiries at{' '}
-          <a href="mailto:editor@careerdost.blog" className="text-green underline font-medium">editor@careerdost.blog</a>.
+          digital verification protocols, and technical architecture. Reachable directly for editorial inquiries and corrections via our{' '}
+          <Link to="/contact" className="text-green underline font-medium">Editorial Contact &amp; Inquiry Tool</Link>.
         </li>
         <li>
           <strong>CareerDost Editorial Desk:</strong> A collaborative team of educational researchers and content editors
@@ -152,14 +152,11 @@ export default function About() {
       </p>
       <ul>
         <li>
-          <strong>Editorial Inquiries:</strong>{' '}
-          <a href="mailto:editor@careerdost.blog" className="text-green underline font-medium">
-            editor@careerdost.blog
-          </a>{' '}
-          or{' '}
-          <a href="mailto:contact@careerdost.blog" className="text-green underline font-medium">
-            contact@careerdost.blog
-          </a>
+          <strong>Editorial Inquiries &amp; Corrections:</strong> Submit direct correction requests, gazette updates, or questions through our on-page{' '}
+          <Link to="/contact" className="text-green underline font-medium">
+            Editorial Desk &amp; Correction Form
+          </Link>{' '}
+          (inbound domain email routing is currently undergoing DNS configuration).
         </li>
         <li>
           <strong>Editorial Helpdesk:</strong> Visit our{' '}

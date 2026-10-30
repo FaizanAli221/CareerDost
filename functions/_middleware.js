@@ -965,6 +965,17 @@ export async function onRequest(context) {
     })
   }
 
+  // 0-ads. Dedicated Ads.txt handler for Google AdSense compliance
+  if (lowerPath === '/ads.txt') {
+    return new Response('google.com, pub-3823137402984505, DIRECT, f08c47fec0942fa0\n', {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'public, max-age=86400',
+      },
+    })
+  }
+
   // 0a. Dynamic D1-backed XML Sitemap handler (prevents serving stale build-time static public/sitemap.xml)
   if (lowerPath === '/sitemap.xml' && context.env?.DB) {
     try {
@@ -1785,7 +1796,7 @@ export async function onRequest(context) {
 
         <section id="editorial-team" class="mb-8">
           <h2 class="font-serif text-2xl font-bold text-ink mt-6 mb-3">Editorial Leadership &amp; Author Attribution</h2>
-          <p class="text-base text-ink leading-relaxed mb-3">CareerDost is founded and edited by <strong>Faizan Ali</strong>, who serves as Lead Editor and Technical Architect. Overseeing day-to-day source verification, gazette parsing, and editorial accuracy, he ensures every opportunity guide complies with strict public documentation standards. Direct editorial correspondence: <a href="mailto:editor@careerdost.blog" class="text-green underline font-semibold">editor@careerdost.blog</a>.</p>
+          <p class="text-base text-ink leading-relaxed mb-3">CareerDost is founded and edited by <strong>Faizan Ali</strong>, who serves as Lead Editor and Technical Architect. Overseeing day-to-day source verification, gazette parsing, and editorial accuracy, he ensures every opportunity guide complies with strict public documentation standards. Reachable directly for editorial inquiries, updates, and corrections via our <a href="/contact" class="text-green underline font-semibold">Editorial Desk &amp; Inquiry Tool</a>.</p>
           <p class="text-base text-ink leading-relaxed">The <strong>CareerDost Editorial Desk</strong> comprises dedicated educational and public-sector researchers monitoring federal and provincial public service commissions (FPSC, PPSC, SPSC, KPPSC, BPSC), testing services (NTS, STS), and accredited institutions.</p>
         </section>
 
@@ -1828,9 +1839,9 @@ export async function onRequest(context) {
         <nav class="text-xs text-inksoft mb-4" aria-label="Breadcrumb"><a href="/">Home</a> / <span>Contact Us</span></nav>
         <h1 class="font-serif text-3xl sm:text-4xl font-bold text-ink mb-4">Contact the CareerDost Editorial Desk</h1>
         <p class="text-base text-ink leading-relaxed mb-4">Use our on-page editorial inquiry and correction tool to report an updated closing deadline, flag a broken official portal link, or request a factual check on any job notification, scholarship, admission circular, or public welfare guide published on CareerDost (<a href="https://careerdost.blog">https://careerdost.blog</a>).</p>
-        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">Direct Editorial Correspondence</h2>
-        <p class="text-base text-ink leading-relaxed mb-2">For editorial inquiries, official corrigendum submissions, and direct publisher correspondence:</p>
-        <p class="text-base text-ink leading-relaxed mb-4"><strong>Email:</strong> <a href="mailto:editor@careerdost.blog" class="text-green font-semibold underline">editor@careerdost.blog</a><br /><span class="text-xs text-inksoft">Lead Editor: Faizan Ali | Verified response timeframe: Within 24–48 business hours.</span></p>
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">Direct Editorial Inquiries &amp; Corrigendum Submissions</h2>
+        <p class="text-base text-ink leading-relaxed mb-2">For editorial inquiries, official corrigendum submissions, and direct publisher correspondence, please submit your message directly through the on-page form below.</p>
+        <p class="text-base text-ink leading-relaxed mb-4"><span class="text-xs text-inksoft">Lead Editor: Faizan Ali | Verified review timeframe: Within 24–48 business hours (Direct custom domain email routing is undergoing DNS configuration).</span></p>
 
         <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">Important Applicant &amp; Privacy Notice</h2>
         <p class="text-base text-ink leading-relaxed mb-4">CareerDost is an independent informational publication and is not a recruitment agency or government department. We do not accept CVs, job applications, or registration forms. Please submit applications directly on the official employer, university, or government portal linked inside each article. Do not share sensitive personal data such as CNIC numbers, bank account details, or passwords.</p>

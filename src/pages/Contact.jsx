@@ -66,11 +66,11 @@ export default function Contact() {
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs text-ink font-medium pt-1">
           <a
-            href="mailto:editor@careerdost.blog"
+            href="#contact-form"
             className="p-3 bg-white border border-line hover:border-green transition-colors flex flex-col gap-1"
           >
-            <span className="text-inksoft uppercase tracking-wider text-[10px]">Direct Email</span>
-            <strong className="text-green font-semibold">📧 editor@careerdost.blog ↗</strong>
+            <span className="text-inksoft uppercase tracking-wider text-[10px]">Editorial Desk</span>
+            <strong className="text-green font-semibold">📝 On-Page Inquiry Tool ↓</strong>
           </a>
           <a
             href="https://whatsapp.com/channel/0029VbDnzwFF1YlIkJax2P1o"
