@@ -67,8 +67,8 @@ async function runProductionChecks() {
 
     // 5. Random Closed-Status Articles
     { url: 'https://careerdost.blog/jobs/university-of-chakwal-uoc-jobs-2026', expected: 'closed', desc: 'Closed Article: UOC' },
-    { url: 'https://careerdost.blog/jobs/bank-islami-cash-officer-jobs-2026', expected: 'closed', desc: 'Closed Article: BankIslami' },
-    { url: 'https://careerdost.blog/jobs/gop-paid-internship-2026-climate-change', expected: 'closed', desc: 'Closed Article: Climate Change' },
+    { url: 'https://careerdost.blog/jobs/fpsc-assistant-director-2026', expected: 'closed', desc: 'Closed Article: FPSC AD' },
+    { url: 'https://careerdost.blog/jobs/punjab-police-constable-recruitment-2026', expected: 'closed', desc: 'Closed Article: Punjab Police' },
 
     // 6. Crawl & Discovery files
     { url: 'https://careerdost.blog/sitemap.xml', expected: '<urlset', desc: 'Dynamic XML Sitemap' },
