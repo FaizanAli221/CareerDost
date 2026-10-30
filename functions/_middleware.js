@@ -1783,6 +1783,12 @@ export async function onRequest(context) {
         <p class="text-base text-ink leading-relaxed mb-4">CareerDost (<a href="https://careerdost.blog">https://careerdost.blog</a>) is an independent digital career, education, and public-information publication serving students, fresh graduates, job seekers, and citizens across Pakistan. We translate complex federal and provincial government notifications, public service commission gazettes, university admission circulars, corporate hiring announcements, and social welfare directives into clear, structured, and verifiable guides.</p>
         <p class="text-base text-ink leading-relaxed mb-6">CareerDost is strictly an independent informational platform. We are not affiliated with any federal or provincial ministry, public service commission (FPSC, PPSC, SPSC, KPPSC, BPSC), testing agency (NTS, STS-IBA, ETS, PTS), university, or private employer. We do not act as a recruitment broker, never collect job applications, and never charge fees to candidates.</p>
 
+        <section id="editorial-team" class="mb-8">
+          <h2 class="font-serif text-2xl font-bold text-ink mt-6 mb-3">Editorial Leadership &amp; Author Attribution</h2>
+          <p class="text-base text-ink leading-relaxed mb-3">CareerDost is founded and edited by <strong>Faizan Ali</strong>, who serves as Lead Editor and Technical Architect. Overseeing day-to-day source verification, gazette parsing, and editorial accuracy, he ensures every opportunity guide complies with strict public documentation standards. Direct editorial correspondence: <a href="mailto:editor@careerdost.blog" class="text-green underline font-semibold">editor@careerdost.blog</a>.</p>
+          <p class="text-base text-ink leading-relaxed">The <strong>CareerDost Editorial Desk</strong> comprises dedicated educational and public-sector researchers monitoring federal and provincial public service commissions (FPSC, PPSC, SPSC, KPPSC, BPSC), testing services (NTS, STS), and accredited institutions.</p>
+        </section>
+
         <section id="editorial-policy" class="mb-8">
           <h2 class="font-serif text-2xl font-bold text-ink mt-6 mb-3">Editorial Policy &amp; 4-Step Verification Workflow</h2>
           <ol class="list-decimal pl-5 space-y-2 text-base text-ink mb-4">
@@ -1822,6 +1828,10 @@ export async function onRequest(context) {
         <nav class="text-xs text-inksoft mb-4" aria-label="Breadcrumb"><a href="/">Home</a> / <span>Contact Us</span></nav>
         <h1 class="font-serif text-3xl sm:text-4xl font-bold text-ink mb-4">Contact the CareerDost Editorial Desk</h1>
         <p class="text-base text-ink leading-relaxed mb-4">Use our on-page editorial inquiry and correction tool to report an updated closing deadline, flag a broken official portal link, or request a factual check on any job notification, scholarship, admission circular, or public welfare guide published on CareerDost (<a href="https://careerdost.blog">https://careerdost.blog</a>).</p>
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">Direct Editorial Correspondence</h2>
+        <p class="text-base text-ink leading-relaxed mb-2">For editorial inquiries, official corrigendum submissions, and direct publisher correspondence:</p>
+        <p class="text-base text-ink leading-relaxed mb-4"><strong>Email:</strong> <a href="mailto:editor@careerdost.blog" class="text-green font-semibold underline">editor@careerdost.blog</a><br /><span class="text-xs text-inksoft">Lead Editor: Faizan Ali | Verified response timeframe: Within 24–48 business hours.</span></p>
+
         <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">Important Applicant &amp; Privacy Notice</h2>
         <p class="text-base text-ink leading-relaxed mb-4">CareerDost is an independent informational publication and is not a recruitment agency or government department. We do not accept CVs, job applications, or registration forms. Please submit applications directly on the official employer, university, or government portal linked inside each article. Do not share sensitive personal data such as CNIC numbers, bank account details, or passwords.</p>
         <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">How Editorial Correction Reviews Work</h2>
