@@ -25,19 +25,36 @@ export default function Footer() {
                 href={WHATSAPP_CHANNEL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center space-x-2 bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 px-3 py-1.5 rounded text-xs font-bold transition-colors w-fit shadow-xs"
+                aria-label="Join official CareerDost WhatsApp Channel"
+                className="inline-flex items-center space-x-2 bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 px-3 py-1.5 rounded-xs text-xs font-bold transition-colors w-fit shadow-xs focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-hidden"
               >
                 <WhatsAppIcon className="w-4 h-4" />
                 <span>Join WhatsApp Channel</span>
               </a>
               <div className="flex flex-wrap items-center gap-2 pt-1">
-                <a href="mailto:careerdost02@gmail.com" className="border border-line bg-paper px-2.5 py-1 text-ink hover:text-green hover:border-green transition-colors">
+                <a
+                  href="mailto:careerdost02@gmail.com"
+                  aria-label="Send email to careerdost02@gmail.com"
+                  className="border border-line bg-paper px-2.5 py-1 text-ink hover:text-green hover:border-green transition-colors rounded-xs focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-hidden"
+                >
                   Email: careerdost02@gmail.com
                 </a>
-                <a href="https://wa.me/923173425680" target="_blank" rel="noopener noreferrer" className="border border-line bg-paper px-2.5 py-1 text-ink hover:text-green hover:border-green transition-colors">
+                <a
+                  href="https://wa.me/923173425680"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Contact CareerDost helpline on WhatsApp at 03173425680"
+                  className="border border-line bg-paper px-2.5 py-1 text-ink hover:text-green hover:border-green transition-colors rounded-xs focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-hidden"
+                >
                   Contact: 03173425680
                 </a>
-                <a href="https://facebook.com/CareerDost" target="_blank" rel="noopener noreferrer" className="border border-line bg-paper px-2.5 py-1 text-ink hover:text-green hover:border-green transition-colors">
+                <a
+                  href="https://facebook.com/CareerDost"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Visit CareerDost on Facebook"
+                  className="border border-line bg-paper px-2.5 py-1 text-ink hover:text-green hover:border-green transition-colors rounded-xs focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-hidden"
+                >
                   Facebook: CareerDost
                 </a>
               </div>
@@ -51,7 +68,10 @@ export default function Footer() {
           <ul className="space-y-2 text-xs text-ink">
             {categories.slice(0, 5).map((c) => (
               <li key={c.slug}>
-                <Link to={`/category/${c.slug}`} className="hover:text-green transition-colors">
+                <Link
+                  to={`/category/${c.slug}`}
+                  className="hover:text-green transition-colors focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-hidden rounded-xs"
+                >
                   {c.label}
                 </Link>
               </li>
@@ -65,7 +85,10 @@ export default function Footer() {
           <ul className="space-y-2 text-xs text-ink">
             {categories.slice(5).map((c) => (
               <li key={c.slug}>
-                <Link to={`/category/${c.slug}`} className="hover:text-green transition-colors">
+                <Link
+                  to={`/category/${c.slug}`}
+                  className="hover:text-green transition-colors focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-hidden rounded-xs"
+                >
                   {c.label}
                 </Link>
               </li>
@@ -77,12 +100,54 @@ export default function Footer() {
         <div>
           <div className="text-xs font-semibold uppercase tracking-wider text-inksoft mb-3">Company &amp; Legal</div>
           <ul className="space-y-2 text-xs text-ink">
-            <li><Link to="/about" className="hover:text-green transition-colors">About CareerDost</Link></li>
-            <li><Link to="/about#editorial-policy" className="hover:text-green transition-colors">Editorial &amp; Verification Policy</Link></li>
-            <li><Link to="/contact" className="hover:text-green transition-colors">Contact Us</Link></li>
-            <li><Link to="/privacy-policy" className="hover:text-green transition-colors">Privacy Policy</Link></li>
-            <li><Link to="/disclaimer" className="hover:text-green transition-colors">Disclaimer Notice</Link></li>
-            <li><Link to="/terms-and-conditions" className="hover:text-green transition-colors">Terms &amp; Conditions</Link></li>
+            <li>
+              <Link
+                to="/about"
+                className="hover:text-green transition-colors focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-hidden rounded-xs"
+              >
+                About Us
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/about#editorial-policy"
+                className="hover:text-green transition-colors focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-hidden rounded-xs"
+              >
+                Editorial &amp; Verification Policy
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/contact"
+                className="hover:text-green transition-colors focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-hidden rounded-xs"
+              >
+                Contact Us
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/privacy-policy"
+                className="hover:text-green transition-colors focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-hidden rounded-xs"
+              >
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/disclaimer"
+                className="hover:text-green transition-colors focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-hidden rounded-xs"
+              >
+                Disclaimer
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/terms-and-conditions"
+                className="hover:text-green transition-colors focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-hidden rounded-xs"
+              >
+                Terms &amp; Conditions
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
