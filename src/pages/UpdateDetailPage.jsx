@@ -12,9 +12,7 @@ import { useSeo } from '../lib/useSeo'
 import { getAbsoluteUrl } from '../lib/config'
 import { trackApplyNowClick, trackOfficialSourceClick } from '../lib/analytics'
 import { getContentType, getContentTypeLabels, getContextualStatus } from '../lib/contentType'
-import { listings } from '../data/listings'
-
-const KNOWN_ARTICLE_SLUGS = new Set(listings.map((l) => l.slug))
+import { KNOWN_ARTICLE_SLUGS } from '../data/articleSlugs'
 
 function formatDate(dateStr) {
   if (!dateStr) return ''
@@ -50,6 +48,8 @@ export default function UpdateDetailPage() {
   const hasMatchingArticle = useMemo(() => {
     if (updateItem?.hasArticle === true) return true
     if (updateItem?.hasArticle === false) return false
+    if (updateItem?.canonicalUrl && updateItem.canonicalUrl.includes('/jobs/')) return true
+    if (updateItem?.canonical_url && updateItem.canonical_url.includes('/jobs/')) return true
     return KNOWN_ARTICLE_SLUGS.has(slug)
   }, [updateItem, slug])
 

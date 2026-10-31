@@ -3,18 +3,9 @@ import { Link } from 'react-router-dom'
 import CategoryFallbackImage from './CategoryFallbackImage'
 import OptimizedImage from './OptimizedImage'
 import { getContentType, getContentTypeLabels, getContextualStatus } from '../lib/contentType'
-import { listings } from '../data/listings'
+import { getUpdateTargetUrl } from '../lib/routing'
 
-const KNOWN_ARTICLE_SLUGS = new Set(listings.map((l) => l.slug))
-
-export function getUpdateTargetUrl(updateItem) {
-  if (!updateItem || !updateItem.slug) return '/daily-updates'
-  if (updateItem.targetUrl) return updateItem.targetUrl
-  if (updateItem.hasArticle === true) return `/jobs/${updateItem.slug}`
-  if (updateItem.hasArticle === false) return `/daily-updates/${updateItem.slug}`
-  if (KNOWN_ARTICLE_SLUGS.has(updateItem.slug)) return `/jobs/${updateItem.slug}`
-  return `/daily-updates/${updateItem.slug}`
-}
+export { getUpdateTargetUrl }
 
 function isRecent(publishDate, hours = 48) {
   if (!publishDate) return false

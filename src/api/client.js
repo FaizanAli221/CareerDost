@@ -402,28 +402,94 @@ export async function adminDeleteUpdate(token, slug) {
   })
 }
 
-export async function adminUploadImage(token, imageData) {
-  const isBase64 = typeof imageData === 'object' && imageData.base64
-  const bodyPayload = isBase64
-    ? JSON.stringify(imageData)
-    : typeof imageData === 'string'
-    ? JSON.stringify({ base64: imageData })
-    : null
+export async function generateClientImageVariants(file) {
+  if (typeof window === 'undefined' || typeof document === 'undefined' || !file || !(file instanceof Blob)) {
+    return null
+  }
+  return new Promise((resolve) => {
+    try {
+      const img = new Image()
+      const url = URL.createObjectURL(file)
+      img.onload = () => {
+        URL.revokeObjectURL(url)
+        const origWidth = img.naturalWidth || img.width
+        const origHeight = img.naturalHeight || img.height
 
-  if (bodyPayload) {
+        const makeVariant = (targetWidth, quality) => {
+          return new Promise((res) => {
+            let width = origWidth
+            let height = origHeight
+            if (width > targetWidth) {
+              height = Math.round((height * targetWidth) / width)
+              width = targetWidth
+            }
+            const canvas = document.createElement('canvas')
+            canvas.width = width
+            canvas.height = height
+            const ctx = canvas.getContext('2d')
+            if (!ctx) return res(null)
+            ctx.imageSmoothingEnabled = true
+            ctx.imageSmoothingQuality = 'high'
+            ctx.drawImage(img, 0, 0, width, height)
+            canvas.toBlob((blob) => res(blob), 'image/webp', quality)
+          })
+        }
+
+        Promise.all([makeVariant(640, 0.82), makeVariant(1200, 0.85)])
+          .then(([card, display]) => resolve({ card, display }))
+          .catch(() => resolve(null))
+      }
+      img.onerror = () => {
+        URL.revokeObjectURL(url)
+        resolve(null)
+      }
+      img.src = url
+    } catch {
+      resolve(null)
+    }
+  })
+}
+
+export async function adminUploadImage(token, imageData, userVariants = null) {
+  const isBase64 = typeof imageData === 'object' && imageData.base64
+  let variants = userVariants
+
+  if (isBase64 || typeof imageData === 'string') {
+    const payload = isBase64 ? { ...imageData } : { base64: imageData }
+    if (variants) {
+      payload.variants = variants
+    }
     return await apiFetch('/admin/upload-image', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: bodyPayload,
+      body: JSON.stringify(payload),
     })
   }
 
-  // File object
+  // File or Blob object
   const formData = new FormData()
   formData.append('file', imageData)
+
+  // Automatically attempt client-side generation of optimized WebP variants
+  if (!variants && typeof window !== 'undefined') {
+    try {
+      variants = await generateClientImageVariants(imageData)
+    } catch {
+      // Fallback: proceed without variants
+    }
+  }
+
+  if (variants) {
+    if (variants.card) {
+      formData.append('variant_card', variants.card, 'card.webp')
+    }
+    if (variants.display) {
+      formData.append('variant_display', variants.display, 'display.webp')
+    }
+  }
 
   const res = await fetch('/api/admin/upload-image', {
     method: 'POST',

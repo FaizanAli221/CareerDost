@@ -369,6 +369,8 @@ app.post('/upload-image', authMiddleware, async (c) => {
     let base64Data = ''
     let size = 0
 
+    let variants = null
+
     if (contentType.includes('multipart/form-data')) {
       const formData = await c.req.parseBody()
       const file = formData.file || formData.image
@@ -391,6 +393,38 @@ app.post('/upload-image', authMiddleware, async (c) => {
         }
         base64Data = btoa(binary)
       }
+
+      const cardFile = formData.variant_card
+      const displayFile = formData.variant_display
+      if (cardFile || displayFile) {
+        variants = {}
+        if (cardFile && typeof cardFile !== 'string') {
+          const cardBuf = await cardFile.arrayBuffer()
+          const cardBytes = new Uint8Array(cardBuf)
+          let cardBinary = ''
+          for (let i = 0; i < cardBytes.length; i++) {
+            cardBinary += String.fromCharCode(cardBytes[i])
+          }
+          variants.card = {
+            data: btoa(cardBinary),
+            size: cardBuf.byteLength,
+            mimeType: cardFile.type || 'image/webp',
+          }
+        }
+        if (displayFile && typeof displayFile !== 'string') {
+          const dispBuf = await displayFile.arrayBuffer()
+          const dispBytes = new Uint8Array(dispBuf)
+          let dispBinary = ''
+          for (let i = 0; i < dispBytes.length; i++) {
+            dispBinary += String.fromCharCode(dispBytes[i])
+          }
+          variants.display = {
+            data: btoa(dispBinary),
+            size: dispBuf.byteLength,
+            mimeType: displayFile.type || 'image/webp',
+          }
+        }
+      }
     } else {
       const body = await c.req.json()
       filename = body.filename || 'uploaded-image.jpg'
@@ -402,6 +436,9 @@ app.post('/upload-image', authMiddleware, async (c) => {
         base64Data = parts[1]
       }
       size = Math.round((base64Data.length * 3) / 4)
+      if (body.variants && typeof body.variants === 'object') {
+        variants = body.variants
+      }
     }
 
     // Server-side MIME validation
@@ -429,6 +466,51 @@ app.post('/upload-image', authMiddleware, async (c) => {
       data: base64Data,
       size,
     })
+
+    // Persist optimized WebP variants if provided (preserves original in imageId)
+    if (variants) {
+      try {
+        if (variants.card) {
+          let cardData = typeof variants.card === 'string' ? variants.card : variants.card.data
+          let cardMime = (typeof variants.card === 'object' && variants.card.mimeType) || 'image/webp'
+          if (cardData && cardData.startsWith('data:')) {
+            const parts = cardData.split(',')
+            cardMime = parts[0].match(/:(.*?);/)?.[1] || cardMime
+            cardData = parts[1]
+          }
+          if (cardData) {
+            await DailyUpdateModel.saveImage(db, {
+              id: `${imageId}_card`,
+              filename: filename.replace(/\.[^.]+$/, '') + '-card.webp',
+              mimeType: cardMime,
+              data: cardData,
+              size: Math.round((cardData.length * 3) / 4),
+            })
+          }
+        }
+
+        if (variants.display) {
+          let displayData = typeof variants.display === 'string' ? variants.display : variants.display.data
+          let displayMime = (typeof variants.display === 'object' && variants.display.mimeType) || 'image/webp'
+          if (displayData && displayData.startsWith('data:')) {
+            const parts = displayData.split(',')
+            displayMime = parts[0].match(/:(.*?);/)?.[1] || displayMime
+            displayData = parts[1]
+          }
+          if (displayData) {
+            await DailyUpdateModel.saveImage(db, {
+              id: `${imageId}_display`,
+              filename: filename.replace(/\.[^.]+$/, '') + '-display.webp',
+              mimeType: displayMime,
+              data: displayData,
+              size: Math.round((displayData.length * 3) / 4),
+            })
+          }
+        }
+      } catch (variantErr) {
+        console.warn('Could not save image variants:', variantErr)
+      }
+    }
 
     const imageUrl = `/api/uploads/${imageId}`
     return c.json({

@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 
 /**
  * Optimized responsive image with native WebP format negotiation,
+ * responsive srcset for admin uploads and static images,
  * explicit dimensions to prevent CLS, and async decoding.
  */
 export default function OptimizedImage({
@@ -17,12 +18,31 @@ export default function OptimizedImage({
 
   if (!src) return null
 
-  const isJpg = /\.(jpe?g|png)$/i.test(src)
-  const webpSrc = (!useFallback && isJpg) ? src.replace(/\.(jpe?g|png)$/i, '.webp') : null
+  const isApiUpload = typeof src === 'string' && src.includes('/api/uploads/')
+  const isJpgOrPng = typeof src === 'string' && /\.(jpe?g|png)$/i.test(src)
+
+  let webpSrcSet = null
+  let webpSingleSrc = null
+
+  if (!useFallback) {
+    if (isApiUpload) {
+      // Remove any existing query params or extensions to get the clean upload ID URL
+      const cleanSrc = src.split('?')[0].replace(/\.(webp|jpe?g|png)$/i, '')
+      // Deliver responsive variants for cards (640w) and high-res/display (1200w)
+      webpSrcSet = `${cleanSrc}?w=640&v=card 640w, ${cleanSrc}?w=1200&v=display 1200w`
+      webpSingleSrc = `${cleanSrc}?w=640&v=card`
+    } else if (isJpgOrPng) {
+      webpSingleSrc = src.replace(/\.(jpe?g|png)$/i, '.webp')
+    }
+  }
 
   return (
     <picture>
-      {webpSrc && <source srcSet={webpSrc} type="image/webp" sizes={sizes} />}
+      {webpSrcSet ? (
+        <source srcSet={webpSrcSet} sizes={sizes} type="image/webp" />
+      ) : webpSingleSrc ? (
+        <source srcSet={webpSingleSrc} sizes={sizes} type="image/webp" />
+      ) : null}
       <img
         src={src}
         alt={alt}
@@ -33,7 +53,7 @@ export default function OptimizedImage({
         fetchPriority={priority ? 'high' : 'auto'}
         className={className}
         onError={() => {
-          if (!useFallback && webpSrc) {
+          if (!useFallback && (webpSrcSet || webpSingleSrc)) {
             setUseFallback(true)
           }
         }}

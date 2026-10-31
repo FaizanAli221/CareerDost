@@ -240,6 +240,8 @@ export default function Home() {
                   <span className="text-xl text-inksoft mr-2.5">🔍</span>
                   <input
                     type="search"
+                    id="home-search-input"
+                    name="q"
                     value={heroSearch}
                     onChange={(e) => setHeroSearch(e.target.value)}
                     placeholder="Search by job title, department, university, test name, or city..."
@@ -318,8 +320,8 @@ export default function Home() {
                 <LoadingGrid count={6} cols="grid sm:grid-cols-2 lg:grid-cols-3" />
               ) : (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {dailyUpdates.slice(0, 6).map((item, idx) => (
-                    <UpdateCard key={item.slug} updateItem={item} priority={idx < 2} />
+                  {dailyUpdates.slice(0, 6).map((item) => (
+                    <UpdateCard key={item.slug} updateItem={item} priority={false} />
                   ))}
                 </div>
               )}
@@ -347,8 +349,8 @@ export default function Home() {
               <p className="text-sm font-sans text-inksoft text-center py-8">No government vacancies listed currently.</p>
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {govJobs.map((item, idx) => (
-                  <OpportunityCard key={item.slug} opportunity={item} priority={idx < 2} />
+                {govJobs.map((item) => (
+                  <OpportunityCard key={item.slug} opportunity={item} priority={false} />
                 ))}
               </div>
             )}

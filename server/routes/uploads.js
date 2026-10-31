@@ -6,10 +6,41 @@ const uploadsRouter = new Hono()
 
 uploadsRouter.get('/:id', async (c) => {
   const db = getDb(c)
-  const id = c.req.param('id')
+  const rawId = c.req.param('id')
+  const width = c.req.query('w')
+  const variant = c.req.query('v') || c.req.query('variant')
+
+  // Identify requested variant
+  let requestedVariant = null
+  if (variant === 'card' || width === '640' || rawId.includes('-640w') || rawId.includes('_card')) {
+    requestedVariant = 'card'
+  } else if (variant === 'display' || width === '1200' || rawId.includes('-1200w') || rawId.includes('_display')) {
+    requestedVariant = 'display'
+  }
+
+  // Base ID: strip extensions and variant suffixes
+  const baseId = rawId.replace(/(-640w|-1200w|_card|_display)?(\.(webp|jpe?g|png))?$/i, '')
 
   try {
-    const img = await DailyUpdateModel.getImage(db, id)
+    let img = null
+
+    // 1. If variant requested, attempt to find the variant first
+    if (requestedVariant === 'card') {
+      img = (await DailyUpdateModel.getImage(db, `${baseId}_card`)) || (await DailyUpdateModel.getImage(db, `${baseId}_640w`))
+    } else if (requestedVariant === 'display') {
+      img = (await DailyUpdateModel.getImage(db, `${baseId}_display`)) || (await DailyUpdateModel.getImage(db, `${baseId}_1200w`))
+    }
+
+    // 2. If no variant requested or variant was not found, check raw ID
+    if (!img) {
+      img = await DailyUpdateModel.getImage(db, rawId)
+    }
+
+    // 3. Fall back to base ID
+    if (!img && baseId !== rawId) {
+      img = await DailyUpdateModel.getImage(db, baseId)
+    }
+
     if (!img) {
       return c.json({ success: false, error: 'Image not found' }, 404)
     }
