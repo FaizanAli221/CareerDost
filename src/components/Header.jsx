@@ -27,6 +27,7 @@ export default function Header() {
     { label: 'Admissions', path: '/category/admissions' },
     { label: 'Results', path: '/category/results' },
     { label: 'Schemes', path: '/category/government-schemes' },
+    { label: 'Career Guides', path: '/category/career-guides' },
   ]
 
   return (

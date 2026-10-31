@@ -71,6 +71,8 @@ export const CATEGORY_THEMES = {
   'results': { bg: 'from-cyan-800 to-blue-950', accent: 'border-cyan-300', tagBg: 'bg-cyan-500/20 text-cyan-200', icon: '📊' },
   'government-schemes': { bg: 'from-emerald-900 to-slate-950', accent: 'border-emerald-400', tagBg: 'bg-emerald-500/20 text-emerald-200', icon: '🤝' },
   'Results': { bg: 'from-cyan-800 to-blue-950', accent: 'border-cyan-300', tagBg: 'bg-cyan-500/20 text-cyan-200', icon: '📊' },
+  'Career Guides': { bg: 'from-emerald-900 to-slate-900', accent: 'border-emerald-400', tagBg: 'bg-emerald-500/20 text-emerald-200', icon: '📚' },
+  'career-guides': { bg: 'from-emerald-900 to-slate-900', accent: 'border-emerald-400', tagBg: 'bg-emerald-500/20 text-emerald-200', icon: '📚' },
 }
 
 export default function CategoryFallbackImage({ category, title, className = '' }) {

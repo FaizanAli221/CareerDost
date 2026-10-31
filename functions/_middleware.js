@@ -661,6 +661,12 @@ const CATEGORY_META = {
   }
 }
 
+function getCategoryLabel(slug) {
+  if (!slug) return 'Update'
+  if (CATEGORY_META[slug]?.label) return CATEGORY_META[slug].label
+  return slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
 function generateCategoryHtml(slug, catMeta, articles, canonical) {
   const label = escapeHtml(catMeta.label || slug)
   const desc = escapeHtml(catMeta.description || '')
@@ -740,6 +746,7 @@ function generateCategoryHtml(slug, catMeta, articles, canonical) {
               <a href="/category/government-jobs" style="color:#1c1917;text-decoration:none;margin-right:16px;">Govt Jobs</a>
               <a href="/category/scholarships" style="color:#1c1917;text-decoration:none;margin-right:16px;">Scholarships</a>
               <a href="/category/admissions" style="color:#1c1917;text-decoration:none;margin-right:16px;">Admissions</a>
+              <a href="/category/career-guides" style="color:#1c1917;text-decoration:none;margin-right:16px;">Career Guides</a>
               <a href="/about" style="color:#1c1917;text-decoration:none;">About</a>
             </nav>
           </div>
@@ -801,7 +808,7 @@ function generateDailyUpdatesIndexHtml(updates, canonical, publishedArticleSlugs
 
   const cardsHtml = updates && updates.length > 0 ? updates.map((up) => {
     const upTitle = escapeHtml(up.title || '')
-    const upCat = escapeHtml(up.category || 'Career Alert')
+    const upCat = escapeHtml(getCategoryLabel(up.category) || 'Career Alert')
     const upOrg = up.organization ? escapeHtml(up.organization) : ''
     const upLoc = up.location ? escapeHtml(up.location) : 'Pakistan'
     const upDate = up.publish_date ? escapeHtml(up.publish_date) : ''
@@ -856,6 +863,7 @@ function generateDailyUpdatesIndexHtml(updates, canonical, publishedArticleSlugs
               <a href="/category/government-jobs" style="color:#1c1917;text-decoration:none;margin-right:16px;">Govt Jobs</a>
               <a href="/category/scholarships" style="color:#1c1917;text-decoration:none;margin-right:16px;">Scholarships</a>
               <a href="/category/admissions" style="color:#1c1917;text-decoration:none;margin-right:16px;">Admissions</a>
+              <a href="/category/career-guides" style="color:#1c1917;text-decoration:none;margin-right:16px;">Career Guides</a>
               <a href="/about" style="color:#1c1917;text-decoration:none;">About</a>
             </nav>
           </div>
@@ -1723,6 +1731,7 @@ export async function onRequest(context) {
               <a href="/category/government-schemes">Government Schemes</a>
               <a href="/category/scholarships">Scholarships</a>
               <a href="/category/admissions">Admissions</a>
+              <a href="/category/career-guides">Career Guides</a>
               <a href="/about">About</a>
             </nav>
           </div>
@@ -1744,6 +1753,7 @@ export async function onRequest(context) {
               <li><a href="/category/scholarships">Local &amp; International Scholarships</a></li>
               <li><a href="/category/admissions">University Admissions</a></li>
               <li><a href="/category/results">Merit Lists &amp; Exam Results</a></li>
+              <li><a href="/category/career-guides">Career Guides &amp; Procedures</a></li>
               <li><a href="/daily-updates">Daily Career &amp; Policy Updates</a></li>
             </ul>
           </section>
@@ -1752,7 +1762,7 @@ export async function onRequest(context) {
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               ${latestArticles.map((a) => `
                 <article class="bg-white border border-line p-4 rounded-xs">
-                  <span class="text-xs font-bold text-green uppercase">${escapeHtml(a.category_slug || 'Update')}</span>
+                  <span class="text-xs font-bold text-green uppercase">${escapeHtml(getCategoryLabel(a.category_slug))}</span>
                   <h3 class="font-serif text-base font-bold text-ink mt-1 mb-1">
                     <a href="/jobs/${escapeHtml(a.slug)}">${escapeHtml(a.title)}</a>
                   </h3>

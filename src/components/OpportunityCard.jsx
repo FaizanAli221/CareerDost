@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { formatDate } from '../lib/format'
 import { getContentType, getContentTypeLabels, getContextualStatus, normalizeDateToYMD } from '../lib/contentType'
+import { categoryBySlug } from '../data/categories'
 import CategoryFallbackImage from './CategoryFallbackImage'
 import OptimizedImage from './OptimizedImage'
 
@@ -12,6 +13,7 @@ export default function OpportunityCard({ opportunity, showDeadlineBadge = true,
   const labels = getContentTypeLabels(contentType, opportunity)
   const statusInfo = getContextualStatus(opportunity, contentType)
   const hasImage = opportunity.featuredImage && opportunity.featuredImage.trim().length > 0
+  const categoryLabel = categoryBySlug(opportunity.category)?.label || opportunity.categoryLabel || opportunity.category
 
   return (
     <div className="border border-line bg-white rounded-xs overflow-hidden flex flex-col justify-between hover:border-green hover:shadow-md transition-all group">
@@ -29,7 +31,7 @@ export default function OpportunityCard({ opportunity, showDeadlineBadge = true,
             />
           ) : (
             <CategoryFallbackImage
-              category={opportunity.categoryLabel || opportunity.category}
+              category={categoryLabel}
               title={opportunity.title}
               className="group-hover:scale-105 transition-transform duration-300"
             />
