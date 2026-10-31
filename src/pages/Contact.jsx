@@ -52,8 +52,11 @@ export default function Contact() {
       </h1>
       <p className="text-inksoft text-base mb-6 leading-relaxed">
         Have you spotted an updated deadline, an official departmental corrigendum, or a broken government
-        portal link? Reach out to the <strong>CareerDost Editorial Desk</strong> using our verified channels or
-        the inquiry form below.
+        portal link? Reach out to the <strong>CareerDost Editorial Desk</strong> directly via email at{' '}
+        <a href="mailto:careerdost02@gmail.com" className="text-green underline font-medium">
+          careerdost02@gmail.com
+        </a>
+        , using our verified channels, or through the inquiry form below.
       </p>
 
       <div className="mb-8 p-5 border border-line bg-paper space-y-3">
@@ -64,7 +67,14 @@ export default function Contact() {
           For the fastest response on urgent deadline extensions, roll number slips, or verification requests,
           connect with us via our verified channels:
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs text-ink font-medium pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs text-ink font-medium pt-1">
+          <a
+            href="mailto:careerdost02@gmail.com"
+            className="p-3 bg-white border border-line hover:border-green transition-colors flex flex-col gap-1"
+          >
+            <span className="text-inksoft uppercase tracking-wider text-[10px]">Official Email</span>
+            <strong className="text-green font-semibold">✉ careerdost02@gmail.com ↗</strong>
+          </a>
           <a
             href="#contact-form"
             className="p-3 bg-white border border-line hover:border-green transition-colors flex flex-col gap-1"

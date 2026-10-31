@@ -68,7 +68,10 @@ export default function Disclaimer() {
           <Link to="/contact" className="text-green underline font-medium">
             Contact Us
           </Link>{' '}
-          page.
+          page or email our editorial desk directly at{' '}
+          <a href="mailto:careerdost02@gmail.com" className="text-green underline font-medium">
+            careerdost02@gmail.com
+          </a>.
         </li>
       </ul>
 

@@ -99,6 +99,18 @@ export default function Terms() {
         terms. These Terms &amp; Conditions are governed by the laws of the Islamic Republic of Pakistan, and
         any disputes shall be subject to the exclusive jurisdiction of the competent courts of Pakistan.
       </p>
+
+      <h2>8. Inquiries &amp; Formal Notices</h2>
+      <p>
+        For inquiries, formal notices, or permissions concerning these Terms &amp; Conditions, please reach out via our{' '}
+        <Link to="/contact" className="text-green underline font-medium">
+          Contact Us
+        </Link>{' '}
+        page or email our editorial desk directly at{' '}
+        <a href="mailto:careerdost02@gmail.com" className="text-green underline font-medium">
+          careerdost02@gmail.com
+        </a>.
+      </p>
     </SimplePage>
   )
 }

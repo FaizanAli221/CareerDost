@@ -75,6 +75,8 @@ export default function Privacy() {
         </li>
       </ul>
 
+      {/* Temporarily hidden: Section 4 - Interactive Chat Assistant (Zanderio AI) */}
+      {/*
       <h2>4. Interactive Chat Assistant &amp; Browser Storage (Zanderio AI)</h2>
       <p>
         To help visitors quickly navigate career notifications and educational guides, CareerDost includes an
@@ -97,8 +99,9 @@ export default function Privacy() {
           time via your browser&rsquo;s privacy settings.
         </li>
       </ul>
+      */}
 
-      <h2>5. Cookies &amp; Third-Party Advertising Disclosures</h2>
+      <h2>4. Cookies &amp; Third-Party Advertising Disclosures</h2>
       <p>
         CareerDost may display contextual or personalized advertisements served by third-party advertising
         companies, including <strong>Google AdSense</strong>, when advertising services are active on the site:
@@ -137,7 +140,7 @@ export default function Privacy() {
         </li>
       </ul>
 
-      <h2>6. External Links to Official Portals</h2>
+      <h2>5. External Links to Official Portals</h2>
       <p>
         Every opportunity published on CareerDost links to external official websites—such as FPSC, PPSC, SPSC,
         NTS, HEC, NADRA, BISP, commercial banks, and accredited universities—so readers can verify notifications
@@ -146,7 +149,7 @@ export default function Privacy() {
         any external portal before submitting your application documents.
       </p>
 
-      <h2>7. Security, Infrastructure &amp; Data Protection</h2>
+      <h2>6. Security, Infrastructure &amp; Data Protection</h2>
       <p>
         CareerDost is served over encrypted HTTPS/TLS connections via Cloudflare edge infrastructure with strict
         security headers (including Content Security Policy, HSTS, and X-Content-Type-Options). Server access
@@ -154,15 +157,18 @@ export default function Privacy() {
         accordance with applicable Pakistani electronic data protection principles.
       </p>
 
-      <h2>8. Changes to This Privacy Policy &amp; Contact</h2>
+      <h2>7. Changes to This Privacy Policy &amp; Official Contact</h2>
       <p>
         We review and update this Privacy Policy whenever our site features, analytics tools, or regulatory
         requirements change. Material updates are reflected by the &ldquo;Last updated&rdquo; date at the top of
-        this page. If you have questions about this Privacy Policy, please reach out through our{' '}
+        this page. If you have questions about this Privacy Policy or wish to request data corrections, please reach out via our{' '}
         <Link to="/contact" className="text-green underline font-medium">
           Contact Us
         </Link>{' '}
-        page.
+        page or email our editorial desk directly at{' '}
+        <a href="mailto:careerdost02@gmail.com" className="text-green underline font-medium">
+          careerdost02@gmail.com
+        </a>.
       </p>
     </SimplePage>
   )

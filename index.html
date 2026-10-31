@@ -157,7 +157,8 @@
       }, { once: true });
     </script>
 
-    <!-- Zanderio AI Widget Loader — Loaded on user interaction to eliminate main-thread blocking and non-composited animations -->
+    <!-- Temporarily disabled: Zanderio AI Widget Loader -->
+    <!--
     <script>
       function loadZanderio() {
         if (window._zanderioLoaded) return;
@@ -175,6 +176,7 @@
         window.addEventListener(e, loadZanderio, { once: true, passive: true });
       });
     </script>
+    -->
   </head>
   <body>
     <div id="root">

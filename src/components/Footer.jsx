@@ -31,6 +31,9 @@ export default function Footer() {
                 <span>Join WhatsApp Channel</span>
               </a>
               <div className="flex flex-wrap items-center gap-2 pt-1">
+                <a href="mailto:careerdost02@gmail.com" className="border border-line bg-paper px-2.5 py-1 text-ink hover:text-green hover:border-green transition-colors">
+                  Email: careerdost02@gmail.com
+                </a>
                 <a href="https://wa.me/923173425680" target="_blank" rel="noopener noreferrer" className="border border-line bg-paper px-2.5 py-1 text-ink hover:text-green hover:border-green transition-colors">
                   Contact: 03173425680
                 </a>

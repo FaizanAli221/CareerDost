@@ -47,7 +47,8 @@ export default function About() {
       <ul>
         <li>
           <strong>Faizan Ali — Founder &amp; Lead Editor:</strong> Oversees editorial integrity, primary source cross-checking,
-          digital verification protocols, and technical architecture. Reachable directly for editorial inquiries and corrections via our{' '}
+          digital verification protocols, and technical architecture. Reachable directly for editorial inquiries, updates, and corrections via email at{' '}
+          <a href="mailto:careerdost02@gmail.com" className="text-green underline font-medium">careerdost02@gmail.com</a> or our{' '}
           <Link to="/contact" className="text-green underline font-medium">Editorial Contact &amp; Inquiry Tool</Link>.
         </li>
         <li>
@@ -152,11 +153,21 @@ export default function About() {
       </p>
       <ul>
         <li>
+          <strong>Official Email:</strong> Reach our editorial desk directly at{' '}
+          <a
+            href="mailto:careerdost02@gmail.com"
+            className="text-green underline font-medium"
+          >
+            careerdost02@gmail.com
+          </a>{' '}
+          for official inquiries, corrigendum submissions, and factual review requests.
+        </li>
+        <li>
           <strong>Editorial Inquiries &amp; Corrections:</strong> Submit direct correction requests, gazette updates, or questions through our on-page{' '}
           <Link to="/contact" className="text-green underline font-medium">
             Editorial Desk &amp; Correction Form
           </Link>{' '}
-          (inbound domain email routing is currently undergoing DNS configuration).
+          or email us directly.
         </li>
         <li>
           <strong>Editorial Helpdesk:</strong> Visit our{' '}
