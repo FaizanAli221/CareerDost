@@ -8,7 +8,7 @@
  */
 
 import { isGenuineJobVacancy, buildJobPostingSchema } from '../src/lib/jobSchema.js'
-import { getContentType, getContentTypeLabels, getContextualStatus } from '../src/lib/contentType.js'
+import { getContentType, getContentTypeLabels, getContextualStatus, getSectorTransparencyNote } from '../src/lib/contentType.js'
 
 const SITE_URL = 'https://careerdost.blog'
 const SITE_NAME = 'CareerDost'
@@ -385,9 +385,10 @@ function generateDailyUpdateHtml(update, canonical, hasArticle = false) {
       <a href="/jobs/${escapeHtml(update.slug)}" style="background:#059669;color:#ffffff;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;border-radius:2px;">Read Full Guide →</a>
     </div>` : ''
 
+  const transparencyText = escapeHtml(getSectorTransparencyNote(update, category))
   const transparencyNote = `
     <div style="background:#faf9f6;border-left:4px solid #059669;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#44403c;">
-      <strong>Official Source &amp; Editorial Transparency:</strong> Official facts, dates, and requirements are derived directly from public gazettes and government portals. CareerDost provides editorial analysis and practical guidance to assist citizens.
+      <strong>Official Source &amp; Editorial Transparency:</strong> ${transparencyText}
     </div>`
 
   const actionButtons = (officialLink || (applyLink && actionBtnText)) ? `
@@ -524,9 +525,10 @@ function generateJobHtml(article, canonical) {
       ${primaryCtaHref ? `<a href="${primaryCtaHref}" target="_blank" rel="noopener noreferrer" style="background:${bannerBtnBg};color:#ffffff;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;border-radius:4px;">${primaryCtaLabel}</a>` : ''}
     </div>`
 
+  const transparencyText = escapeHtml(getSectorTransparencyNote(article, categorySlug))
   const transparencyNote = `
     <div style="background:#faf9f6;border-left:4px solid #059669;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#44403c;">
-      <strong>Official Source &amp; Editorial Transparency:</strong> Official notification details and schedules are verified from government gazettes and administrative records. CareerDost provides editorial analysis and practical guidance to assist citizens.
+      <strong>Official Source &amp; Editorial Transparency:</strong> ${transparencyText}
     </div>`
 
   const recordTypeLabel = cType === 'job'

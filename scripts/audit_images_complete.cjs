@@ -15,13 +15,23 @@ function jwt(admin, secret) {
   return h + '.' + p + '.' + s;
 }
 
-let JWT_SECRET = 'careerdost-admin-jwt-secret-key-prod-2026';
-if (fs.existsSync('.env.local')) {
+let JWT_SECRET = process.env.ADMIN_JWT_SECRET || '';
+if (!JWT_SECRET && fs.existsSync('.env.local')) {
   const envContent = fs.readFileSync('.env.local', 'utf8');
   const m = envContent.match(/ADMIN_JWT_SECRET=(.+)/);
   if (m) JWT_SECRET = m[1].trim();
 }
-const token = jwt({ id: 2, username: '4330426358809', role: 'superadmin' }, JWT_SECRET);
+if (!JWT_SECRET && fs.existsSync('.env')) {
+  const envContent = fs.readFileSync('.env', 'utf8');
+  const m = envContent.match(/ADMIN_JWT_SECRET=(.+)/);
+  if (m) JWT_SECRET = m[1].trim();
+}
+if (!JWT_SECRET) {
+  console.error('ERROR: ADMIN_JWT_SECRET environment variable is required to run live image audit.');
+  process.exit(1);
+}
+const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+const token = jwt({ id: 1, username: adminUsername, role: 'superadmin' }, JWT_SECRET);
 
 function fetchJson(urlPath) {
   return new Promise((resolve, reject) => {

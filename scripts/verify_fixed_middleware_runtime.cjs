@@ -5,7 +5,7 @@ async function testActualMiddlewareRuntime() {
   console.log('=== TESTING ACTUAL MIDDLEWARE RUNTIME ON ALL 9 AFFECTED ARTICLES ===\n');
 
   const { isGenuineJobVacancy, buildJobPostingSchema } = await import('../src/lib/jobSchema.js');
-  const { getContentType, getContentTypeLabels, getContextualStatus } = await import('../src/lib/contentType.js');
+  const { getContentType, getContentTypeLabels, getContextualStatus, getSectorTransparencyNote } = await import('../src/lib/contentType.js');
 
   const mwCode = fs.readFileSync('functions/_middleware.js', 'utf8');
 
@@ -55,6 +55,7 @@ async function testActualMiddlewareRuntime() {
     getContentType,
     getContentTypeLabels,
     getContextualStatus,
+    getSectorTransparencyNote,
     isGenuineJobVacancy,
     buildJobPostingSchema,
     SITE_URL: 'https://careerdost.blog',

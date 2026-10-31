@@ -1,6 +1,7 @@
 import React from 'react'
 import { safeUrl } from '../lib/security'
-import { formatDate } from '../lib/format'
+import { formatDate, normalizeDateToYMD } from '../lib/format'
+import { getSectorTransparencyNote } from '../lib/contentType'
 
 export default function KeyInfoSummary({ item, type, labels, statusInfo }) {
   if (!item || !labels) return null
@@ -91,7 +92,7 @@ export default function KeyInfoSummary({ item, type, labels, statusInfo }) {
               {labels.dateLabel}
             </span>
             <strong className="text-ink font-semibold line-clamp-2">
-              {type === 'job' && !isNaN(new Date(lastDate.split('T')[0] + 'T00:00:00').getTime())
+              {normalizeDateToYMD(lastDate)
                 ? formatDate(lastDate)
                 : lastDate}
             </strong>
@@ -104,7 +105,7 @@ export default function KeyInfoSummary({ item, type, labels, statusInfo }) {
         <div className="flex items-center gap-1.5">
           <span className="text-green font-bold">●</span>
           <span>
-            <strong>Official Facts:</strong> Sourced from official gazettes &amp; government portals. CareerDost provides independent public analysis.
+            <strong>Editorial Transparency:</strong> {getSectorTransparencyNote(item, type)}
           </span>
         </div>
         {officialLink && (

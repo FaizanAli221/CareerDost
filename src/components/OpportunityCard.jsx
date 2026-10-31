@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { formatDate } from '../lib/format'
-import { getContentType, getContentTypeLabels, getContextualStatus } from '../lib/contentType'
+import { getContentType, getContentTypeLabels, getContextualStatus, normalizeDateToYMD } from '../lib/contentType'
 import CategoryFallbackImage from './CategoryFallbackImage'
 import OptimizedImage from './OptimizedImage'
 
@@ -89,7 +89,9 @@ export default function OpportunityCard({ opportunity, showDeadlineBadge = true,
           <span>Posted: {formatDate(opportunity.publishDate)}</span>
           <span className="font-medium text-ink truncate max-w-[55%] text-right">
             {labels.dateLabel}: {
-              contentType === 'job' && !isNaN(new Date(String(opportunity.lastDate).split('T')[0] + 'T00:00:00').getTime())
+              opportunity.noDeadline
+                ? 'No Deadline'
+                : normalizeDateToYMD(opportunity.lastDate)
                 ? formatDate(opportunity.lastDate)
                 : opportunity.lastDate || 'Ongoing'
             }

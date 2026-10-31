@@ -11,7 +11,61 @@
  * 7. 'guide': Educational guides, career strategies, citizen how-to references
  */
 
-import { formatDate } from './format.js'
+import { formatDate, normalizeDateToYMD } from './format.js'
+export { normalizeDateToYMD }
+
+/**
+ * Sector-aware transparency notice describing source origin without
+ * inappropriately applying "government gazette" boilerplate to private companies or universities.
+ */
+export function getSectorTransparencyNote(item, categorySlug) {
+  const cat = String(categorySlug || item?.category || item?.category_slug || '').toLowerCase()
+  const org = String(item?.organization || '').toLowerCase()
+  const title = String(item?.title || '').toLowerCase()
+  const isVerified = Boolean(item?.isVerified || item?.is_verified)
+  const verb = isVerified ? 'verified from' : 'sourced directly from'
+
+  // 1. Universities & Admissions
+  if (
+    cat === 'admissions' ||
+    org.includes('university') ||
+    org.includes('college') ||
+    org.includes('institute') ||
+    title.includes('university') ||
+    title.includes('admission')
+  ) {
+    return `Official academic requirements, faculty criteria, and admission schedules are ${verb} official university portals and accredited institutional announcements. CareerDost provides independent educational analysis and application guidance to assist students and candidates.`
+  }
+
+  // 2. Private Companies, Banks, IT & Tech firms
+  if (
+    cat === 'private-jobs' ||
+    cat === 'bank-jobs' ||
+    cat === 'it-jobs' ||
+    cat === 'internships' ||
+    org.includes('bank') ||
+    org.includes('limited') ||
+    org.includes('technologies') ||
+    org.includes('telecom') ||
+    org.includes('10pearls') ||
+    org.includes('systems')
+  ) {
+    return `Official vacancy criteria, job descriptions, and application deadlines are ${verb} official corporate careers portals and verified employer announcements. CareerDost provides independent editorial guidance to assist professional job seekers.`
+  }
+
+  // 3. Scholarships
+  if (cat === 'scholarships' || title.includes('scholarship')) {
+    return `Official scholarship criteria, eligibility rules, and funding schedules are ${verb} accredited awarding bodies, sponsoring embassies, and Higher Education Commission (HEC) circulars. CareerDost provides independent advisory analysis to assist applicants.`
+  }
+
+  // 4. Government Schemes & Public Welfare
+  if (cat === 'government-schemes' || title.includes('scheme') || title.includes('bisp')) {
+    return `Official scheme parameters, statutory rules, and disbursement timelines are ${verb} statutory public notifications and verified government portals. CareerDost provides independent civic analysis and consumer guidance.`
+  }
+
+  // 5. Default / Government Jobs & Public Sector
+  return `Official recruitment parameters, pay scales (BPS), and schedules are ${verb} official government notifications, administrative circulars, and departmental portals. CareerDost provides independent editorial analysis and practical guidance to assist citizens.`
+}
 
 export function isLabourWageNotification(item) {
   if (!item) return false
@@ -359,6 +413,26 @@ export function getContextualStatus(item, type) {
   const slug = String(item.slug || '').toLowerCase()
   const noDeadline = Boolean(item.noDeadline || item.no_deadline)
 
+  // 0. Preserve explicit CLOSED status and manually authored closure notices
+  const isExplicitClosed =
+    String(item.status || '').toLowerCase() === 'closed' ||
+    lowerDate.includes('closed') ||
+    lowerDate.includes('expired') ||
+    slug.includes('closed') ||
+    String(item.title || '').toLowerCase().includes('(closed') ||
+    String(item.title || '').toLowerCase().includes('applications closed')
+
+  if (isExplicitClosed) {
+    return {
+      status: 'EXPIRED',
+      label: 'APPLICATIONS CLOSED',
+      badgeClass: 'bg-slate-200 text-slate-700 border-slate-300',
+      description: lastDate ? `Applications officially closed on ${formatDate(lastDate)}.` : 'Applications for this recruitment cycle have officially closed.',
+      isExpired: true,
+      days: -1,
+    }
+  }
+
   if (type === 'notification') {
     if (isLabourWageNotification(item)) {
       return {
@@ -454,42 +528,60 @@ export function getContextualStatus(item, type) {
   }
 
   // Job, Admission, Scholarship with date checks
-  if (noDeadline || !lastDate || String(lastDate).trim() === '') {
+  if (noDeadline || lowerDate.includes('rolling') || lowerDate.includes('ongoing') || lowerDate.includes('continuous')) {
     return {
       status: 'OPEN',
       label: 'NO DEADLINE',
       badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300',
-      description: 'No strict closing deadline specified in the official notice.',
+      description: lastDate || 'No strict closing deadline specified in the official notice.',
       isExpired: false,
     }
   }
 
-  // Check if lastDate contains descriptive text (e.g., 'Effective Since...')
-  const cleanDate = String(lastDate).trim().split('T')[0]
-  const parsed = new Date(cleanDate + 'T00:00:00')
-
-  if (isNaN(parsed.getTime())) {
-    // Descriptive string, not an ISO date
+  if (lowerDate.includes('pending') || lowerDate.includes('unconfirmed') || lowerDate.includes('not yet announced')) {
     return {
-      status: 'ACTIVE',
-      label: 'ACTIVE',
-      badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300',
-      description: lastDate,
+      status: 'DETAILS PENDING',
+      label: 'DETAILS PENDING',
+      badgeClass: 'bg-amber-100 text-amber-900 border-amber-300',
+      description: lastDate || 'Official announcement made; final dates and registration window pending.',
       isExpired: false,
     }
   }
 
-  // Calculate days remaining
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const diffDays = Math.ceil((parsed - today) / (1000 * 60 * 60 * 24))
+  const ymd = normalizeDateToYMD(lastDate)
+  if (!ymd) {
+    if (lastDate && lastDate.length > 0) {
+      return {
+        status: 'NOTICE',
+        label: 'CHECK NOTICE',
+        badgeClass: 'bg-stone-100 text-stone-800 border-stone-300',
+        description: lastDate,
+        isExpired: false,
+      }
+    }
+    return {
+      status: 'NOTICE',
+      label: 'CHECK NOTICE',
+      badgeClass: 'bg-stone-100 text-stone-800 border-stone-300',
+      description: 'Deadline not specified in public notice. Verify current status on official portal.',
+      isExpired: false,
+    }
+  }
+
+  // Calculate calendar days difference in Pakistan Standard Time (PKT, UTC+5)
+  const todayPkt = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Karachi' })
+  const [ty, tm, td] = ymd.split('-').map(Number)
+  const [cy, cm, cd] = todayPkt.split('-').map(Number)
+  const targetUtc = Date.UTC(ty, tm - 1, td)
+  const currentUtc = Date.UTC(cy, cm - 1, cd)
+  const diffDays = Math.round((targetUtc - currentUtc) / (1000 * 60 * 60 * 24))
 
   if (diffDays < 0) {
     return {
       status: 'EXPIRED',
-      label: 'EXPIRED',
+      label: 'APPLICATIONS CLOSED',
       badgeClass: 'bg-slate-200 text-slate-700 border-slate-300',
-      description: `Applications officially closed on ${formatDate(cleanDate)}.`,
+      description: `Applications officially closed on ${formatDate(ymd)}.`,
       isExpired: true,
       days: diffDays,
     }
@@ -500,7 +592,7 @@ export function getContextualStatus(item, type) {
       status: 'CLOSES TODAY',
       label: 'CLOSES TODAY',
       badgeClass: 'bg-red-100 text-red-900 border-red-300 font-bold',
-      description: `Today is the final day to submit your online application (${formatDate(cleanDate)}).`,
+      description: `Today is the final day to submit your online application (${formatDate(ymd)}).`,
       isExpired: false,
       days: 0,
     }
@@ -511,7 +603,7 @@ export function getContextualStatus(item, type) {
       status: 'CLOSING SOON',
       label: `${diffDays}d Left`,
       badgeClass: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
-      description: `Only ${diffDays} day${diffDays > 1 ? 's' : ''} left before portal closure (${formatDate(cleanDate)}).`,
+      description: `Only ${diffDays} day${diffDays > 1 ? 's' : ''} left before portal closure (${formatDate(ymd)}).`,
       isExpired: false,
       days: diffDays,
     }
@@ -521,7 +613,7 @@ export function getContextualStatus(item, type) {
     status: 'OPEN',
     label: `${diffDays} Days Left`,
     badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300',
-    description: `Application deadline is ${formatDate(cleanDate)} (${diffDays} days remaining).`,
+    description: `Application deadline is ${formatDate(ymd)} (${diffDays} days remaining).`,
     isExpired: false,
     days: diffDays,
   }

@@ -9,7 +9,7 @@ import { safeUrl } from '../lib/security'
 import { useSeo } from '../lib/useSeo'
 import { getAbsoluteUrl } from '../lib/config'
 import { trackApplyNowClick, trackOfficialSourceClick } from '../lib/analytics'
-import { getContentType, getContentTypeLabels, getContextualStatus, isLabourWageNotification } from '../lib/contentType'
+import { getContentType, getContentTypeLabels, getContextualStatus, isLabourWageNotification, normalizeDateToYMD } from '../lib/contentType'
 import { isGenuineJobVacancy, buildJobPostingSchema } from '../lib/jobSchema'
 
 import CategoryFallbackImage from '../components/CategoryFallbackImage'
@@ -650,7 +650,7 @@ export default function ArticlePage() {
               value={
                 listing.noDeadline
                   ? 'No Deadline'
-                  : contentType === 'job' && !isNaN(new Date(String(listing.lastDate).split('T')[0] + 'T00:00:00').getTime())
+                  : normalizeDateToYMD(listing.lastDate)
                   ? formatDate(listing.lastDate)
                   : listing.lastDate
               }
