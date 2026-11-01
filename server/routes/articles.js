@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { getDb } from '../db.js'
 import { ArticleModel } from '../models/Article.js'
+import { filterPublicArticles } from '../../src/data/consolidatedRedirects.js'
 
 const app = new Hono()
 
@@ -16,31 +17,35 @@ app.get('/', async (c) => {
   const category = c.req.query('category')
 
   if (query) {
-    const articles = await ArticleModel.search(db, query, 'published')
-    return c.json({ success: true, data: articles })
+    const articles = filterPublicArticles(await ArticleModel.search(db, query, 'published'))
+    return c.json({ success: true, data: limit && limit > 0 ? articles.slice(0, limit) : articles })
   }
 
   if (closingSoon === 'true') {
-    const articles = await ArticleModel.getClosingSoon(db, limit || 6, 'published')
-    return c.json({ success: true, data: articles })
+    const targetLimit = limit || 6
+    const articles = filterPublicArticles(await ArticleModel.getClosingSoon(db, targetLimit + 15, 'published'))
+    return c.json({ success: true, data: articles.slice(0, targetLimit) })
   }
 
   if (featured === 'true') {
-    const articles = await ArticleModel.getFeatured(db, limit || 4, 'published')
-    return c.json({ success: true, data: articles })
+    const targetLimit = limit || 4
+    const articles = filterPublicArticles(await ArticleModel.getFeatured(db, targetLimit + 15, 'published'))
+    return c.json({ success: true, data: articles.slice(0, targetLimit) })
   }
 
   if (latest === 'true') {
-    const articles = await ArticleModel.getLatest(db, limit || 12, 'published')
-    return c.json({ success: true, data: articles })
+    const targetLimit = limit || 12
+    const articles = filterPublicArticles(await ArticleModel.getLatest(db, targetLimit + 15, 'published'))
+    return c.json({ success: true, data: articles.slice(0, targetLimit) })
   }
 
   if (category) {
-    const articles = await ArticleModel.getByCategory(db, category, 'published', limit)
-    return c.json({ success: true, data: articles })
+    const fetchLimit = limit && limit > 0 ? limit + 15 : undefined
+    const articles = filterPublicArticles(await ArticleModel.getByCategory(db, category, 'published', fetchLimit))
+    return c.json({ success: true, data: limit && limit > 0 ? articles.slice(0, limit) : articles })
   }
 
-  let articles = await ArticleModel.getAll(db, 'published')
+  let articles = filterPublicArticles(await ArticleModel.getAll(db, 'published'))
   if (limit && Number(limit) > 0) {
     articles = articles.slice(0, Number(limit))
   }
@@ -54,7 +59,7 @@ app.get('/search', async (c) => {
   if (!q.trim()) {
     return c.json({ success: true, data: [] })
   }
-  const articles = await ArticleModel.search(db, q, 'published')
+  const articles = filterPublicArticles(await ArticleModel.search(db, q, 'published'))
   return c.json({ success: true, data: articles })
 })
 

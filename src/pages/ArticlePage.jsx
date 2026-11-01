@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, Navigate } from 'react-router-dom'
 import { categoryBySlug as defaultCategoryBySlug } from '../data/categories'
+import { CONSOLIDATED_SLUG_REDIRECTS } from '../data/consolidatedRedirects'
 import { getArticleBySlugFromDb, getArticlesByCategoryFromDb, getCategoriesFromDb } from '../api/client'
 import CategoryTag from '../components/CategoryTag'
 import ListingRow from '../components/ListingRow'
@@ -33,6 +34,7 @@ function DetailRow({ label, value }) {
 
 export default function ArticlePage() {
   const { slug } = useParams()
+  const consolidatedTarget = slug ? CONSOLIDATED_SLUG_REDIRECTS.get(slug.toLowerCase()) : null
 
   const [listing, setListing] = useState(() => {
     if (typeof window !== 'undefined' && window.__INITIAL_ARTICLE__ && window.__INITIAL_ARTICLE__.slug === slug) {
@@ -52,6 +54,11 @@ export default function ArticlePage() {
 
   useEffect(() => {
     let isMounted = true
+    if (consolidatedTarget) {
+      return () => {
+        isMounted = false
+      }
+    }
 
     // If preloaded from SSR window.__INITIAL_ARTICLE__, load ancillary data without showing skeleton
     if (listing && listing.slug === slug) {
@@ -232,6 +239,10 @@ export default function ArticlePage() {
     ogImage: listing?.featuredImage ? getAbsoluteUrl(listing.featuredImage) : getAbsoluteUrl('/images/hec-commonwealth-scholarship-2027.jpg'),
     jsonLd: jsonLdSchema,
   })
+
+  if (consolidatedTarget) {
+    return <Navigate to={consolidatedTarget} replace />
+  }
 
   if (loading) {
     return (

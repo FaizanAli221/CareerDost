@@ -9,6 +9,7 @@
 
 import { isGenuineJobVacancy, buildJobPostingSchema } from '../src/lib/jobSchema.js'
 import { getContentType, getContentTypeLabels, getContextualStatus, getSectorTransparencyNote } from '../src/lib/contentType.js'
+import { CONSOLIDATED_SLUG_REDIRECTS } from '../src/data/consolidatedRedirects.js'
 
 const SITE_URL = 'https://careerdost.blog'
 const SITE_NAME = 'CareerDost'
@@ -46,22 +47,6 @@ const STATIC_ROUTE_REDIRECTS = new Map([
   ['/editorial-policy', '/about#editorial-policy'],
   ['/jobs', '/'],
   ['/category/closing-soon', '/daily-updates'],
-])
-
-const CONSOLIDATED_SLUG_REDIRECTS = new Map([
-  ['bank-alfalah-cso-jobs-2026', '/jobs/bank-alfalah-jobs-internships-2026'],
-  ['systems-limited-hiring-software-engineers', '/jobs/systems-limited-associate-software-engineer-jobs-2026'],
-  ['hbl-management-trainee-officer-2026', '/jobs/hbl-jobs-internships-the-league-2026'],
-  ['benazir-income-support-programme-2026', '/jobs/bisp-8171-payment-check-2026-official-guide'],
-  ['nts-nat-result-september-2026', '/jobs/nts-latest-results-answer-keys-2026'],
-  ['commonwealth-scholarships-2027-28-pakistan-hec-csc-uk', '/jobs/hec-uk-commonwealth-scholarships-2027-28'],
-  ['cbd-punjab-paid-internship-2026-youth-career-program', '/jobs/punjab-cbd-youth-career-program-2026-internship'],
-  ['sindh-pink-scooty-scheme-2026-online-registration-eligibility', '/jobs/sindh-govt-electric-scooty-scheme-2026-women'],
-  ['shaikh-ayaz-university-spring-2027-admissions-apply-online', '/jobs/shaikh-ayaz-university-admissions-2027'],
-  ['lums-nano-physics-research-associate-jobs-2026', '/jobs/lums-electronic-technician-jobs-2026'],
-  ['lums-lahore-jobs-advancement-it-staff-2026', '/jobs/lums-electronic-technician-jobs-2026'],
-  ['virtual-university-admissions-2026-deadline-tomorrow', '/jobs/virtual-university-fall-2026-admissions'],
-  ['nts-nat-2026-october-test-roll-number-slips-uploaded', '/jobs/nts-nat-gat-roll-number-slip-2026'],
 ])
 
 function getAbsoluteUrl(url) {
@@ -1621,11 +1606,11 @@ export async function onRequest(context) {
                  FROM articles
                  WHERE category_slug = ? AND status = 'published'
                  ORDER BY publish_date DESC
-                 LIMIT 40`
+                 LIMIT 55`
               )
               .bind(slug)
               .all()
-            articles = results || []
+            articles = (results || []).filter((a) => !CONSOLIDATED_SLUG_REDIRECTS.has(a.slug)).slice(0, 40)
           } catch (err) {
             console.warn('Category articles query error:', err)
           }
@@ -1720,10 +1705,10 @@ export async function onRequest(context) {
         const { results } = await context.env.DB
           .prepare(
             `SELECT slug, title, excerpt, category_slug, organization, location, publish_date, last_date
-             FROM articles WHERE status = 'published' ORDER BY publish_date DESC LIMIT 12`
+             FROM articles WHERE status = 'published' ORDER BY publish_date DESC LIMIT 25`
           )
           .all()
-        latestArticles = results || []
+        latestArticles = (results || []).filter((a) => !CONSOLIDATED_SLUG_REDIRECTS.has(a.slug)).slice(0, 12)
       } catch (err) {
         console.warn('Homepage articles query error:', err)
       }
@@ -1918,7 +1903,9 @@ export async function onRequest(context) {
           .prepare(`SELECT slug FROM articles WHERE status = 'published'`)
           .all()
         if (artResults && artResults.length > 0) {
-          publishedArticleSlugs = new Set(artResults.map((a) => a.slug))
+          publishedArticleSlugs = new Set(
+            artResults.map((a) => a.slug).filter((s) => !CONSOLIDATED_SLUG_REDIRECTS.has(s))
+          )
         }
 
         const { results } = await context.env.DB
@@ -1926,11 +1913,11 @@ export async function onRequest(context) {
             `SELECT id, slug, title, category, short_description, featured_image, image_alt,
                     official_link, apply_link, deadline, publish_date, organization,
                     location, qualification, experience, positions, job_type, salary, is_verified, no_deadline
-             FROM daily_updates WHERE status = 'published' ORDER BY publish_date DESC LIMIT 24`
+             FROM daily_updates WHERE status = 'published' ORDER BY publish_date DESC LIMIT 36`
           )
           .all()
         if (results && results.length > 0) {
-          updates = results
+          updates = results.filter((u) => !CONSOLIDATED_SLUG_REDIRECTS.has(u.slug)).slice(0, 24)
         }
       } catch (err) {
         console.warn('DB daily updates fetch error:', err)

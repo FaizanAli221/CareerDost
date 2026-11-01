@@ -3,6 +3,7 @@ import path from 'path'
 import Database from 'better-sqlite3'
 import { listings } from '../src/data/listings.js'
 import { categories } from '../src/data/categories.js'
+import { CONSOLIDATED_SLUGS_SET } from '../src/data/consolidatedRedirects.js'
 
 const SITE_URL = process.env.SITE_URL || 'https://careerdost.blog'
 
@@ -150,21 +151,7 @@ function generateSitemap() {
     lastmod: todayStr
   }))
 
-  const EXCLUDED_SLUGS = new Set([
-    'httpswwwnjpgovpk',
-    'systems-limited-hiring-software-engineers',
-    'hbl-management-trainee-officer-2026',
-    'benazir-income-support-programme-2026',
-    'nts-nat-result-september-2026',
-    'commonwealth-scholarships-2027-28-pakistan-hec-csc-uk',
-    'cbd-punjab-paid-internship-2026-youth-career-program',
-    'sindh-pink-scooty-scheme-2026-online-registration-eligibility',
-    'shaikh-ayaz-university-spring-2027-admissions-apply-online',
-    'lums-nano-physics-research-associate-jobs-2026',
-    'lums-lahore-jobs-advancement-it-staff-2026',
-    'virtual-university-admissions-2026-deadline-tomorrow',
-    'nts-nat-2026-october-test-roll-number-slips-uploaded'
-  ])
+  const EXCLUDED_SLUGS = CONSOLIDATED_SLUGS_SET
 
   let articleUrlsList = []
   try {
