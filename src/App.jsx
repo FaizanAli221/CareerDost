@@ -15,6 +15,7 @@ import Contact from './pages/Contact'
 import Privacy from './pages/Privacy'
 import Disclaimer from './pages/Disclaimer'
 import Terms from './pages/Terms'
+import JobReadinessToolPage from './pages/JobReadinessToolPage'
 import NotFound from './pages/NotFound'
 
 const AdminPage = lazy(() => import('./pages/AdminPage'))
@@ -43,6 +44,7 @@ export default function App() {
               <Route path="/category/:slug" element={<CategoryPage />} />
               <Route path="/jobs" element={<Navigate to="/" replace />} />
               <Route path="/jobs/:slug" element={<ArticlePage />} />
+              <Route path="/tools/job-readiness-checker" element={<JobReadinessToolPage />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/about" element={<About />} />
               <Route path="/editorial-policy" element={<Navigate to="/about#editorial-policy" replace />} />

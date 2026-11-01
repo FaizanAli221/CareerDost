@@ -20,9 +20,11 @@ export default function OptimizedImage({
 
   const isApiUpload = typeof src === 'string' && src.includes('/api/uploads/')
   const isJpgOrPng = typeof src === 'string' && /\.(jpe?g|png)$/i.test(src)
+  const isStaticWebp = typeof src === 'string' && !isApiUpload && /\.webp$/i.test(src)
 
   let webpSrcSet = null
   let webpSingleSrc = null
+  let resolvedImgSrc = src
 
   if (!useFallback) {
     if (isApiUpload) {
@@ -34,6 +36,8 @@ export default function OptimizedImage({
     } else if (isJpgOrPng) {
       webpSingleSrc = src.replace(/\.(jpe?g|png)$/i, '.webp')
     }
+  } else if (isStaticWebp) {
+    resolvedImgSrc = src.replace(/\.webp$/i, '.jpg')
   }
 
   return (
@@ -44,7 +48,7 @@ export default function OptimizedImage({
         <source srcSet={webpSingleSrc} sizes={sizes} type="image/webp" />
       ) : null}
       <img
-        src={src}
+        src={resolvedImgSrc}
         alt={alt}
         width={width}
         height={height}
@@ -53,7 +57,7 @@ export default function OptimizedImage({
         fetchPriority={priority ? 'high' : 'auto'}
         className={className}
         onError={() => {
-          if (!useFallback && (webpSrcSet || webpSingleSrc)) {
+          if (!useFallback && (webpSrcSet || webpSingleSrc || isStaticWebp)) {
             setUseFallback(true)
           }
         }}

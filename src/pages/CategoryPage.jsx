@@ -172,6 +172,28 @@ export default function CategoryPage() {
       <h1 className="font-serif text-2xl sm:text-3xl text-ink mb-2">{cat.label} in Pakistan</h1>
       {cat.description && <p className="font-sans text-inksoft max-w-2xl mb-6">{cat.description}</p>}
 
+      {(slug === 'guides-and-resources' || slug === 'career-guides') && (
+        <div className="border border-green/30 bg-green-light/40 p-4 sm:p-5 rounded-xs mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-sans">
+          <div>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-green block mb-0.5">
+              Interactive Utility
+            </span>
+            <strong className="font-serif text-base sm:text-lg text-ink block">
+              Government Job Application Readiness Checker
+            </strong>
+            <p className="text-xs text-inksoft mt-0.5">
+              Check your CNIC, domicile, academic transcripts, age limit, and portal readiness before submitting an application.
+            </p>
+          </div>
+          <Link
+            to="/tools/job-readiness-checker"
+            className="bg-green hover:bg-green-dark text-white px-4 py-2.5 text-xs font-bold rounded-xs transition-colors shrink-0 self-start sm:self-auto"
+          >
+            Open Readiness Checker →
+          </Link>
+        </div>
+      )}
+
       <div className="flex flex-wrap gap-2 mb-6 font-sans text-sm">
         {categoriesList.map((c) => (
           <Link

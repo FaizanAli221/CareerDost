@@ -24,12 +24,14 @@ const VALID_CATEGORIES = new Set([
   'admissions',
   'government-schemes',
   'results',
-  'career-guides'
+  'career-guides',
+  'guides-and-resources'
 ])
 
 const KNOWN_STATIC_ROUTES = new Set([
   '/',
   '/daily-updates',
+  '/tools/job-readiness-checker',
   '/search',
   '/about',
   '/contact',
@@ -471,7 +473,7 @@ function generateJobHtml(article, canonical) {
   const cType = getContentType(article)
   const labels = getContentTypeLabels(cType, article)
   const statusInfo = getContextualStatus(article, cType)
-  const categoryLabel = categorySlug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+  const categoryLabel = escapeHtml(getCategoryLabel(article.category_slug || 'government-jobs'))
   const org = article.organization ? escapeHtml(article.organization) : ''
   const loc = article.location ? escapeHtml(article.location) : ''
   const qual = article.qualification ? escapeHtml(article.qualification) : ''
@@ -658,6 +660,11 @@ const CATEGORY_META = {
     label: 'Career Guides',
     short: 'Guides',
     description: 'Comprehensive citizen guides, eligibility checks, verification steps, and official portal walkthroughs across Pakistan.'
+  },
+  'guides-and-resources': {
+    label: 'CareerDost Guides & Resources',
+    short: 'Guides & Resources',
+    description: 'Original Pakistani job application guides, NJP portal walkthroughs, document checklists, and interactive career readiness tools.'
   }
 }
 
@@ -683,6 +690,7 @@ function generateCategoryHtml(slug, catMeta, articles, canonical) {
     { slug: 'government-schemes', label: 'Schemes' },
     { slug: 'results', label: 'Results' },
     { slug: 'career-guides', label: 'Guides' },
+    { slug: 'guides-and-resources', label: 'Guides & Resources' },
   ]
 
   const navPills = allCategoriesNav.map((c) => {
@@ -1003,6 +1011,7 @@ export async function onRequest(context) {
       const staticPages = [
         { loc: '/', priority: '1.0', changefreq: 'daily', lastmod: todayStr },
         { loc: '/daily-updates', priority: '0.9', changefreq: 'daily', lastmod: todayStr },
+        { loc: '/tools/job-readiness-checker', priority: '0.8', changefreq: 'monthly', lastmod: todayStr },
         { loc: '/about', priority: '0.5', changefreq: 'monthly', lastmod: todayStr },
         { loc: '/contact', priority: '0.5', changefreq: 'monthly', lastmod: todayStr },
         { loc: '/privacy-policy', priority: '0.3', changefreq: 'yearly', lastmod: todayStr },
@@ -1754,8 +1763,27 @@ export async function onRequest(context) {
               <li><a href="/category/admissions">University Admissions</a></li>
               <li><a href="/category/results">Merit Lists &amp; Exam Results</a></li>
               <li><a href="/category/career-guides">Career Guides &amp; Procedures</a></li>
+              <li><a href="/category/guides-and-resources">CareerDost Guides &amp; Resources</a></li>
+              <li><a href="/tools/job-readiness-checker">Government Job Application Readiness Checker</a></li>
               <li><a href="/daily-updates">Daily Career &amp; Policy Updates</a></li>
             </ul>
+          </section>
+          <section class="mb-8">
+            <h2 class="font-serif text-xl font-bold text-ink mb-4">Original CareerDost Guides, Checklists &amp; Tools</h2>
+            <div class="grid sm:grid-cols-3 gap-4">
+              <article class="bg-white border border-line p-4 rounded-xs">
+                <h3 class="font-serif text-base font-bold text-ink mb-1"><a href="/jobs/njp-application-rejection-12-common-mistakes-avoid">NJP Application Rejection: 12 Common Mistakes Pakistani Job Applicants Should Avoid</a></h3>
+                <p class="text-xs text-inksoft">Practical guide distinguishing documented NJP portal rules from common CNIC, domicile, transcript, and experience mistakes.</p>
+              </article>
+              <article class="bg-white border border-line p-4 rounded-xs">
+                <h3 class="font-serif text-base font-bold text-ink mb-1"><a href="/jobs/government-jobs-documents-checklist-pakistan-2026">Government Jobs Documents Checklist in Pakistan 2026</a></h3>
+                <p class="text-xs text-inksoft">Complete candidate folder guide and printable checklist covering CNIC, Domicile/PRC, HEC/IBCC attestation, NOC, and professional licenses.</p>
+              </article>
+              <article class="bg-white border border-line p-4 rounded-xs">
+                <h3 class="font-serif text-base font-bold text-ink mb-1"><a href="/tools/job-readiness-checker">Government Job Application Readiness Checker</a></h3>
+                <p class="text-xs text-inksoft">Interactive browser checklist to verify your documents, age limit, and official advertisement requirements before applying.</p>
+              </article>
+            </div>
           </section>
           <section>
             <h2 class="font-serif text-xl font-bold text-ink mb-4">Latest Verified Opportunities &amp; Official Updates</h2>
@@ -2017,6 +2045,77 @@ export async function onRequest(context) {
       .on('link[rel="canonical"]', { element: (e) => e.setAttribute('href', canonical) })
       .on('head', { element: (e) => e.append('<meta name="robots" content="noindex, follow" />', { html: true }) })
       .on('#root', { element: (e) => e.setInnerContent(searchHtml, { html: true }) })
+      .transform(response)
+  }
+
+  // 9B. Interactive Tool Page: /tools/job-readiness-checker
+  if (lowerPath === '/tools/job-readiness-checker') {
+    const pageTitle = 'Government Job Application Readiness Checker — CareerDost'
+    const pageDesc = 'Free pre-submission readiness checklist for Pakistan government job applicants. Verify CNIC, domicile, degrees, age limit, and portal requirements privately.'
+    const canonical = `${SITE_URL}/tools/job-readiness-checker`
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'WebApplication',
+          name: pageTitle,
+          url: canonical,
+          applicationCategory: 'EducationalApplication',
+          operatingSystem: 'All',
+          offers: { '@type': 'Offer', price: '0', priceCurrency: 'PKR' },
+          description: pageDesc,
+          publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+        },
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+            { '@type': 'ListItem', position: 2, name: 'CareerDost Guides & Resources', item: `${SITE_URL}/category/guides-and-resources` },
+            { '@type': 'ListItem', position: 3, name: 'Government Job Application Readiness Checker', item: canonical },
+          ],
+        },
+      ],
+    }
+
+    const toolHtml = `
+      <main class="container-x py-10 max-w-4xl font-sans">
+        <nav class="text-xs text-inksoft mb-4" aria-label="Breadcrumb">
+          <a href="/">Home</a> / <a href="/category/guides-and-resources">CareerDost Guides &amp; Resources</a> / <span>Application Readiness Checker</span>
+        </nav>
+        <h1 class="font-serif text-3xl sm:text-4xl font-bold text-ink mb-4">Government Job Application Readiness Checker</h1>
+        <p class="text-base text-inksoft leading-relaxed mb-4">Use this interactive pre-submission readiness tool before applying on NJP (<a href="https://www.njp.gov.pk" target="_blank" rel="noopener noreferrer">njp.gov.pk</a>), FPSC (<a href="https://www.fpsc.gov.pk" target="_blank" rel="noopener noreferrer">fpsc.gov.pk</a>), SPSC (<a href="https://spsc.gov.pk" target="_blank" rel="noopener noreferrer">spsc.gov.pk</a>), PPSC, KPPSC, BPSC, or departmental portals.</p>
+        <div style="border-left:4px solid #f59e0b;background:#fffbeb;padding:12px 16px;margin-bottom:20px;font-size:14px;color:#78350f;">
+          <strong>This checklist helps you prepare your application. It does not guarantee eligibility or acceptance.</strong><br/>
+          <span style="font-size:12px;">Privacy Notice: CareerDost does not collect or store CNIC numbers, personal documents, or sensitive information.</span>
+        </div>
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-3">7 Core Application Readiness Checks</h2>
+        <ul class="list-disc pl-5 space-y-2 text-base text-ink mb-6">
+          <li><strong>CNIC available:</strong> Valid NADRA CNIC with personal spellings matching educational certificates.</li>
+          <li><strong>Domicile available:</strong> District Domicile Certificate (and Form-D PRC where applicable).</li>
+          <li><strong>Required educational documents available:</strong> Degrees and transcripts/DMCs declared on or before closing date.</li>
+          <li><strong>Experience certificate available, if required:</strong> Signed employer experience certificates with exact dates.</li>
+          <li><strong>Age eligibility checked:</strong> Exact age on closing date verified with applicable upper-age relaxation rules.</li>
+          <li><strong>Relevant professional registration checked, if required:</strong> Active PEC, PMDC, PNC, Pharmacy Council, or Bar registration where required.</li>
+          <li><strong>Advertisement requirements reviewed:</strong> Quota, fee challan/PSID rules, NOC rules, and submission mode confirmed.</li>
+        </ul>
+        <p class="text-sm text-ink">Related Guides: <a href="/jobs/njp-application-rejection-12-common-mistakes-avoid">NJP Application Rejection: 12 Common Mistakes to Avoid</a> • <a href="/jobs/government-jobs-documents-checklist-pakistan-2026">Government Jobs Documents Checklist in Pakistan 2026</a> • <a href="/category/government-jobs">Browse Government Jobs</a></p>
+      </main>`
+
+    return new HTMLRewriter()
+      .on('title', { element: (e) => e.setInnerContent(pageTitle) })
+      .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
+      .on('link[rel="canonical"]', { element: (e) => e.setAttribute('href', canonical) })
+      .on('meta[property="og:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
+      .on('meta[property="og:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
+      .on('meta[property="og:url"]', { element: (e) => e.setAttribute('content', canonical) })
+      .on('meta[name="twitter:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
+      .on('meta[name="twitter:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
+      .on('head', {
+        element(e) {
+          e.append(`<script id="page-jsonld" type="application/ld+json">${JSON.stringify(jsonLd)}</script>`, { html: true })
+        },
+      })
+      .on('#root', { element: (e) => e.setInnerContent(toolHtml, { html: true }) })
       .transform(response)
   }
 

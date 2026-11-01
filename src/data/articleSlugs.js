@@ -2,6 +2,8 @@
 // Decoupled from full listings to avoid pulling 980+ KB into homepage bundle
 
 export const KNOWN_ARTICLE_SLUGS = new Set([
+  'njp-application-rejection-12-common-mistakes-avoid',
+  'government-jobs-documents-checklist-pakistan-2026',
   'niahs-hyderabad-bsn-nursing-admissions-2026-27',
   'memon-college-of-nursing-karachi-bsn-admissions-2026-27',
   'nts-nat-xi-2026-november-registration-guide',

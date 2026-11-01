@@ -109,7 +109,12 @@ export function parseMarkdownToHtml(md, options = {}) {
   function formatInline(str) {
     if (!str) return ''
     return str
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-green hover:underline font-semibold">$1</a>')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label, rawHref) => {
+        const href = String(rawHref || '').trim()
+        const isExternal = /^https?:\/\//i.test(href) && !/^https?:\/\/(www\.)?careerdost\.blog(\/|$)/i.test(href)
+        const attrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : ''
+        return `<a href="${href}"${attrs} class="text-green hover:underline font-semibold">${label}</a>`
+      })
       .replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-ink">$1</strong>')
       .replace(/\*([^*]+)\*/g, '<em class="italic">$1</em>')
       .replace(/`([^`]+)`/g, '<code class="bg-paper px-1.5 py-0.5 rounded text-xs font-mono border border-line text-ink">$1</code>')
@@ -257,13 +262,16 @@ export function parseMarkdownToHtml(md, options = {}) {
 
   const rawHtml = html.join('\n')
 
-  // Sanitize via DOMPurify with allowed tags and attributes
-  return DOMPurify.sanitize(rawHtml, {
-    ADD_ATTR: ['target', 'rel', 'class', 'className'],
-    ALLOWED_TAGS: [
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'ul', 'ol', 'li', 'strong', 'em', 'b', 'i',
-      'a', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'blockquote',
-      'div', 'span', 'br', 'hr', 'code', 'pre', 'img'
-    ],
-  })
+  // Sanitize via DOMPurify with allowed tags and attributes (in browser environments)
+  if (typeof DOMPurify?.sanitize === 'function') {
+    return DOMPurify.sanitize(rawHtml, {
+      ADD_ATTR: ['target', 'rel', 'class', 'className'],
+      ALLOWED_TAGS: [
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'ul', 'ol', 'li', 'strong', 'em', 'b', 'i',
+        'a', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'blockquote',
+        'div', 'span', 'br', 'hr', 'code', 'pre', 'img'
+      ],
+    })
+  }
+  return rawHtml
 }

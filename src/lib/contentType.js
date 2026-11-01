@@ -25,6 +25,17 @@ export function getSectorTransparencyNote(item, categorySlug) {
   const isVerified = Boolean(item?.isVerified || item?.is_verified)
   const verb = isVerified ? 'verified from' : 'sourced directly from'
 
+  // 0. Original CareerDost Guides & Resources
+  if (
+    cat === 'guides-and-resources' ||
+    cat === 'career-guides' ||
+    cat === 'guide' ||
+    cat === 'careerdost guides & resources' ||
+    cat === 'career guides'
+  ) {
+    return `This original CareerDost guide is compiled from publicly documented recruitment portals, statutory verification procedures, and public-service application rules. Always treat the official job advertisement and recruiting authority's instructions as final.`
+  }
+
   // 1. Universities & Admissions
   if (
     cat === 'admissions' ||
@@ -109,6 +120,9 @@ export function getContentType(item) {
   // 2. Explicit Informational / Portal Walkthrough Guides
   if (
     cat === 'career-guides' ||
+    cat === 'guides-and-resources' ||
+    cat === 'careerdost guides & resources' ||
+    cat === 'career guides' ||
     slug === 'sindh-job-portal-2026-junior-clerk-jobs' ||
     slug === 'pec-graduate-engineer-training-get-program-2026' ||
     slug === 'nadra-digital-payments-2026' ||
@@ -341,21 +355,21 @@ export function getContentTypeLabels(type, item = null) {
       break
     case 'guide':
       res = {
-        badge: 'Career & Public Guide',
-        badgeClass: 'bg-stone-100 text-stone-900 border-stone-300',
-        orgLabel: 'Issuing Desk / Department',
-        typeLabel: 'Guide Topic',
-        locLabel: 'Target Audience / Scope',
-        qualLabel: 'Prerequisites / Eligibility',
-        expLabel: 'Experience Level',
+        badge: 'CareerDost Guide & Resource',
+        badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+        orgLabel: 'Editorial Desk / Reference Body',
+        typeLabel: 'Guide Category',
+        locLabel: 'Applicable Scope',
+        qualLabel: 'Target Readers',
+        expLabel: 'Application Stage',
         posLabel: 'Key Takeaways',
         salLabel: 'Key Benefit / Coverage',
-        dateLabel: 'Published / Status Date',
-        ctaLabel: 'Explore Official Guidelines ↗',
-        ctaSecondary: null,
-        howToApplyTitle: 'Recommended Action Steps',
+        dateLabel: 'Last Verified',
+        ctaLabel: 'Visit Official Portal / Resource ↗',
+        ctaSecondary: 'Official Reference Website ↗',
+        howToApplyTitle: 'Recommended Pre-Application Steps',
         statusPrefix: 'Guide Status',
-        summaryTitle: 'Key Guide Summary',
+        summaryTitle: 'Key Guide & Resource Summary',
       }
       break
     case 'job':

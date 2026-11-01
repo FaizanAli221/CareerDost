@@ -40,6 +40,7 @@ const UPDATE_CATEGORIES = [
   'Deadline Alerts',
   'Career News',
   'Government Schemes',
+  'CareerDost Guides & Resources',
 ]
 
 const SITE_PRODUCTION_URL = SITE_URL
@@ -428,7 +429,7 @@ export default function AdminPage() {
   }
 
   const handleGenerateNanoPrompt = (title, category, org = '') => {
-    const prompt = `Editorial 16:9 featured banner for CareerDost (Pakistani career & opportunities portal). Topic: "${title || 'Career Opportunity'}" (${category}${org ? ', ' + org : ''}). Palette: Deep forest green (#059669 / #064e3b), clean off-white background (#faf9f6), subtle gold accents. Clean architectural lines, professional Pakistan public institution aesthetic, modern flat editorial illustration style. Highly professional, zero watermark, strictly no hallucinated or unverified text.`
+    const prompt = `Editorial 16:9 featured banner for CareerDost (Pakistani career & opportunities portal). Topic: "${title || 'Career Opportunity'}" (${category}${org ? ', ' + org : ''}). Palette: Deep forest green (#0B3D2E / #059669), clean off-white paper (#F6F5F1), subtle gold accents. Clean typography and visual hierarchy, professional Pakistani career & education editorial illustration style. Strictly NO fake government logos, state emblems, fake official documents, or misleading seals; zero watermarks.`
     setNanoPromptBox(prompt)
   }
 
@@ -1697,10 +1698,17 @@ export default function AdminPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => insertFormatting(updateForm, setUpdateForm, '<a href="https://official.gov.pk" target="_blank" rel="noopener noreferrer">', '</a>', 'Official Portal Link')}
+                  onClick={() => insertFormatting(updateForm, setUpdateForm, '[', '](https://official.gov.pk)', 'Official Portal Link')}
                   className="px-2.5 py-1 bg-paper border border-line hover:bg-green hover:text-white font-bold"
                 >
-                  🔗 Insert Link
+                  🔗 Official Link
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertFormatting(updateForm, setUpdateForm, '[', '](/jobs/government-jobs-documents-checklist-pakistan-2026)', 'Related CareerDost Guide')}
+                  className="px-2.5 py-1 bg-paper border border-line hover:bg-green hover:text-white font-bold"
+                >
+                  🏠 Internal Link
                 </button>
                 <button
                   type="button"
@@ -2183,6 +2191,20 @@ export default function AdminPage() {
                 </button>
                 <button
                   type="button"
+                  onClick={() => insertFormatting(articleForm, setArticleForm, '[', '](https://www.njp.gov.pk)', 'Official Source Portal')}
+                  className="px-2.5 py-1 bg-paper border hover:bg-green hover:text-white font-bold"
+                >
+                  🔗 Official Link
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertFormatting(articleForm, setArticleForm, '[', '](/jobs/government-jobs-documents-checklist-pakistan-2026)', 'Related CareerDost Guide')}
+                  className="px-2.5 py-1 bg-paper border hover:bg-green hover:text-white font-bold"
+                >
+                  🏠 Internal Link
+                </button>
+                <button
+                  type="button"
                   onClick={() => insertTableTemplate(articleForm, setArticleForm)}
                   className="px-2.5 py-1 bg-paper border hover:bg-green hover:text-white font-bold"
                 >
@@ -2506,6 +2528,43 @@ export default function AdminPage() {
                 onChange={(e) => setCategoryForm({ ...categoryForm, slug: generateSlug(e.target.value) })}
                 className="w-full border border-line p-2.5 bg-white font-mono"
                 required
+              />
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-ink font-bold mb-1">Short Nav Label</label>
+                <input
+                  type="text"
+                  value={categoryForm.short}
+                  onChange={(e) => setCategoryForm({ ...categoryForm, short: e.target.value })}
+                  className="w-full border border-line p-2.5 bg-white"
+                  placeholder="e.g. Guides & Resources"
+                />
+              </div>
+
+              <div>
+                <label className="block text-ink font-bold mb-1">Badge Tone</label>
+                <select
+                  value={categoryForm.tone || 'green'}
+                  onChange={(e) => setCategoryForm({ ...categoryForm, tone: e.target.value })}
+                  className="w-full border border-line p-2.5 bg-white font-semibold"
+                >
+                  <option value="green">Green (Public / Guides)</option>
+                  <option value="gold">Gold (Banking / Results)</option>
+                  <option value="brick">Brick (Admissions / Scholarships)</option>
+                  <option value="slate">Slate (Private / IT / Internships)</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-ink font-bold mb-1">Category SEO Description</label>
+              <textarea
+                value={categoryForm.description}
+                onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
+                className="w-full border border-line p-2.5 bg-white h-20"
+                placeholder="1-2 sentence overview displayed on the category landing page and meta description..."
               />
             </div>
 

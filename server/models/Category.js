@@ -10,22 +10,24 @@ export class CategoryModel {
   }
 
   static async create(db, { slug, label, short, tone = 'slate', description = '' }) {
+    const cleanShort = (short || label || '').trim()
     const res = await db
       .prepare(
         'INSERT INTO categories (slug, label, short, tone, description) VALUES (?, ?, ?, ?, ?)'
       )
-      .bind(slug, label, short, tone, description)
+      .bind(slug, label, cleanShort, tone || 'slate', description || '')
       .run()
     return res.success
   }
 
   static async update(db, slug, { label, short, tone, description, newSlug }) {
     const targetSlug = newSlug || slug
+    const cleanShort = (short || label || '').trim()
     const res = await db
       .prepare(
         'UPDATE categories SET slug = ?, label = ?, short = ?, tone = ?, description = ? WHERE slug = ?'
       )
-      .bind(targetSlug, label, short, tone, description, slug)
+      .bind(targetSlug, label, cleanShort, tone || 'slate', description || '', slug)
       .run()
     return res.success
   }

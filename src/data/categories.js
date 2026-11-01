@@ -82,6 +82,14 @@ export const categories = [
     description:
       'Evergreen educational guides on CV writing, interview preparation, career planning and job application strategies.',
   },
+  {
+    slug: 'guides-and-resources',
+    label: 'CareerDost Guides & Resources',
+    short: 'Guides & Resources',
+    tone: 'green',
+    description:
+      'Original Pakistani job application guides, NJP portal walkthroughs, document checklists, and interactive career readiness tools.',
+  },
 ]
 
 export const categoryBySlug = (slug) => categories.find((c) => c.slug === slug)

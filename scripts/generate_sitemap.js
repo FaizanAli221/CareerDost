@@ -135,6 +135,7 @@ function generateSitemap() {
   const staticPages = [
     { loc: '/', priority: '1.0', changefreq: 'daily', lastmod: todayStr },
     { loc: '/daily-updates', priority: '0.9', changefreq: 'daily', lastmod: todayStr },
+    { loc: '/tools/job-readiness-checker', priority: '0.8', changefreq: 'monthly', lastmod: todayStr },
     { loc: '/about', priority: '0.5', changefreq: 'monthly', lastmod: todayStr },
     { loc: '/contact', priority: '0.5', changefreq: 'monthly', lastmod: todayStr },
     { loc: '/privacy-policy', priority: '0.3', changefreq: 'yearly', lastmod: todayStr },

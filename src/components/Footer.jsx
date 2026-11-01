@@ -93,6 +93,14 @@ export default function Footer() {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link
+                to="/tools/job-readiness-checker"
+                className="text-green font-semibold hover:underline transition-colors focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-hidden rounded-xs"
+              >
+                Job Readiness Checker
+              </Link>
+            </li>
           </ul>
         </div>
 

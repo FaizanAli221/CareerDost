@@ -18,6 +18,8 @@ import WhatsAppCTA from '../components/WhatsAppCTA'
 import ShareButtons from '../components/ShareButtons'
 import SafeContent from '../components/SafeContent'
 import KeyInfoSummary from '../components/KeyInfoSummary'
+import JobReadinessChecker from '../components/JobReadinessChecker'
+import PrintableDocsChecklist from '../components/PrintableDocsChecklist'
 
 function DetailRow({ label, value }) {
   if (!value || value === 'N/A') return null
@@ -323,7 +325,7 @@ export default function ArticlePage() {
           </div>
 
           {/* Social Share Buttons */}
-          <ShareButtons title={listing.title} url={`/jobs/${listing.slug}`} className="mb-6" />
+          <ShareButtons title={listing.title} url={`/jobs/${listing.slug}`} className="no-print mb-6" />
 
           {/* Featured Image Banner */}
           <div className="relative aspect-[16/9] w-full bg-slate-900 rounded-xs overflow-hidden mb-6 shadow-xs">
@@ -357,6 +359,56 @@ export default function ArticlePage() {
           <div className="prose-content text-ink leading-relaxed text-sm sm:text-base space-y-4">
             <SafeContent content={listing.content} stripTitle={listing.title} />
           </div>
+
+          {/* Interactive Printable Documents Checklist on Documents Guide */}
+          {slug === 'government-jobs-documents-checklist-pakistan-2026' && (
+            <PrintableDocsChecklist />
+          )}
+
+          {/* Embedded Application Readiness Checker on Original CareerDost Guides */}
+          {(slug === 'njp-application-rejection-12-common-mistakes-avoid' ||
+            slug === 'government-jobs-documents-checklist-pakistan-2026') && (
+            <JobReadinessChecker compact={true} showGuideLinks={false} />
+          )}
+
+          {/* Contextual Applicant Preparation Resources for Government Jobs & Related Guides */}
+          {slug !== 'njp-application-rejection-12-common-mistakes-avoid' &&
+            slug !== 'government-jobs-documents-checklist-pakistan-2026' &&
+            (listing.category === 'government-jobs' ||
+              listing.category === 'career-guides' ||
+              listing.category === 'guides-and-resources') && (
+              <div className="no-print mt-8 border border-green/25 bg-green-light/30 p-5 rounded-xs font-sans">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-green mb-1">
+                  CareerDost Guides &amp; Resources
+                </div>
+                <h2 className="font-serif text-lg sm:text-xl font-bold text-ink mb-2">
+                  Prepare Your Government Job Application File Before Applying
+                </h2>
+                <p className="text-xs sm:text-sm text-inksoft mb-3 leading-relaxed">
+                  Avoid common portal scrutiny rejections by reviewing your required documents and checking eligibility rules before final submission:
+                </p>
+                <div className="grid sm:grid-cols-3 gap-2.5 text-xs">
+                  <Link
+                    to="/jobs/njp-application-rejection-12-common-mistakes-avoid"
+                    className="border border-line bg-white hover:border-green p-3 rounded-xs font-semibold text-ink hover:text-green transition-colors"
+                  >
+                    12 Common NJP Application Mistakes →
+                  </Link>
+                  <Link
+                    to="/jobs/government-jobs-documents-checklist-pakistan-2026"
+                    className="border border-line bg-white hover:border-green p-3 rounded-xs font-semibold text-ink hover:text-green transition-colors"
+                  >
+                    Government Jobs Documents Checklist 2026 →
+                  </Link>
+                  <Link
+                    to="/tools/job-readiness-checker"
+                    className="border border-green/40 bg-white hover:bg-green hover:text-white p-3 rounded-xs font-bold text-green transition-colors"
+                  >
+                    ✓ Application Readiness Checker →
+                  </Link>
+                </div>
+              </div>
+            )}
 
           {/* Contextual Action / Redressal / How to Benefit Section */}
           <div className="mt-10 border border-line bg-paper/70 p-5 sm:p-6 rounded-xs">
@@ -608,7 +660,7 @@ export default function ArticlePage() {
           )}
 
           {/* Contextual Category Internal Link CTA */}
-          <div className="mt-8 p-4 bg-paper border border-line rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="no-print mt-8 p-4 bg-paper border border-line rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div>
               <span className="text-inksoft block">Explore more verified updates:</span>
               <strong className="text-ink text-sm">Looking for more in {cat.label}?</strong>
@@ -622,10 +674,10 @@ export default function ArticlePage() {
           </div>
 
           {/* Social Share Buttons (Bottom) */}
-          <ShareButtons title={listing.title} url={`/jobs/${listing.slug}`} className="mt-8 mb-6" />
+          <ShareButtons title={listing.title} url={`/jobs/${listing.slug}`} className="no-print mt-8 mb-6" />
 
           {/* WhatsApp Channel CTA */}
-          <WhatsAppCTA variant="banner" className="mt-8 mb-0" />
+          <WhatsAppCTA variant="banner" className="no-print mt-8 mb-0" />
         </article>
 
         {/* Sidebar Key Details with Adaptive Content Type Labels */}

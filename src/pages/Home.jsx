@@ -267,6 +267,8 @@ export default function Home() {
               <Link to="/category/results" className="hover:text-green underline">Merit Lists &amp; NTS</Link>
               <span>•</span>
               <Link to="/category/scholarships" className="hover:text-green underline">HEC Scholarships</Link>
+              <span>•</span>
+              <Link to="/category/guides-and-resources" className="hover:text-green underline font-semibold text-green">Guides &amp; Checklists</Link>
             </div>
           </div>
         </div>
@@ -354,6 +356,81 @@ export default function Home() {
                 ))}
               </div>
             )}
+          </section>
+
+          {/* 5B. CAREERDOST GUIDES, CHECKLISTS & READINESS TOOLS */}
+          <section className="container-x">
+            <div className="border border-green/25 bg-white p-6 sm:p-8 rounded-xs shadow-xs">
+              <SectionHeader
+                tag="🧭 Original Applicant Resources"
+                title="CareerDost Guides, Checklists &amp; Tools"
+                subtitle="Practical preparation guides, document attestation checklists, and interactive application readiness tools for Pakistani candidates"
+                linkTo="/category/guides-and-resources"
+                linkText="All Guides &amp; Resources →"
+              />
+
+              <div className="grid md:grid-cols-3 gap-6">
+                <Link
+                  to="/jobs/njp-application-rejection-12-common-mistakes-avoid"
+                  className="border border-line bg-paper/50 hover:bg-white hover:border-green p-5 rounded-xs transition-all flex flex-col justify-between group"
+                >
+                  <div>
+                    <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-green mb-2">
+                      Portal Application Guide
+                    </span>
+                    <h3 className="font-serif text-lg font-bold text-ink group-hover:text-green transition-colors mb-2 leading-snug">
+                      NJP Application Rejection: 12 Common Mistakes Pakistani Job Applicants Should Avoid
+                    </h3>
+                    <p className="text-xs text-inksoft leading-relaxed">
+                      Distinguish documented NJP portal rules from common CNIC, domicile, transcript date, experience, and age-limit mistakes before submitting.
+                    </p>
+                  </div>
+                  <span className="mt-4 pt-3 border-t border-line/60 text-xs font-bold text-green">
+                    Read NJP Mistakes Guide →
+                  </span>
+                </Link>
+
+                <Link
+                  to="/jobs/government-jobs-documents-checklist-pakistan-2026"
+                  className="border border-line bg-paper/50 hover:bg-white hover:border-green p-5 rounded-xs transition-all flex flex-col justify-between group"
+                >
+                  <div>
+                    <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-green mb-2">
+                      Printable Folder Guide
+                    </span>
+                    <h3 className="font-serif text-lg font-bold text-ink group-hover:text-green transition-colors mb-2 leading-snug">
+                      Government Jobs Documents Checklist in Pakistan 2026
+                    </h3>
+                    <p className="text-xs text-inksoft leading-relaxed">
+                      Complete reference table and printable checklist covering CNIC, Domicile/PRC, transcripts, HEC/IBCC attestation, NOC, and council licenses.
+                    </p>
+                  </div>
+                  <span className="mt-4 pt-3 border-t border-line/60 text-xs font-bold text-green">
+                    Open Printable Checklist →
+                  </span>
+                </Link>
+
+                <Link
+                  to="/tools/job-readiness-checker"
+                  className="border-2 border-green/35 bg-green-light/40 hover:bg-green-light/70 p-5 rounded-xs transition-all flex flex-col justify-between group"
+                >
+                  <div>
+                    <span className="inline-block text-[11px] font-bold uppercase tracking-wider bg-green text-white px-2 py-0.5 rounded-xs mb-2">
+                      Interactive Browser Tool
+                    </span>
+                    <h3 className="font-serif text-lg font-bold text-ink group-hover:text-green transition-colors mb-2 leading-snug">
+                      Government Job Application Readiness Checker
+                    </h3>
+                    <p className="text-xs text-inksoft leading-relaxed">
+                      Verify your 7 core application requirements—CNIC, domicile, degrees, experience, age limit, registration, and ad review—with zero personal data stored.
+                    </p>
+                  </div>
+                  <span className="mt-4 pt-3 border-t border-green/20 text-xs font-bold text-green">
+                    Launch Readiness Checker →
+                  </span>
+                </Link>
+              </div>
+            </div>
           </section>
         </>
       )}

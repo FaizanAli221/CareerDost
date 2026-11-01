@@ -73,6 +73,8 @@ export const CATEGORY_THEMES = {
   'Results': { bg: 'from-cyan-800 to-blue-950', accent: 'border-cyan-300', tagBg: 'bg-cyan-500/20 text-cyan-200', icon: '📊' },
   'Career Guides': { bg: 'from-emerald-900 to-slate-900', accent: 'border-emerald-400', tagBg: 'bg-emerald-500/20 text-emerald-200', icon: '📚' },
   'career-guides': { bg: 'from-emerald-900 to-slate-900', accent: 'border-emerald-400', tagBg: 'bg-emerald-500/20 text-emerald-200', icon: '📚' },
+  'CareerDost Guides & Resources': { bg: 'from-emerald-900 to-slate-900', accent: 'border-emerald-400', tagBg: 'bg-emerald-500/20 text-emerald-200', icon: '🧭' },
+  'guides-and-resources': { bg: 'from-emerald-900 to-slate-900', accent: 'border-emerald-400', tagBg: 'bg-emerald-500/20 text-emerald-200', icon: '🧭' },
 }
 
 export default function CategoryFallbackImage({ category, title, className = '' }) {
