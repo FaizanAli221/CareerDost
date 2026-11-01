@@ -958,13 +958,34 @@ export async function onRequest(context) {
 
   // 0. Dedicated Google Search Console verification token file handler
   if (lowerPath === '/googlefa0859c31163b27d.html') {
-    return new Response('google-site-verification: googlefa0859c31163b27d.html\n', {
+    const html = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Google Site Verification — CareerDost</title>
+    <meta name="robots" content="noindex, nofollow" />
+  </head>
+  <body>
+    <h1>Google Site Verification</h1>
+    <p>google-site-verification: googlefa0859c31163b27d.html</p>
+  </body>
+</html>`
+    return new Response(html, {
       status: 200,
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
         'Cache-Control': 'public, max-age=86400',
+        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';",
       },
     })
+  }
+
+  // 0-cf. Cloudflare email protection fallback redirect (prevents 404 when bots strip hash)
+  if (lowerPath === '/cdn-cgi/l/email-protection') {
+    return Response.redirect(`${SITE_URL}/contact`, 301)
   }
 
   // 0-ads. Dedicated Ads.txt handler for Google AdSense compliance
@@ -2071,6 +2092,7 @@ export async function onRequest(context) {
         </nav>
         <h1 class="font-serif text-3xl sm:text-4xl font-bold text-ink mb-4">Government Job Application Readiness Checker</h1>
         <p class="text-base text-inksoft leading-relaxed mb-4">Use this interactive pre-submission readiness tool before applying on NJP (<a href="https://www.njp.gov.pk" target="_blank" rel="noopener noreferrer">njp.gov.pk</a>), FPSC (<a href="https://www.fpsc.gov.pk" target="_blank" rel="noopener noreferrer">fpsc.gov.pk</a>), SPSC (<a href="https://spsc.gov.pk" target="_blank" rel="noopener noreferrer">spsc.gov.pk</a>), PPSC, KPPSC, BPSC, or departmental portals.</p>
+        <p class="text-sm text-ink leading-relaxed mb-4">Before applying for competitive civil service positions or provincial public service commission tests, applicants frequently encounter application rejections due to minor discrepancies between CNIC spellings and matriculation certificates, expired domicile validity, missing Form-D PRC, or unverified employer experience attestations. Use this checklist to audit your document readiness prior to paying non-refundable bank challans or submitting online portal profiles.</p>
         <div style="border-left:4px solid #f59e0b;background:#fffbeb;padding:12px 16px;margin-bottom:20px;font-size:14px;color:#78350f;">
           <strong>This checklist helps you prepare your application. It does not guarantee eligibility or acceptance.</strong><br/>
           <span style="font-size:12px;">Privacy Notice: CareerDost does not collect or store CNIC numbers, personal documents, or sensitive information.</span>
@@ -2164,6 +2186,8 @@ export async function onRequest(context) {
         <p class="text-base text-ink leading-relaxed mb-4">CareerDost (<a href="https://careerdost.blog">https://careerdost.blog</a>) is an independent private informational website and is <strong>not</strong> affiliated with, endorsed by, or operated by the Government of Pakistan, any provincial government (Sindh, Punjab, Khyber Pakhtunkhwa, Balochistan, Gilgit-Baltistan, or AJK), BISP (8171), SPHF, HEC, FPSC, PPSC, SPSC, KPPSC, BPSC, NTS, STS-IBA, or any commercial bank or employer mentioned on this site.</p>
         <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">No Recruitment, Placement, or Fee Collection</h2>
         <p class="text-base text-ink leading-relaxed mb-4">CareerDost does not issue job offer letters, conduct recruitment tests, process welfare payments, or charge fees to candidates. Always verify dates, challan procedures, and eligibility rules directly on the linked official government or employer portal before applying, and never send money to individuals or mobile wallets claiming guaranteed selection. To report fraudulent listings or suspicious third parties impersonating CareerDost, email us directly at <a href="mailto:careerdost02@gmail.com" class="text-green font-semibold underline">careerdost02@gmail.com</a>.</p>
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">Primary Source Verification &amp; Applicant Vigilance</h2>
+        <p class="text-base text-ink leading-relaxed mb-4">All opportunities published on CareerDost — including federal vacancies, provincial commission advertisements, university admissions, and government financial assistance programs — are compiled from publicly circulated official gazettes, department portals, and authorized daily newspapers. While our editorial desk conducts thorough verification checks before indexing, issuing institutions reserve the sole right to alter eligibility criteria, extend deadlines, or cancel recruitments. Candidates must always review the official notification documents on the designated primary department portals.</p>
       </main>`
     return new HTMLRewriter()
       .on('title', { element: (e) => e.setInnerContent(pageTitle) })
@@ -2191,6 +2215,8 @@ export async function onRequest(context) {
         <p class="text-base text-ink leading-relaxed mb-4">CareerDost provides independent editorial guidance and does not process job, admission, scholarship, or welfare applications. Visitors are solely responsible for confirming closing dates, age limits, domicile rules, and application procedures on the official issuing authority's website before submitting documents or statutory bank challans.</p>
         <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">Intellectual Property &amp; Governing Law</h2>
         <p class="text-base text-ink leading-relaxed mb-4">Original editorial articles, structured tables, and site design on CareerDost may not be scraped or republished in bulk without written permission. Official logos and government notifications remain the property of their respective institutions. These terms are governed by the applicable laws of Pakistan.</p>
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">Third-Party Portals &amp; External Links</h2>
+        <p class="text-base text-ink leading-relaxed mb-4">When following links from CareerDost to external department sites, university admission portals, testing agencies (such as NTS or STS), or recruitment portals, users are subject to the terms and privacy practices of those third-party domains. CareerDost is not responsible for external website availability, online payment gateway failures, or changes to application instructions made after publication.</p>
         <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">Inquiries &amp; Formal Notices</h2>
         <p class="text-base text-ink leading-relaxed mb-4">For questions regarding these terms, intellectual property inquiries, or formal editorial correspondence, please contact our Editorial Desk directly via email at <a href="mailto:careerdost02@gmail.com" class="text-green font-semibold underline">careerdost02@gmail.com</a> or via our <a href="/contact" class="text-green underline font-semibold">Contact page</a>.</p>
       </main>`

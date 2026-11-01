@@ -8,28 +8,33 @@ Allow: /
 User-agent: Googlebot
 Allow: /
 Disallow: /admin
+Allow: /api/uploads/
 Disallow: /api/
 
 User-agent: Bingbot
 Allow: /
 Disallow: /admin
+Allow: /api/uploads/
 Disallow: /api/
 
 # Generative Engine Optimization (GEO) & Answer Search Bots (Allowed for real-time citations)
 User-agent: OAI-SearchBot
 Allow: /
 Disallow: /admin
+Allow: /api/uploads/
 Disallow: /api/
 
 User-agent: PerplexityBot
 Allow: /
 Disallow: /admin
+Allow: /api/uploads/
 Disallow: /api/
 
 # Default Crawlers
 User-agent: *
 Allow: /
 Disallow: /admin
+Allow: /api/uploads/
 Disallow: /api/
 
 # XML Sitemap

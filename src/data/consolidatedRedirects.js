@@ -24,6 +24,9 @@ export const CONSOLIDATED_SLUG_REDIRECTS = new Map([
   ['lums-lahore-jobs-advancement-it-staff-2026', '/jobs/lums-electronic-technician-jobs-2026'],
   ['virtual-university-admissions-2026-deadline-tomorrow', '/jobs/virtual-university-fall-2026-admissions'],
   ['nts-nat-2026-october-test-roll-number-slips-uploaded', '/jobs/nts-nat-gat-roll-number-slip-2026'],
+  ['nepra-support-staff-jobs-2026', '/jobs/nepra-jobs-2026-balochistan-driver-security-guard-dispatch-rider'],
+  ['cabinet-division-driver-jobs-bps-04-2026', '/jobs/cabinet-division-staff-car-driver-jobs-bps-04-2026'],
+  ['meezan-bank-jobs-october-2026', '/jobs/meezan-bank-transaction-associates-batch-01-jobs-2026'],
 ])
 
 export const CONSOLIDATED_SLUGS_SET = new Set(CONSOLIDATED_SLUG_REDIRECTS.keys())
