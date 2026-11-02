@@ -958,27 +958,12 @@ export async function onRequest(context) {
 
   // 0. Dedicated Google Search Console verification token file handler
   if (lowerPath === '/googlefa0859c31163b27d.html') {
-    const html = `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Google Site Verification — CareerDost</title>
-    <meta name="robots" content="noindex, nofollow" />
-  </head>
-  <body>
-    <h1>Google Site Verification</h1>
-    <p>google-site-verification: googlefa0859c31163b27d.html</p>
-  </body>
-</html>`
-    return new Response(html, {
+    return new Response('google-site-verification: googlefa0859c31163b27d.html\n', {
       status: 200,
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
         'Cache-Control': 'public, max-age=86400',
         'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-        'Referrer-Policy': 'strict-origin-when-cross-origin',
-        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';",
       },
     })
   }
