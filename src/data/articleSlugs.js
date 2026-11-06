@@ -2,6 +2,7 @@
 // Decoupled from full listings to avoid pulling 980+ KB into homepage bundle
 
 export const KNOWN_ARTICLE_SLUGS = new Set([
+  'economic-affairs-division-jobs-balochistan-2026',
   'njp-application-rejection-12-common-mistakes-avoid',
   'government-jobs-documents-checklist-pakistan-2026',
   'niahs-hyderabad-bsn-nursing-admissions-2026-27',
