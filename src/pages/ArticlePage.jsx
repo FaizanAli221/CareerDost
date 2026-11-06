@@ -21,6 +21,8 @@ import SafeContent from '../components/SafeContent'
 import KeyInfoSummary from '../components/KeyInfoSummary'
 import JobReadinessChecker from '../components/JobReadinessChecker'
 import PrintableDocsChecklist from '../components/PrintableDocsChecklist'
+import AdsterraBanner300x250 from '../components/AdsterraBanner300x250'
+import AdsterraNativeBanner from '../components/AdsterraNativeBanner'
 
 function DetailRow({ label, value }) {
   if (!value || value === 'N/A') return null
@@ -36,14 +38,23 @@ export default function ArticlePage() {
   const { slug } = useParams()
   const consolidatedTarget = slug ? CONSOLIDATED_SLUG_REDIRECTS.get(slug.toLowerCase()) : null
 
+  const [initialHydratedSlug, setInitialHydratedSlug] = useState(() => {
+    if (typeof window !== 'undefined' && window.__INITIAL_ARTICLE__ && window.__INITIAL_ARTICLE__.slug === slug) {
+      return slug
+    }
+    return null
+  })
   const [listing, setListing] = useState(() => {
     if (typeof window !== 'undefined' && window.__INITIAL_ARTICLE__ && window.__INITIAL_ARTICLE__.slug === slug) {
-      return window.__INITIAL_ARTICLE__
+      const preloaded = window.__INITIAL_ARTICLE__
+      // Consume SSR hydration payload once so subsequent SPA navigations always fetch fresh data
+      delete window.__INITIAL_ARTICLE__
+      return preloaded
     }
     return null
   })
   const [loading, setLoading] = useState(() => {
-    if (typeof window !== 'undefined' && window.__INITIAL_ARTICLE__ && window.__INITIAL_ARTICLE__.slug === slug) {
+    if (listing && listing.slug === slug) {
       return false
     }
     return true
@@ -60,8 +71,9 @@ export default function ArticlePage() {
       }
     }
 
-    // If preloaded from SSR window.__INITIAL_ARTICLE__, load ancillary data without showing skeleton
-    if (listing && listing.slug === slug) {
+    const usedInitialSsr = initialHydratedSlug === slug && listing && listing.slug === slug
+    if (usedInitialSsr) {
+      setInitialHydratedSlug(null)
       getArticlesByCategoryFromDb(listing.category, 5).then((rel) => {
         if (!isMounted) return
         setRelated((rel || []).filter((l) => l.slug !== listing.slug).slice(0, 4))
@@ -69,6 +81,29 @@ export default function ArticlePage() {
       getCategoriesFromDb().then((cats) => {
         if (isMounted && cats) setCategoriesList(cats)
       })
+
+      // If admin has edited content in this browser, silently revalidate in background without skeleton flash
+      let shouldRevalidate = false
+      try {
+        shouldRevalidate = Boolean(
+          window.localStorage?.getItem('careerdost_content_v') ||
+          window.localStorage?.getItem('careerdost_admin_token')
+        )
+      } catch {}
+
+      if (shouldRevalidate) {
+        getArticleBySlugFromDb(slug).then((fresh) => {
+          if (!isMounted) return
+          if (fresh) {
+            setListing(fresh)
+            setNotFound(false)
+          } else {
+            setListing(null)
+            setNotFound(true)
+          }
+        }).catch(() => {})
+      }
+
       return () => {
         isMounted = false
       }
@@ -77,18 +112,10 @@ export default function ArticlePage() {
     setLoading(true)
     setNotFound(false)
 
-    // Attempt to load from DB, then dynamically fallback if needed
+    // Load published record from D1 API (getArticleBySlugFromDb handles offline fallback while respecting 404s for drafts)
     getArticleBySlugFromDb(slug)
-      .then(async (data) => {
+      .then((article) => {
         if (!isMounted) return
-        let article = data
-        if (!article) {
-          try {
-            const mod = await import('../data/listings')
-            article = mod.getListingBySlug ? mod.getListingBySlug(slug) : (mod.listings || []).find((l) => l.slug === slug)
-          } catch {}
-        }
-
         if (article) {
           setListing(article)
           setNotFound(false)
@@ -102,18 +129,9 @@ export default function ArticlePage() {
           setNotFound(true)
         }
       })
-      .catch(async (err) => {
+      .catch((err) => {
         console.warn('Error fetching article:', err)
         if (!isMounted) return
-        try {
-          const mod = await import('../data/listings')
-          const fallback = mod.getListingBySlug ? mod.getListingBySlug(slug) : (mod.listings || []).find((l) => l.slug === slug)
-          if (fallback) {
-            setListing(fallback)
-            setNotFound(false)
-            return
-          }
-        } catch {}
         setListing(null)
         setNotFound(true)
       })
@@ -310,6 +328,14 @@ export default function ArticlePage() {
             {listing.title}
           </h1>
 
+          {/* Editorial Lead Summary / Excerpt (matches SSR lead paragraph) */}
+          {listing.excerpt &&
+            listing.excerpt.trim() !== String(Array.isArray(listing.content) ? listing.content[0] || '' : listing.content || '').trim() && (
+              <p className="font-sans text-sm sm:text-base text-inksoft leading-relaxed border-l-4 border-green pl-4 py-1 bg-paper mb-4">
+                {listing.excerpt}
+              </p>
+            )}
+
           {/* Top Meta Line */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-inksoft mb-4 pb-4 border-b border-line">
             <span>By <Link to="/about#editorial-team" className="font-semibold text-ink hover:text-green underline">Faizan Ali &amp; CareerDost Editorial Desk</Link></span>
@@ -387,7 +413,10 @@ export default function ArticlePage() {
             slug !== 'government-jobs-documents-checklist-pakistan-2026' &&
             (listing.category === 'government-jobs' ||
               listing.category === 'career-guides' ||
-              listing.category === 'guides-and-resources') && (
+              listing.category === 'guides-and-resources') && (() => {
+              const isSindh = [listing.title, listing.location, listing.organization].filter(Boolean).join(' ').toLowerCase().match(/sindh|karachi|hyderabad|sukkur|larkana|badin|spsc|sts/i)
+              const isNjp = [listing.title, listing.location, listing.organization, listing.apply_link, listing.official_link, slug].filter(Boolean).join(' ').toLowerCase().includes('njp') || (listing.apply_link || '').includes('njp.gov.pk')
+              return (
               <div className="no-print mt-8 border border-green/25 bg-green-light/30 p-5 rounded-xs font-sans">
                 <div className="text-[11px] font-bold uppercase tracking-wider text-green mb-1">
                   CareerDost Guides &amp; Resources
@@ -398,7 +427,23 @@ export default function ArticlePage() {
                 <p className="text-xs sm:text-sm text-inksoft mb-3 leading-relaxed">
                   Avoid common portal scrutiny rejections by reviewing your required documents and checking eligibility rules before final submission:
                 </p>
-                <div className="grid sm:grid-cols-3 gap-2.5 text-xs">
+                <div className="grid gap-2.5 text-xs sm:grid-cols-2 lg:grid-cols-4">
+                  {isSindh && (
+                    <Link
+                      to="/jobs/sindh-government-jobs-2026"
+                      className="border border-green/30 bg-white hover:border-green p-3 rounded-xs font-bold text-ink hover:text-green transition-colors"
+                    >
+                      Sindh Govt Jobs 2026 Directory →
+                    </Link>
+                  )}
+                  {isNjp && slug !== 'national-job-portal-njp-pakistan-application-guide' && (
+                    <Link
+                      to="/jobs/national-job-portal-njp-pakistan-application-guide"
+                      className="border border-green/30 bg-white hover:border-green p-3 rounded-xs font-bold text-ink hover:text-green transition-colors"
+                    >
+                      NJP Application Guide 2026 →
+                    </Link>
+                  )}
                   <Link
                     to="/jobs/njp-application-rejection-12-common-mistakes-avoid"
                     className="border border-line bg-white hover:border-green p-3 rounded-xs font-semibold text-ink hover:text-green transition-colors"
@@ -419,7 +464,8 @@ export default function ArticlePage() {
                   </Link>
                 </div>
               </div>
-            )}
+              )
+            })()}
 
           {/* Contextual Action / Redressal / How to Benefit Section */}
           <div className="mt-10 border border-line bg-paper/70 p-5 sm:p-6 rounded-xs">
@@ -518,6 +564,9 @@ export default function ArticlePage() {
               )}
             </div>
           </div>
+
+          {/* Adsterra Native Responsive Banner */}
+          <AdsterraNativeBanner />
 
           {/* Contextual Frequently Asked Questions (FAQ) — only rendered if article content doesn't already have FAQs */}
           {!hasFaqInContent && (
@@ -723,6 +772,9 @@ export default function ArticlePage() {
               value={listing.isVerified || listing.is_verified ? '✓ Official Verified' : 'Standard'}
             />
           </div>
+
+          {/* Adsterra 300x250 Medium Rectangle Banner */}
+          <AdsterraBanner300x250 />
 
           <WhatsAppCTA variant="sidebar" />
 

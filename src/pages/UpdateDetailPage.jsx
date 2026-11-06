@@ -8,6 +8,7 @@ import WhatsAppCTA from '../components/WhatsAppCTA'
 import ShareButtons from '../components/ShareButtons'
 import SafeContent from '../components/SafeContent'
 import KeyInfoSummary from '../components/KeyInfoSummary'
+import AdsterraNativeBanner from '../components/AdsterraNativeBanner'
 import { useSeo } from '../lib/useSeo'
 import { getAbsoluteUrl } from '../lib/config'
 import { trackApplyNowClick, trackOfficialSourceClick } from '../lib/analytics'
@@ -27,15 +28,23 @@ function formatDate(dateStr) {
 
 export default function UpdateDetailPage() {
   const { slug } = useParams()
+  const [initialHydratedSlug, setInitialHydratedSlug] = useState(() => {
+    if (typeof window !== 'undefined' && window.__INITIAL_UPDATE__ && window.__INITIAL_UPDATE__.slug === slug) {
+      return slug
+    }
+    return null
+  })
   const [updateItem, setUpdateItem] = useState(() => {
     if (typeof window !== 'undefined' && window.__INITIAL_UPDATE__ && window.__INITIAL_UPDATE__.slug === slug) {
-      return window.__INITIAL_UPDATE__
+      const preloaded = window.__INITIAL_UPDATE__
+      delete window.__INITIAL_UPDATE__
+      return preloaded
     }
     return null
   })
   const [related, setRelated] = useState([])
   const [loading, setLoading] = useState(() => {
-    if (typeof window !== 'undefined' && window.__INITIAL_UPDATE__ && window.__INITIAL_UPDATE__.slug === slug) {
+    if (updateItem && updateItem.slug === slug) {
       return false
     }
     return true
@@ -132,13 +141,32 @@ export default function UpdateDetailPage() {
   useEffect(() => {
     let isMounted = true
 
-    if (updateItem && updateItem.slug === slug) {
+    const usedInitialSsr = initialHydratedSlug === slug && updateItem && updateItem.slug === slug
+    if (usedInitialSsr) {
+      setInitialHydratedSlug(null)
       getLatestDailyUpdatesFromDb(4).then((latestData) => {
         if (!isMounted) return
         if (latestData) {
           setRelated(latestData.filter((u) => u.slug !== slug).slice(0, 3))
         }
       })
+
+      let shouldRevalidate = false
+      try {
+        shouldRevalidate = Boolean(
+          window.localStorage?.getItem('careerdost_content_v') ||
+          window.localStorage?.getItem('careerdost_admin_token')
+        )
+      } catch {}
+
+      if (shouldRevalidate) {
+        getDailyUpdateBySlugFromDb(slug).then((fresh) => {
+          if (!isMounted) return
+          if (fresh) setUpdateItem(fresh)
+          else setUpdateItem(null)
+        }).catch(() => {})
+      }
+
       return () => {
         isMounted = false
       }
@@ -383,6 +411,9 @@ export default function UpdateDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Adsterra Native Responsive Banner */}
+      <AdsterraNativeBanner />
 
       {/* Social Share Buttons (Bottom) */}
       <ShareButtons title={updateItem.title} url={`/daily-updates/${updateItem.slug}`} className="my-6" />
