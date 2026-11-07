@@ -2,6 +2,9 @@
 // Decoupled from full listings to avoid pulling 980+ KB into homepage bundle
 
 export const KNOWN_ARTICLE_SLUGS = new Set([
+  'gates-cambridge-scholarship-2027',
+  'kp-government-20000-paid-internships-2026',
+  'sindh-government-graduate-internship-program-2026',
   'economic-affairs-division-jobs-balochistan-2026',
   'njp-application-rejection-12-common-mistakes-avoid',
   'government-jobs-documents-checklist-pakistan-2026',
