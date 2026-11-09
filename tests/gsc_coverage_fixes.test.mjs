@@ -155,6 +155,65 @@ await runCheck('9. Database safeguards: id=575 (sindh-government-jobs-2026) back
   assert.equal(row.content, backup.d1_articles_row.content, 'Original content of id=575 must be 100% preserved')
 })
 
+// 10. Approved P2 Content Improvements & Redirect Verification
+await runCheck('10. Approved P2 content improvements: NAVTTC, Survey of Pakistan, TDAP, CTI redirect, 8 Balochistan links, and SPSC canonical link', async () => {
+  const contentBackupPath = path.join(ROOT, 'backups/d1_content_improvements_backup_20261109.json')
+  assert.ok(fs.existsSync(contentBackupPath), 'Content improvements backup file must exist')
+
+  const countWords = (jsonStr) => {
+    const arr = JSON.parse(jsonStr)
+    return arr.join(' ').replace(/[#*|>-]/g, ' ').trim().split(/\s+/).length
+  }
+
+  // 10a. NAVTTC (id=582)
+  const navttc = db.prepare(`SELECT * FROM articles WHERE slug = 'navttc-short-term-expert-media-content-writer-jobs-2026'`).get()
+  assert.ok(navttc && navttc.status === 'published')
+  assert.ok(countWords(navttc.content) >= 550, `Expected NAVTTC >= 550 words, got ${countWords(navttc.content)}`)
+
+  // 10b. Survey of Pakistan (id=571)
+  const sop = db.prepare(`SELECT * FROM articles WHERE slug = 'survey-of-pakistan-jobs-2026-naib-qasid-sanitary-worker'`).get()
+  assert.ok(sop && sop.status === 'published')
+  assert.ok(countWords(sop.content) >= 550, `Expected Survey of Pakistan >= 550 words, got ${countWords(sop.content)}`)
+  assert.ok(sop.content.includes('Post-Wise Vacancy Distribution & Eligibility Criteria'), 'Survey of Pakistan must include post-wise eligibility table')
+  assert.ok(sop.content.includes('Mandatory Document Checklist'), 'Survey of Pakistan must include document checklist')
+
+  // 10c. TDAP Balochistan (id=572)
+  const tdap = db.prepare(`SELECT * FROM articles WHERE slug = 'tdap-jobs-2026-superintendent-udc-ldc-driver-balochistan'`).get()
+  assert.ok(tdap && tdap.status === 'published')
+  assert.ok(countWords(tdap.content) >= 550, `Expected TDAP >= 550 words, got ${countWords(tdap.content)}`)
+  assert.ok(tdap.content.includes('Post-Wise Eligibility Table & Pay Scale Equivalence'), 'TDAP must include post-wise eligibility table')
+
+  // 10d. CTI duplicate update redirect
+  const mwCode = fs.readFileSync(path.join(ROOT, 'functions/_middleware.js'), 'utf8')
+  assert.ok(
+    mwCode.includes("['/daily-updates/sindh-college-education-teaching-interns-ctis-jobs-2026', '/jobs/sindh-cti-jobs-2026-college-teaching-interns']"),
+    'CTI update path must redirect to /jobs/sindh-cti-jobs-2026-college-teaching-interns in STATIC_ROUTE_REDIRECTS'
+  )
+
+  // 10e. 8 Balochistan quota internal links in NJP Balochistan articles
+  const eightBalochSlugs = [
+    '/jobs/pakistan-bait-ul-mal-jobs-2026-balochistan-njp',
+    '/jobs/port-qasim-authority-jobs-2026-balochistan-quota',
+    '/jobs/fbr-customs-jobs-2026-udc-ldc-wireless-operator-balochistan',
+    '/jobs/wapda-jobs-2026-wireless-operator-surveyor-junior-clerk-balochistan',
+    '/jobs/survey-of-pakistan-jobs-2026-naib-qasid-sanitary-worker',
+    '/jobs/tdap-jobs-2026-superintendent-udc-ldc-driver-balochistan',
+    '/jobs/pims-islamabad-jobs-2026-21-positions-balochistan-quota',
+    '/jobs/national-savings-balochistan-jobs-2026-bps-11',
+  ]
+  const njpGuide = db.prepare(`SELECT content FROM articles WHERE slug = 'national-job-portal-njp-pakistan-application-guide'`).get()
+  const eadArt = db.prepare(`SELECT content FROM articles WHERE slug = 'economic-affairs-division-jobs-balochistan-2026'`).get()
+  for (const link of eightBalochSlugs) {
+    assert.ok(njpGuide.content.includes(link), `NJP Guide must include link to ${link}`)
+    assert.ok(eadArt.content.includes(link), `EAD Balochistan article must include link to ${link}`)
+  }
+
+  // 10f. Sindh Graduate Internship internal link correction
+  const sindhIntern = db.prepare(`SELECT content FROM articles WHERE slug = 'sindh-government-graduate-internship-program-2026'`).get()
+  assert.ok(sindhIntern.content.includes('/jobs/spsc-combined-competitive-exam-guide-2026'), 'Sindh internship article must link to /jobs/spsc-combined-competitive-exam-guide-2026')
+  assert.ok(!sindhIntern.content.includes('/jobs/sindh-pink-scooty-scheme-2026-online-registration-eligibility'), 'Sindh internship article must not link to redirected Pink Scooty slug')
+})
+
 db.close()
 
 console.log(`\nResults: ${passed} passed, ${failed} failed\n`)

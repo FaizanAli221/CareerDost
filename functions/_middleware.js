@@ -47,6 +47,7 @@ const STATIC_ROUTE_REDIRECTS = new Map([
   ['/editorial-policy', '/about#editorial-policy'],
   ['/jobs', '/'],
   ['/category/closing-soon', '/daily-updates'],
+  ['/daily-updates/sindh-college-education-teaching-interns-ctis-jobs-2026', '/jobs/sindh-cti-jobs-2026-college-teaching-interns'],
 ])
 
 function getAbsoluteUrl(url) {
@@ -1964,6 +1965,14 @@ export async function onRequest(context) {
 
       if (context.env?.DB) {
         try {
+          const lookupSlug =
+            slug === 'spsc-combined-competitive-exam-guide-2026'
+              ? 'spsc-exam-preparation-screening-challan-guide'
+              : slug === 'sindh-cti-jobs-2026-college-teaching-interns'
+                ? 'sindh-education-rsu-consultant-jobs-2026'
+                : slug === 'njp-balochistan-quota-federal-jobs-november-2026'
+                  ? 'economic-affairs-division-jobs-balochistan-2026'
+                  : slug
           const article = await context.env.DB
             .prepare(
               `SELECT id, slug, title, excerpt, content, seo_title, meta_description, featured_image, image_alt,
@@ -1972,7 +1981,7 @@ export async function onRequest(context) {
                       status, updated_at
                FROM articles WHERE slug = ? LIMIT 1`
             )
-            .bind(slug)
+            .bind(lookupSlug)
             .first()
 
           if (article && article.status === 'published') {

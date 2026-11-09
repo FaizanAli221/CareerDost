@@ -7,7 +7,7 @@ const app = new Hono()
 
 // Public API: Get published articles with optional filtering/search
 app.get('/', async (c) => {
-  c.header('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600')
+  c.header('Cache-Control', 'public, max-age=0, s-maxage=15, must-revalidate')
   const db = getDb(c)
   const query = c.req.query('q')
   const featured = c.req.query('featured')
@@ -54,6 +54,7 @@ app.get('/', async (c) => {
 
 // Public API: Search published articles
 app.get('/search', async (c) => {
+  c.header('Cache-Control', 'public, max-age=0, s-maxage=15, must-revalidate')
   const db = getDb(c)
   const q = c.req.query('q') || ''
   if (!q.trim()) {
@@ -66,11 +67,29 @@ app.get('/search', async (c) => {
 // Public API: Get published article by slug
 app.get('/:slug', async (c) => {
   const db = getDb(c)
-  const slug = c.req.param('slug')
+  const rawSlug = c.req.param('slug')
+  const slug =
+    rawSlug === 'spsc-combined-competitive-exam-guide-2026'
+      ? 'spsc-exam-preparation-screening-challan-guide'
+      : rawSlug === 'sindh-cti-jobs-2026-college-teaching-interns'
+        ? 'sindh-education-rsu-consultant-jobs-2026'
+        : rawSlug === 'njp-balochistan-quota-federal-jobs-november-2026'
+          ? 'economic-affairs-division-jobs-balochistan-2026'
+          : rawSlug
   const article = await ArticleModel.getBySlug(db, slug, 'published')
 
   if (!article) {
+    c.header('Cache-Control', 'no-store, no-cache, must-revalidate')
     return c.json({ success: false, error: 'Article not found' }, 404)
+  }
+
+  const contentSig = JSON.stringify(article.content || '').length
+  const etag = `W/"art-${article.id}-${encodeURIComponent(String(article.updatedAt || ''))}-${(article.title || '').length}-${contentSig}"`
+  c.header('ETag', etag)
+  c.header('Cache-Control', 'public, max-age=0, s-maxage=5, must-revalidate')
+
+  if (c.req.header('If-None-Match') === etag) {
+    return c.body(null, 304)
   }
 
   return c.json({ success: true, data: article })
