@@ -142,6 +142,18 @@ const VERIFIED_EMPLOYER_ADDRESSES = {
     addressRegion: 'Punjab',
     addressCountry: 'PK',
   },
+  'lesco-jobs-2026-balochistan-quota-ots': {
+    streetAddress: 'LESCO Headquarters, 22-A Queens Road',
+    addressLocality: 'Lahore',
+    addressRegion: 'Punjab',
+    addressCountry: 'PK',
+  },
+  'paec-foundation-jobs-advertisement-05-2026': {
+    streetAddress: 'PAEC Foundation Head Office, Mauve Area, Sector G-9/1',
+    addressLocality: 'Islamabad',
+    addressRegion: 'Islamabad Capital Territory',
+    addressCountry: 'PK',
+  },
   'hec-jobs-2026': {
     streetAddress: 'Sector H-9',
     addressLocality: 'Islamabad',
@@ -241,6 +253,12 @@ const VERIFIED_JOB_DESIGNATIONS = {
   'sbp-cyber-security-it-jobs-2026': 'Cyber Security Operations Analyst (OG-3)',
   'bank-of-punjab-karachi-manager-jobs-2026': 'Regional Manager Alliances & Projects Governance',
   'askari-bank-jobs-october-2026-karachi': 'Analyst Payment Screening & e-KYC',
+  'lesco-jobs-2026-balochistan-quota-ots': 'Assistant Manager (Electrical, Customer Services, Accounts, HR, IT)',
+  'paec-foundation-jobs-advertisement-05-2026': 'Jr. Manager (IT), Tech-I (Electrical) & Assistant Dispenser',
+  'sindh-irrigation-department-jobs-2026-badin-tando-muhammad-khan': 'Darogha, Jeep Driver, Gauge Reader, Beldar & Field Staff (BPS-01 to BPS-04)',
+  'district-sessions-court-dadu-jobs-2026-nts': 'Stenographer (BPS-16), Data Coder (BPS-14) & Junior Clerk (BPS-11)',
+  'islamabad-police-jobs-2026-790-constable-asi-sub-inspector': 'Constable (BS-07), Assistant Sub-Inspector (BS-11) & Sub-Inspector (BS-14)',
+  'survey-of-pakistan-jobs-2026-naib-qasid-sanitary-worker': 'Naib Qasid & Sanitary Worker (BPS-01)',
 }
 
 const CITY_TO_REGION = [
@@ -435,8 +453,9 @@ export function isGenuineJobVacancy(item, contentType = 'job') {
   const validThrough = normalizeValidThrough(rawLastDate, rawNoDeadline)
   if (!validThrough) return false
 
-  // Suppress active JobPosting schema when application deadline has passed
-  const todayIso = new Date().toISOString().slice(0, 10)
+  // Suppress active JobPosting schema when application deadline has passed in Pakistan Standard Time (UTC+5)
+  const pktNow = new Date(Date.now() + 5 * 60 * 60 * 1000)
+  const todayIso = pktNow.toISOString().slice(0, 10)
   if (validThrough < todayIso) return false
 
   return true

@@ -16,6 +16,7 @@ import Privacy from './pages/Privacy'
 import Disclaimer from './pages/Disclaimer'
 import Terms from './pages/Terms'
 import JobReadinessToolPage from './pages/JobReadinessToolPage'
+import SindhGovJobsPillarPage from './pages/SindhGovJobsPillarPage'
 import NotFound from './pages/NotFound'
 
 const AdminPage = lazy(() => import('./pages/AdminPage'))
@@ -43,6 +44,9 @@ export default function App() {
               <Route path="/daily-updates/:slug" element={<UpdateDetailPage />} />
               <Route path="/category/:slug" element={<CategoryPage />} />
               <Route path="/jobs" element={<Navigate to="/" replace />} />
+              <Route path="/jobs/sindh-government-jobs-2026" element={<SindhGovJobsPillarPage />} />
+              <Route path="/jobs/spsc-combined-competitive-exam-guide-2026" element={<Navigate to="/jobs/spsc-exam-preparation-screening-challan-guide" replace />} />
+              <Route path="/jobs/njp-balochistan-quota-federal-jobs-november-2026" element={<Navigate to="/jobs/economic-affairs-division-jobs-balochistan-2026" replace />} />
               <Route path="/jobs/:slug" element={<ArticlePage />} />
               <Route path="/tools/job-readiness-checker" element={<JobReadinessToolPage />} />
               <Route path="/search" element={<SearchPage />} />

@@ -9,7 +9,12 @@ const app = new Hono()
 
 const SITE_URL = 'https://careerdost.blog'
 
-const EXCLUDED_SITEMAP_SLUGS = CONSOLIDATED_SLUGS_SET
+const EXCLUDED_SITEMAP_SLUGS = new Set([
+  ...CONSOLIDATED_SLUGS_SET,
+  'hyderabad-division-section-144-notification-2026',
+  'fpsc-consolidated-advertisement-09-2026-announced',
+  'hec-fully-funded-phd-scholarships-2026-open',
+])
 
 app.get('/robots.txt', (c) => {
   const content = `User-agent: Mediapartners-Google

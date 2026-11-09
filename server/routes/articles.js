@@ -67,15 +67,7 @@ app.get('/search', async (c) => {
 // Public API: Get published article by slug
 app.get('/:slug', async (c) => {
   const db = getDb(c)
-  const rawSlug = c.req.param('slug')
-  const slug =
-    rawSlug === 'spsc-combined-competitive-exam-guide-2026'
-      ? 'spsc-exam-preparation-screening-challan-guide'
-      : rawSlug === 'sindh-cti-jobs-2026-college-teaching-interns'
-        ? 'sindh-education-rsu-consultant-jobs-2026'
-        : rawSlug === 'njp-balochistan-quota-federal-jobs-november-2026'
-          ? 'economic-affairs-division-jobs-balochistan-2026'
-          : rawSlug
+  const slug = c.req.param('slug')
   const article = await ArticleModel.getBySlug(db, slug, 'published')
 
   if (!article) {

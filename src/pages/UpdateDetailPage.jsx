@@ -130,11 +130,16 @@ export default function UpdateDetailPage() {
     }
   }, [updateItem, slug, canonicalPath])
 
+  const isNoIndexUpdate =
+    slug === 'fpsc-consolidated-advertisement-09-2026-announced' ||
+    slug === 'hec-fully-funded-phd-scholarships-2026-open'
+
   useSeo({
     title: updateItem ? `${updateItem.seoTitle || updateItem.title} — CareerDost` : 'Daily Update — CareerDost',
     description: updateItem ? updateItem.metaDescription || updateItem.shortDescription : 'Verified Pakistan daily update.',
     canonical: canonicalPath,
     ogImage: updateItem?.featuredImage ? getAbsoluteUrl(updateItem.featuredImage) : getAbsoluteUrl('/images/hec-commonwealth-scholarship-2027.jpg'),
+    robots: !loading && !updateItem ? 'noindex, nofollow' : isNoIndexUpdate ? 'noindex, follow' : null,
     jsonLd: jsonLdSchema,
   })
 

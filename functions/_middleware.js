@@ -47,7 +47,17 @@ const STATIC_ROUTE_REDIRECTS = new Map([
   ['/editorial-policy', '/about#editorial-policy'],
   ['/jobs', '/'],
   ['/category/closing-soon', '/daily-updates'],
-  ['/daily-updates/sindh-college-education-teaching-interns-ctis-jobs-2026', '/jobs/sindh-cti-jobs-2026-college-teaching-interns'],
+  ['/jobs/spsc-combined-competitive-exam-guide-2026', '/jobs/spsc-exam-preparation-screening-challan-guide'],
+  ['/jobs/njp-balochistan-quota-federal-jobs-november-2026', '/jobs/economic-affairs-division-jobs-balochistan-2026'],
+])
+
+const NOINDEX_ARTICLE_SLUGS = new Set([
+  'hyderabad-division-section-144-notification-2026',
+])
+
+const NOINDEX_UPDATE_SLUGS = new Set([
+  'fpsc-consolidated-advertisement-09-2026-announced',
+  'hec-fully-funded-phd-scholarships-2026-open',
 ])
 
 function getAbsoluteUrl(url) {
@@ -114,11 +124,14 @@ function normalizeLegacyBlockHtml(str) {
     .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '- $1\n')
 }
 
-function withHtmlCacheHeaders(response, cacheControl = 'public, max-age=0, s-maxage=300, stale-while-revalidate=86400', etag = '') {
+function withHtmlCacheHeaders(response, cacheControl = 'public, max-age=0, s-maxage=300, stale-while-revalidate=86400', etag = '', robotsTag = '') {
   const headers = new Headers(response.headers)
   headers.set('Cache-Control', cacheControl)
   if (etag) {
     headers.set('ETag', etag)
+  }
+  if (robotsTag) {
+    headers.set('X-Robots-Tag', robotsTag)
   }
   return new Response(response.body, {
     status: response.status,
@@ -1380,9 +1393,10 @@ export async function onRequest(context) {
         (r) =>
           r.status === 'published' &&
           r.slug !== 'httpswwwnjpgovpk' &&
-          !CONSOLIDATED_SLUG_REDIRECTS.has(r.slug)
+          !CONSOLIDATED_SLUG_REDIRECTS.has(r.slug) &&
+          !NOINDEX_ARTICLE_SLUGS.has(r.slug)
       )
-      const publishedArticleSlugs = new Set(publishedArticleRows.map((r) => r.slug))
+      const publishedArticleSlugs = new Set((allArticleRows || []).filter((r) => r.status === 'published').map((r) => r.slug))
       const staticPages = [
         { loc: '/', priority: '1.0', changefreq: 'daily', lastmod: todayStr },
         { loc: '/jobs/sindh-government-jobs-2026', priority: '0.9', changefreq: 'daily', lastmod: todayStr },
@@ -1418,7 +1432,8 @@ export async function onRequest(context) {
           (u) =>
             !publishedArticleSlugs.has(u.slug) &&
             u.slug !== 'httpswwwnjpgovpk' &&
-            !CONSOLIDATED_SLUG_REDIRECTS.has(u.slug)
+            !CONSOLIDATED_SLUG_REDIRECTS.has(u.slug) &&
+            !NOINDEX_UPDATE_SLUGS.has(u.slug)
         )
         .map((u) => ({
           loc: `/daily-updates/${u.slug}`,
@@ -1616,6 +1631,7 @@ export async function onRequest(context) {
             const dailyHtml = generateDailyUpdateHtml(update, canonical)
             const modDate = update.updated_at ? String(update.updated_at).split(' ')[0].split('T')[0] : update.publish_date
 
+            const isNoIndexUpdate = NOINDEX_UPDATE_SLUGS.has(slug)
             const rewriter = new HTMLRewriter()
               .on('title', { element: (e) => e.setInnerContent(pageTitle) })
               .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
@@ -1630,6 +1646,9 @@ export async function onRequest(context) {
               .on('meta[name="twitter:image"]', { element: (e) => e.setAttribute('content', ogImage) })
               .on('head', {
                 element(e) {
+                  if (isNoIndexUpdate) {
+                    e.append(`<meta name="robots" content="noindex, follow" />\n`, { html: true })
+                  }
                   if (ogImage) {
                     const isStatic = ogImage.includes('/images/')
                     const webpUrl = isStatic && /\.(jpe?g|png)$/i.test(ogImage) ? ogImage.replace(/\.(jpe?g|png)$/i, '.webp') : null
@@ -1746,7 +1765,12 @@ export async function onRequest(context) {
               })
 
             const updateEtag = `W/"ssr-upd-${update.id}-${encodeURIComponent(String(update.updated_at || update.publish_date || ''))}-${String(update.title || '').length}-${String(update.content || '').length}"`
-            return withHtmlCacheHeaders(rewriter.transform(response), 'public, max-age=0, s-maxage=300, stale-while-revalidate=86400', updateEtag)
+            return withHtmlCacheHeaders(
+              rewriter.transform(response),
+              'public, max-age=0, s-maxage=300, stale-while-revalidate=86400',
+              updateEtag,
+              isNoIndexUpdate ? 'noindex, follow' : ''
+            )
           }
 
           // Not found in daily_updates: check if exists in articles table
@@ -1965,14 +1989,6 @@ export async function onRequest(context) {
 
       if (context.env?.DB) {
         try {
-          const lookupSlug =
-            slug === 'spsc-combined-competitive-exam-guide-2026'
-              ? 'spsc-exam-preparation-screening-challan-guide'
-              : slug === 'sindh-cti-jobs-2026-college-teaching-interns'
-                ? 'sindh-education-rsu-consultant-jobs-2026'
-                : slug === 'njp-balochistan-quota-federal-jobs-november-2026'
-                  ? 'economic-affairs-division-jobs-balochistan-2026'
-                  : slug
           const article = await context.env.DB
             .prepare(
               `SELECT id, slug, title, excerpt, content, seo_title, meta_description, featured_image, image_alt,
@@ -1981,7 +1997,7 @@ export async function onRequest(context) {
                       status, updated_at
                FROM articles WHERE slug = ? LIMIT 1`
             )
-            .bind(lookupSlug)
+            .bind(slug)
             .first()
 
           if (article && article.status === 'published') {
@@ -2060,6 +2076,7 @@ export async function onRequest(context) {
                   },
                 }
 
+            const isNoIndexArticle = NOINDEX_ARTICLE_SLUGS.has(slug)
             const rewriter = new HTMLRewriter()
               .on('title', { element: (e) => e.setInnerContent(pageTitle) })
               .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
@@ -2074,6 +2091,9 @@ export async function onRequest(context) {
               .on('meta[name="twitter:image"]', { element: (e) => e.setAttribute('content', ogImage) })
               .on('head', {
                 element(e) {
+                  if (isNoIndexArticle) {
+                    e.append(`<meta name="robots" content="noindex, follow" />\n`, { html: true })
+                  }
                   if (ogImage) {
                     const isStatic = ogImage.includes('/images/')
                     const webpUrl = isStatic && /\.(jpe?g|png)$/i.test(ogImage) ? ogImage.replace(/\.(jpe?g|png)$/i, '.webp') : null
@@ -2159,7 +2179,12 @@ export async function onRequest(context) {
               })
 
             const articleEtag = `W/"ssr-art-${article.id}-${encodeURIComponent(String(article.updated_at || article.publish_date || ''))}-${String(article.title || '').length}-${String(article.content || '').length}"`
-            return withHtmlCacheHeaders(rewriter.transform(response), 'public, max-age=0, s-maxage=300, stale-while-revalidate=86400', articleEtag)
+            return withHtmlCacheHeaders(
+              rewriter.transform(response),
+              'public, max-age=0, s-maxage=300, stale-while-revalidate=86400',
+              articleEtag,
+              isNoIndexArticle ? 'noindex, follow' : ''
+            )
           }
 
           // Not found in articles: check if exists in daily_updates
@@ -2756,13 +2781,13 @@ export async function onRequest(context) {
   // 10. Legal Pages: /privacy-policy, /disclaimer, /terms-and-conditions
   if (lowerPath === '/privacy-policy') {
     const pageTitle = 'Privacy Policy — Cookies, Analytics & Advertising Disclosures | CareerDost'
-    const pageDesc = 'Official Privacy Policy for CareerDost (https://careerdost.blog) covering Google Analytics 4 (GA4), Google AdSense advertising cookies, data protection standards, and user opt-out rights.'
+    const pageDesc = 'Official Privacy Policy for CareerDost (https://careerdost.blog) covering Google Analytics 4 (GA4), Google AdSense, Adsterra, third-party advertising cookies, data protection standards, and user opt-out rights.'
     const canonical = `${SITE_URL}/privacy-policy`
     const privacyHtml = `
       <main class="container-x py-10 max-w-4xl font-sans">
         <nav class="text-xs text-inksoft mb-4" aria-label="Breadcrumb"><a href="/">Home</a> / <span>Privacy Policy</span></nav>
         <h1 class="font-serif text-3xl sm:text-4xl font-bold text-ink mb-4">Privacy Policy — CareerDost</h1>
-        <p class="text-sm text-inksoft mb-4">Effective Date: January 1, 2026 • Last Reviewed: October 18, 2026</p>
+        <p class="text-sm text-inksoft mb-4">Effective Date: January 1, 2026 • Last Reviewed: November 10, 2026</p>
         <p class="text-base text-ink leading-relaxed mb-4">CareerDost (<a href="https://careerdost.blog">https://careerdost.blog</a>) respects your privacy. We do not require visitor registration to read our guides, and we never request or store sensitive personal identifiers such as CNIC numbers, bank account numbers, BISP/8171 dynamic survey records, or passwords.</p>
 
         <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">1. Log Files &amp; Cloudflare Edge Security</h2>
@@ -2771,12 +2796,14 @@ export async function onRequest(context) {
         <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">2. Google Analytics 4 (GA4) Measurement</h2>
         <p class="text-base text-ink leading-relaxed mb-4">We use Google Analytics 4 (Measurement ID: <code>G-489C8F8SNJ</code>) to understand aggregate readership trends, page views, and device types. Google Analytics sets first-party cookies (such as <code>_ga</code>) to distinguish unique sessions without identifying individual visitors. You can opt out via the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">Google Analytics Opt-out Browser Add-on</a>.</p>
 
-        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">3. Third-Party Advertising &amp; Google AdSense Cookies</h2>
-        <p class="text-base text-ink leading-relaxed mb-3">CareerDost may display advertisements served by Google AdSense and certified third-party advertising partners:</p>
+        <h2 class="font-serif text-xl font-bold text-ink mt-6 mb-2">3. Third-Party Advertising, Cookies &amp; Ad Network Disclosures</h2>
+        <p class="text-base text-ink leading-relaxed mb-3">CareerDost displays contextual and/or personalized advertisements served by third-party advertising providers, including <strong>Google AdSense</strong> and <strong>Adsterra</strong> (operated via third-party ad delivery domains such as <code>highperformanceformat.com</code> and <code>pl29190020.profitablecpmratenetwork.com</code>):</p>
         <ul class="list-disc pl-5 space-y-2 text-base text-ink mb-4">
-          <li>Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to CareerDost or other websites on the internet.</li>
-          <li>Google's use of advertising cookies enables it and its partners to serve advertisements to our visitors based on their visit to <code>careerdost.blog</code> and/or other sites on the internet.</li>
-          <li>Users may opt out of personalized advertising by visiting <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer">Google Ads Settings (adssettings.google.com)</a> or <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer">www.aboutads.info/choices</a>. See also <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">How Google uses information from sites or apps that use our services</a>.</li>
+          <li>Third-party ad servers and ad networks (including Google AdSense and Adsterra) use cookies, JavaScript tags, web beacons, and embedded iframes to deliver advertisements, measure ad impressions, cap frequency, and evaluate campaign performance.</li>
+          <li>When these third-party ad scripts or iframes load in your browser, the respective ad provider automatically receives standard technical request information—including your IP address, browser user-agent, device type, operating system, and referring page URL.</li>
+          <li>Google's use of advertising cookies (such as DoubleClick DART cookies) enables it and its partners to serve advertisements to our visitors based on their visit to <code>careerdost.blog</code> and/or other websites on the Internet.</li>
+          <li>CareerDost has no access to or control over third-party cookies, tracking identifiers, or scripts placed by external advertising networks, which are governed by each provider's own privacy policy.</li>
+          <li>Users may manage or block third-party cookies through their browser privacy settings, opt out of Google personalized advertising at <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer">Google Ads Settings (adssettings.google.com)</a>, or manage participating third-party ad choices at <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer">www.aboutads.info/choices</a>. See also <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">How Google uses information from sites or apps that use our services</a>.</li>
         </ul>
 
         <!-- Temporarily hidden: 4. On-Page AI Assistant Widget (Zanderio AI) -->

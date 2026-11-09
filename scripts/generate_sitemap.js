@@ -152,7 +152,12 @@ function generateSitemap() {
     lastmod: todayStr
   }))
 
-  const EXCLUDED_SLUGS = CONSOLIDATED_SLUGS_SET
+  const EXCLUDED_SLUGS = new Set([
+    ...CONSOLIDATED_SLUGS_SET,
+    'hyderabad-division-section-144-notification-2026',
+    'fpsc-consolidated-advertisement-09-2026-announced',
+    'hec-fully-funded-phd-scholarships-2026-open',
+  ])
 
   let articleUrlsList = []
   try {

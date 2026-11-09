@@ -6,12 +6,12 @@ export default function Privacy() {
   useSeo({
     title: 'Privacy Policy — CareerDost',
     description:
-      'Read the CareerDost Privacy Policy covering data minimization, Google Analytics (GA4), local browser storage, third-party advertising cookies, and user privacy rights.',
+      'Official Privacy Policy for CareerDost (https://careerdost.blog) covering Google Analytics 4 (GA4), Google AdSense, Adsterra, third-party advertising cookies, data protection standards, and user opt-out rights.',
     canonical: '/privacy-policy',
   })
 
   return (
-    <SimplePage title="Privacy Policy" updated="18 October 2026">
+    <SimplePage title="Privacy Policy" updated="10 November 2026">
       <p>
         This Privacy Policy explains how <strong>CareerDost</strong> (&ldquo;we&rdquo;, &ldquo;us&rdquo;, or
         &ldquo;our&rdquo;, accessible at{' '}
@@ -103,31 +103,43 @@ export default function Privacy() {
 
       <h2>4. Cookies &amp; Third-Party Advertising Disclosures</h2>
       <p>
-        CareerDost may display contextual or personalized advertisements served by third-party advertising
-        companies, including <strong>Google AdSense</strong>, when advertising services are active on the site:
+        CareerDost displays contextual and/or personalized advertisements served by third-party advertising
+        providers, including <strong>Google AdSense</strong> and <strong>Adsterra</strong> (operated via third-party
+        ad delivery domains such as <code>highperformanceformat.com</code> and{' '}
+        <code>pl29190020.profitablecpmratenetwork.com</code>):
       </p>
       <ul>
         <li>
-          Third-party vendors, including Google, use cookies (such as Google advertising cookies and DoubleClick
-          DART cookies) or web beacons to serve ads based on a user&rsquo;s prior visits to{' '}
-          <code>careerdost.blog</code> or other websites on the Internet.
+          Third-party ad servers and ad networks (including Google AdSense and Adsterra) use cookies, JavaScript
+          tags, web beacons, and embedded iframes to deliver advertisements, measure ad impressions, cap frequency,
+          and evaluate campaign performance.
         </li>
         <li>
-          Google&rsquo;s use of advertising cookies enables it and its partners to serve advertisements to our
-          visitors based on their visit to this site and/or other sites on the Internet.
+          When these third-party ad scripts or iframes load in your browser, the respective ad provider automatically
+          receives standard technical request information—including your IP address, browser user-agent, device type,
+          operating system, and referring page URL.
         </li>
         <li>
-          Users may opt out of personalized advertising at any time by visiting{' '}
+          Google&rsquo;s use of advertising cookies (such as Google advertising cookies and DoubleClick DART cookies)
+          enables it and its partners to serve advertisements to our visitors based on their visit to{' '}
+          <code>careerdost.blog</code> and/or other websites on the Internet.
+        </li>
+        <li>
+          CareerDost has no access to or control over third-party cookies, tracking identifiers, or scripts placed
+          by external advertising networks, which are governed by each provider&rsquo;s own privacy policy.
+        </li>
+        <li>
+          Users may manage or block third-party cookies through their browser privacy settings, opt out of Google
+          personalized advertising at{' '}
           <a
             href="https://adssettings.google.com"
             target="_blank"
             rel="noopener noreferrer"
             className="text-green underline"
           >
-            Google Ads Settings
+            Google Ads Settings (adssettings.google.com)
           </a>
-          . Alternatively, you can opt out of a third-party vendor&rsquo;s use of cookies for personalized
-          advertising by visiting{' '}
+          , or manage participating third-party vendor cookie choices at{' '}
           <a
             href="https://www.aboutads.info/choices/"
             target="_blank"
@@ -135,6 +147,15 @@ export default function Privacy() {
             className="text-green underline"
           >
             www.aboutads.info/choices
+          </a>
+          . See also{' '}
+          <a
+            href="https://policies.google.com/technologies/partner-sites"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-green underline"
+          >
+            How Google uses information from sites or apps that use our services
           </a>
           .
         </li>

@@ -64,8 +64,11 @@ export function useSeo(options = {}) {
     ogType = 'website',
     ogImage = DEFAULT_OG_IMAGE,
     noIndex = false,
-    jsonLd = null,
+    robots = null,
+    jsonLd: explicitJsonLd = null,
+    schemaJson = null,
   } = opts
+  const jsonLd = explicitJsonLd || schemaJson || null
 
   const jsonLdString = jsonLd ? JSON.stringify(jsonLd) : ''
 
@@ -81,7 +84,7 @@ export function useSeo(options = {}) {
     }
 
     // 3. Meta Robots
-    setMetaTag('name', 'robots', noIndex ? 'noindex, nofollow' : 'index, follow')
+    setMetaTag('name', 'robots', robots || (noIndex ? 'noindex, nofollow' : 'index, follow'))
 
     // 4. Canonical URL
     const pathname = typeof window !== 'undefined' && window.location ? window.location.pathname : '/'
@@ -109,5 +112,5 @@ export function useSeo(options = {}) {
     // 7. Structured Data JSON-LD
     setJsonLd(jsonLdString ? JSON.parse(jsonLdString) : null)
 
-  }, [title, description, canonical, ogType, ogImage, noIndex, jsonLdString])
+  }, [title, description, canonical, ogType, ogImage, noIndex, robots, jsonLdString])
 }

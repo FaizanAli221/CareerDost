@@ -249,12 +249,15 @@ export default function ArticlePage() {
     }
   }, [listing, slug, cat, contentType])
 
+  const isNoIndexArticle = slug === 'hyderabad-division-section-144-notification-2026'
+
   useSeo({
     title: listing?.seoTitle || (listing ? `${listing.title} — CareerDost` : 'Opportunity — CareerDost'),
     description: listing?.metaDescription || listing?.excerpt || 'View verified requirements, eligibility criteria, and direct official links on CareerDost.',
     canonical: `/jobs/${slug}`,
     ogType: 'article',
     ogImage: listing?.featuredImage ? getAbsoluteUrl(listing.featuredImage) : getAbsoluteUrl('/images/hec-commonwealth-scholarship-2027.jpg'),
+    robots: notFound ? 'noindex, nofollow' : isNoIndexArticle ? 'noindex, follow' : null,
     jsonLd: jsonLdSchema,
   })
 
