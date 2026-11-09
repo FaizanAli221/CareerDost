@@ -96,10 +96,41 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
 }
 
+function normalizeLegacyInlineHtml(str) {
+  if (!str) return ''
+  return String(str)
+    .replace(/<(strong|b)>([\s\S]*?)<\/\1>/gi, '**$2**')
+    .replace(/<(em|i)>([\s\S]*?)<\/\1>/gi, '*$2*')
+}
+
+function normalizeLegacyBlockHtml(str) {
+  if (!str) return ''
+  return String(str)
+    .replace(/\r\n/g, '\n')
+    .replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, '\n\n## $1\n\n')
+    .replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi, '\n\n### $1\n\n')
+    .replace(/<\/?(ul|ol)[^>]*>/gi, '\n')
+    .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '- $1\n')
+}
+
+function withHtmlCacheHeaders(response, cacheControl = 'public, max-age=0, s-maxage=300, stale-while-revalidate=86400', etag = '') {
+  const headers = new Headers(response.headers)
+  headers.set('Cache-Control', cacheControl)
+  if (etag) {
+    headers.set('ETag', etag)
+  }
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  })
+}
+
 function formatInline(str) {
   if (!str) return ''
   const linkTokens = []
-  const tokenized = String(str).replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]+)\)/g, (_, label, href) => {
+  const normalized = normalizeLegacyInlineHtml(str)
+  const tokenized = String(normalized).replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]+)\)/g, (_, label, href) => {
     const id = `@@CDLINK_${linkTokens.length}@@`
     const safeHref = escapeHtml(href)
     const safeLabel = escapeHtml(label)
@@ -147,7 +178,8 @@ function renderContentBlocks(content, targetTitle = '') {
   const blocks = []
   for (const rb of rawBlocks) {
     if (!rb) continue
-    const parts = String(rb).split(/\n\s*\n/)
+    const normalizedRb = normalizeLegacyBlockHtml(rb)
+    const parts = String(normalizedRb).split(/\n\s*\n/)
     for (const p of parts) {
       if (p.trim()) blocks.push(p.trim())
     }
@@ -534,6 +566,28 @@ function generateJobHtml(article, canonical) {
       </div>
     </div>` : ''
 
+  const isSindhGovJob = (title + ' ' + loc + ' ' + org).toLowerCase().match(/\b(sindh|karachi|hyderabad|sukkur|larkana|badin|spsc|sts)\b/i)
+  const isNjpJob = (title + ' ' + loc + ' ' + org + ' ' + (applyLink || '') + ' ' + (officialLink || '') + ' ' + (article.slug || '')).toLowerCase().includes('njp') || (applyLink || '').includes('njp.gov.pk')
+  const applicantResourcesBox = `
+    <div style="background:#faf9f6;border:1px solid #e7e5e4;border-radius:2px;padding:20px;margin-bottom:32px;font-family:sans-serif;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#059669;margin-bottom:6px;">
+        CareerDost Applicant Preparation Resources
+      </div>
+      <strong style="font-family:serif;font-size:16px;color:#1c1917;display:block;margin-bottom:8px;">
+        Verify Your Application File Before Applying
+      </strong>
+      <p style="font-size:13px;color:#78716c;margin-bottom:14px;line-height:1.5;">
+        Avoid recruitment portal scrutiny rejections by reviewing mandatory documents, domicile requirements, and application rules:
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));gap:10px;font-size:12px;">
+        ${isSindhGovJob ? `<a href="/jobs/sindh-government-jobs-2026" style="background:#ffffff;border:1px solid #a7f3d0;padding:10px 12px;border-radius:2px;color:#047857;text-decoration:none;font-weight:700;">Sindh Govt Jobs 2026 Directory →</a>` : ''}
+        ${(isNjpJob && article.slug !== 'national-job-portal-njp-pakistan-application-guide') ? `<a href="/jobs/national-job-portal-njp-pakistan-application-guide" style="background:#ffffff;border:1px solid #a7f3d0;padding:10px 12px;border-radius:2px;color:#047857;text-decoration:none;font-weight:700;">NJP Application Guide 2026 →</a>` : ''}
+        <a href="/jobs/government-jobs-documents-checklist-pakistan-2026" style="background:#ffffff;border:1px solid #e7e5e4;padding:10px 12px;border-radius:2px;color:#1c1917;text-decoration:none;font-weight:600;">Government Jobs Documents Checklist →</a>
+        <a href="/tools/job-readiness-checker" style="background:#ffffff;border:1px solid #a7f3d0;padding:10px 12px;border-radius:2px;color:#047857;text-decoration:none;font-weight:700;">✓ Job Readiness Checker →</a>
+        <a href="/jobs/njp-application-rejection-12-common-mistakes-avoid" style="background:#ffffff;border:1px solid #e7e5e4;padding:10px 12px;border-radius:2px;color:#1c1917;text-decoration:none;font-weight:600;">12 Common Application Mistakes →</a>
+      </div>
+    </div>`
+
   return `
     <div class="min-h-screen flex flex-col bg-paper">
       <header class="border-b border-line bg-white sticky top-0 z-40 shadow-xs">
@@ -583,6 +637,7 @@ function generateJobHtml(article, canonical) {
           <div class="font-sans text-ink text-base leading-relaxed space-y-5 mb-10 border-b border-line pb-8">
             ${contentHtml}
           </div>
+          ${applicantResourcesBox}
           ${actionButtons}
         </article>
       </main>
@@ -778,6 +833,305 @@ function generateCategoryHtml(slug, catMeta, articles, canonical) {
   `
 }
 
+function generateSindhPillarHtml(articles, canonical) {
+  const todayIso = new Date().toISOString().slice(0, 10)
+  const activeArticles = []
+  const archivedArticles = []
+
+  for (const art of (articles || [])) {
+    if (!art || !art.slug || art.slug === 'sindh-government-jobs-2026' || CONSOLIDATED_SLUG_REDIRECTS.has(art.slug)) {
+      continue
+    }
+    const lastDate = art.last_date || art.lastDate
+    if (lastDate && /^\d{4}-\d{2}-\d{2}$/.test(lastDate) && lastDate < todayIso) {
+      archivedArticles.push(art)
+    } else {
+      activeArticles.push(art)
+    }
+  }
+
+  const articleCards = activeArticles && activeArticles.length > 0 ? activeArticles.slice(0, 24).map((art) => {
+    const artTitle = escapeHtml(art.title || '')
+    const artOrg = art.organization ? escapeHtml(art.organization) : ''
+    const artLoc = art.location ? escapeHtml(art.location) : 'Sindh, Pakistan'
+    const artDate = art.publish_date ? escapeHtml(art.publish_date) : ''
+    const artLastDate = art.last_date ? escapeHtml(art.last_date) : ''
+    const artExcerpt = art.excerpt ? escapeHtml(art.excerpt) : ''
+    const artImg = art.featured_image ? getAbsoluteUrl(art.featured_image) : ''
+    const artAlt = escapeHtml(art.image_alt || art.title || 'Sindh Job Vacancy')
+
+    return `
+      <article style="background:#ffffff;border:1px solid #e7e5e4;border-radius:2px;overflow:hidden;display:flex;flex-direction:column;">
+        ${artImg ? `
+        <div style="aspect-ratio:16/9;width:100%;overflow:hidden;background:#0f172a;">
+          <img src="${artImg}" alt="${artAlt}" width="600" height="338" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" />
+        </div>` : ''}
+        <div style="padding:16px;flex:1;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:8px;">
+            <span style="color:#059669;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Sindh Govt Job</span>
+            ${artDate ? `<span style="color:#78716c;">${artDate}</span>` : ''}
+          </div>
+          <h2 style="font-family:serif;font-size:16px;font-weight:700;line-height:1.35;margin-bottom:8px;color:#1c1917;">
+            <a href="/jobs/${art.slug}" style="color:#1c1917;text-decoration:none;">${artTitle}</a>
+          </h2>
+          ${artOrg ? `<p style="font-size:12px;color:#78716c;margin-bottom:6px;font-weight:600;">${artOrg}</p>` : ''}
+          ${artExcerpt ? `<p style="font-size:12px;color:#78716c;line-height:1.5;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${artExcerpt}</p>` : ''}
+          <div style="margin-top:auto;padding-top:12px;border-top:1px solid #f5f5f4;display:flex;justify-content:space-between;align-items:center;font-size:12px;">
+            <span style="color:#78716c;">${artLoc}</span>
+            <a href="/jobs/${art.slug}" style="color:#059669;font-weight:600;text-decoration:none;">${artLastDate ? `Apply by ${artLastDate} →` : 'View Details →'}</a>
+          </div>
+        </div>
+      </article>
+    `
+  }).join('\n') : `
+    <div style="grid-column:1/-1;padding:48px 16px;text-align:center;color:#78716c;background:#ffffff;border:1px solid #e7e5e4;">
+      <p>No active Sindh vacancies currently listed. Check back regularly or view recent notices below.</p>
+    </div>
+  `
+
+  const archivedRows = archivedArticles.slice(0, 6).map((art) => `
+    <div style="background:#ffffff;border:1px solid #e7e5e4;padding:12px 16px;margin-bottom:8px;border-radius:2px;display:flex;justify-content:space-between;align-items:center;font-size:13px;">
+      <a href="/jobs/${art.slug}" style="color:#1c1917;text-decoration:none;font-weight:600;">${escapeHtml(art.title)}</a>
+      <span style="color:#78716c;font-size:11px;background:#f5f5f4;padding:2px 8px;border-radius:2px;white-space:nowrap;">Deadline Passed</span>
+    </div>
+  `).join('\n')
+
+  return `
+    <div class="min-h-screen flex flex-col bg-paper font-sans" style="background:#faf9f6;">
+      <header class="border-b border-line bg-white sticky top-0 z-40 shadow-xs" style="background:#ffffff;border-bottom:1px solid #e7e5e4;">
+        <div class="container-x">
+          <div class="flex items-center justify-between h-16 gap-4 border-b border-line/50">
+            <a href="/" class="flex items-baseline gap-1.5 shrink-0 group" style="text-decoration:none;">
+              <span class="font-serif text-2xl sm:text-3xl font-bold text-ink" style="color:#1c1917;">
+                CareerDost
+              </span>
+            </a>
+            <nav class="hidden md:flex items-center gap-6 text-sm font-sans font-medium text-ink">
+              <a href="/daily-updates" style="color:#1c1917;text-decoration:none;margin-right:16px;">Daily Updates</a>
+              <a href="/category/government-jobs" style="color:#1c1917;text-decoration:none;margin-right:16px;">Govt Jobs</a>
+              <a href="/category/scholarships" style="color:#1c1917;text-decoration:none;margin-right:16px;">Scholarships</a>
+              <a href="/category/admissions" style="color:#1c1917;text-decoration:none;margin-right:16px;">Admissions</a>
+              <a href="/category/career-guides" style="color:#1c1917;text-decoration:none;margin-right:16px;">Career Guides</a>
+              <a href="/about" style="color:#1c1917;text-decoration:none;">About</a>
+            </nav>
+          </div>
+        </div>
+      </header>
+      <main class="flex-1">
+        <div class="container-x py-8" style="padding-top:32px;padding-bottom:48px;max-width:1024px;margin:0 auto;padding-left:16px;padding-right:16px;">
+          <nav style="font-size:12px;color:#78716c;margin-bottom:16px;" aria-label="Breadcrumb">
+            <a href="/" style="color:#059669;text-decoration:none;">Home</a>
+            <span style="margin:0 6px;">/</span>
+            <a href="/category/government-jobs" style="color:#059669;text-decoration:none;">Government Jobs</a>
+            <span style="margin:0 6px;">/</span>
+            <span style="color:#1c1917;font-weight:600;">Sindh Government Jobs 2026</span>
+          </nav>
+
+          <header style="margin-bottom:32px;border-bottom:1px solid #e7e5e4;padding-bottom:24px;">
+            <div style="display:inline-block;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;padding:4px 12px;font-size:12px;font-weight:700;border-radius:9999px;margin-bottom:12px;">
+              ✓ Verified Provincial Recruitment Hub
+            </div>
+            <h1 style="font-family:serif;font-size:32px;font-weight:700;color:#1c1917;line-height:1.25;margin-bottom:16px;">
+              Sindh Government Jobs 2026 — Latest Vacancies
+            </h1>
+            <p style="font-size:16px;color:#44403c;line-height:1.6;margin-bottom:16px;">
+              Welcome to CareerDost’s verified directory of <strong>Sindh Government Jobs 2026</strong>. Public sector departments across Sindh—including the <strong>Sindh Public Service Commission (SPSC)</strong>, <strong>Sukkur IBA Testing Services (STS)</strong>, <strong>High Court of Sindh &amp; District Judiciary</strong>, and provincial municipal corporations—regularly announce recruitment notices across all 30 districts of Sindh, including Karachi, Hyderabad, Sukkur, Larkana, and Badin.
+            </p>
+            <div style="background:#ffffff;border-left:4px solid #059669;padding:16px;font-size:14px;color:#1c1917;line-height:1.6;border-radius:2px;border:1px solid #e7e5e4;border-left-width:4px;border-left-color:#059669;">
+              <strong>Key Recruitment Update (2026 Policy):</strong> The Sindh Services, General Administration &amp; Coordination Department (S&amp;GAD) enforces a general <strong>15-year upper age relaxation</strong> (up to 43 years for general provincial posts). Candidates holding a valid <strong>Sindh Domicile</strong> and <strong>PRC Form "D"</strong> are eligible to apply under designated Rural (60%) and Urban (40%) provincial quota allocations.
+            </div>
+          </header>
+
+          <div style="aspect-ratio:21/9;width:100%;margin-bottom:32px;border-radius:2px;overflow:hidden;background:#0f172a;border:1px solid #e7e5e4;">
+            <img src="/images/sindh-government-jobs-2026-spsc-sts-guide.webp" alt="Sindh Government Jobs 2026 Latest Vacancies SPSC STS Online Apply Guide CareerDost" width={1200} height={514} style="width:100%;height:100%;object-fit:cover;display:block;" fetchpriority="high" />
+          </div>
+
+          <!-- Quick Facts Table -->
+          <section style="background:#ffffff;border:1px solid #e7e5e4;border-radius:2px;padding:24px;margin-bottom:36px;">
+            <h2 style="font-family:serif;font-size:22px;font-weight:700;color:#1c1917;margin-bottom:16px;border-bottom:1px solid #e7e5e4;padding-bottom:10px;">
+              Quick Facts: Sindh Government Recruitment 2026
+            </h2>
+            <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:12px;">
+              <table style="width:100%;border-collapse:collapse;font-size:14px;text-align:left;">
+                <tbody>
+                  <tr style="border-bottom:1px solid #f5f5f4;">
+                    <td style="padding:10px;font-weight:600;color:#1c1917;width:32%;background:#faf9f6;">Jurisdiction</td>
+                    <td style="padding:10px;color:#44403c;">Government of Sindh (Provincial, Divisional &amp; District Cadres)</td>
+                  </tr>
+                  <tr style="border-bottom:1px solid #f5f5f4;">
+                    <td style="padding:10px;font-weight:600;color:#1c1917;background:#faf9f6;">Official Testing Agencies</td>
+                    <td style="padding:10px;color:#44403c;">SPSC (BPS-16+), Sukkur IBA Testing Services (STS BPS-05 to 15), District Selection Committees (BPS-01 to 04)</td>
+                  </tr>
+                  <tr style="border-bottom:1px solid #f5f5f4;">
+                    <td style="padding:10px;font-weight:600;color:#1c1917;background:#faf9f6;">General Age Limit</td>
+                    <td style="padding:10px;color:#44403c;">18 to 28 years + 15 Years General S&amp;GAD Relaxation = <strong>Up to 43 Years</strong></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid #f5f5f4;">
+                    <td style="padding:10px;font-weight:600;color:#1c1917;background:#faf9f6;">Mandatory Domicile</td>
+                    <td style="padding:10px;color:#44403c;">District Domicile Certificate &amp; PRC Form "D" (Rural or Urban Quota)</td>
+                  </tr>
+                  <tr style="border-bottom:1px solid #f5f5f4;">
+                    <td style="padding:10px;font-weight:600;color:#1c1917;background:#faf9f6;">Statutory Quotas</td>
+                    <td style="padding:10px;color:#44403c;">Rural 60%, Urban 40%, Women 5%, Minorities 5%, Differently-Abled 5%</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:10px;font-weight:600;color:#1c1917;background:#faf9f6;">Official Portals</td>
+                    <td style="padding:10px;color:#44403c;">
+                      <a href="https://spsc.gov.pk" target="_blank" rel="noopener noreferrer" style="color:#059669;font-weight:600;text-decoration:none;margin-right:12px;">spsc.gov.pk ↗</a>
+                      <a href="https://apply.sts.net.pk" target="_blank" rel="noopener noreferrer" style="color:#059669;font-weight:600;text-decoration:none;margin-right:12px;">apply.sts.net.pk ↗</a>
+                      <a href="https://sindhjobs.gov.pk" target="_blank" rel="noopener noreferrer" style="color:#059669;font-weight:600;text-decoration:none;">sindhjobs.gov.pk ↗</a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Active Jobs Section -->
+          <section style="margin-bottom:36px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <div>
+                <h2 style="font-family:serif;font-size:24px;font-weight:700;color:#1c1917;margin-bottom:4px;">
+                  Active Sindh Government Job Vacancies
+                </h2>
+                <p style="font-size:13px;color:#78716c;">
+                  Verified open positions across Karachi, Hyderabad, Sukkur, Larkana, and Badin.
+                </p>
+              </div>
+              <span style="background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;padding:4px 12px;font-size:12px;font-weight:700;border-radius:9999px;">
+                ${activeArticles.length} Active Vacancies
+              </span>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(290px, 1fr));gap:20px;margin-bottom:32px;">
+              ${articleCards}
+            </div>
+          </section>
+
+          <!-- Documents Checklist -->
+          <section style="background:#ffffff;border:1px solid #e7e5e4;border-radius:2px;padding:24px;margin-bottom:36px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#059669;margin-bottom:6px;">
+              Official Submission Guide
+            </div>
+            <h2 style="font-family:serif;font-size:22px;font-weight:700;color:#1c1917;margin-bottom:12px;">
+              Sindh Government Jobs: Mandatory Application Documents Checklist
+            </h2>
+            <p style="font-size:13px;color:#78716c;margin-bottom:16px;line-height:1.5;">
+              Ensure your application dossier contains attested copies of these mandatory documents before submitting to SPSC, STS, or District Selection Committees:
+            </p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:12px;font-size:13px;color:#1c1917;">
+              <div style="background:#faf9f6;border:1px solid #e7e5e4;padding:12px;border-radius:2px;">
+                <strong>✓ Original CNIC:</strong> Valid NADRA CNIC with permanent address in Sindh.
+              </div>
+              <div style="background:#faf9f6;border:1px solid #e7e5e4;padding:12px;border-radius:2px;">
+                <strong>✓ Domicile Certificate:</strong> Issued by District Deputy Commissioner office.
+              </div>
+              <div style="background:#faf9f6;border:1px solid #e7e5e4;padding:12px;border-radius:2px;">
+                <strong>✓ PRC Form "D":</strong> Permanent Residence Certificate indicating Urban or Rural status.
+              </div>
+              <div style="background:#faf9f6;border:1px solid #e7e5e4;padding:12px;border-radius:2px;">
+                <strong>✓ Educational Certificates:</strong> Degrees, mark sheets, and diplomas (HEC/IBCC attested where required).
+              </div>
+              <div style="background:#faf9f6;border:1px solid #e7e5e4;padding:12px;border-radius:2px;">
+                <strong>✓ Departmental NOC:</strong> No Objection Certificate from parent department if currently employed.
+              </div>
+              <div style="background:#faf9f6;border:1px solid #e7e5e4;padding:12px;border-radius:2px;">
+                <strong>✓ Photographs &amp; Paid Challan:</strong> Passport-size photos with blue background and original fee receipt.
+              </div>
+            </div>
+          </section>
+
+          <!-- Contextual Internal Linking Hub -->
+          <section style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:2px;padding:24px;margin-bottom:36px;">
+            <h2 style="font-family:serif;font-size:20px;font-weight:700;color:#065f46;margin-bottom:12px;">
+              Related Sindh Public Sector Guides &amp; Key Notices
+            </h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:12px;font-size:13px;">
+              <div style="background:#ffffff;padding:14px;border:1px solid #d1fae5;border-radius:2px;">
+                <a href="/jobs/sindh-courts-bps-1-4-jobs-2026" style="color:#1c1917;text-decoration:none;font-weight:700;display:block;margin-bottom:4px;">Sindh Courts BPS-01 to 04 Jobs →</a>
+                <span style="color:#78716c;font-size:12px;">District &amp; Sessions Court vacancies for peon, naib qasid &amp; driver.</span>
+              </div>
+              <div style="background:#ffffff;padding:14px;border:1px solid #d1fae5;border-radius:2px;">
+                <a href="/jobs/spsc-cce-2026-examination-reforms-age-attempts-screening" style="color:#1c1917;text-decoration:none;font-weight:700;display:block;margin-bottom:4px;">SPSC CCE-2026 Examination Guide →</a>
+                <span style="color:#78716c;font-size:12px;">Screening test dates, age relaxation rules &amp; syllabus updates.</span>
+              </div>
+              <div style="background:#ffffff;padding:14px;border:1px solid #d1fae5;border-radius:2px;">
+                <a href="/jobs/sindh-job-portal-2026-junior-clerk-jobs" style="color:#1c1917;text-decoration:none;font-weight:700;display:block;margin-bottom:4px;">Sindh Job Portal Junior Clerk Guide →</a>
+                <span style="color:#78716c;font-size:12px;">Typing test standards, BPS-11 requirements &amp; online apply steps.</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- FAQs Section -->
+          <section style="background:#ffffff;border:1px solid #e7e5e4;border-radius:2px;padding:24px;margin-bottom:36px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#059669;margin-bottom:6px;">
+              Applicant Knowledge Base
+            </div>
+            <h2 style="font-family:serif;font-size:22px;font-weight:700;color:#1c1917;margin-bottom:20px;">
+              Frequently Asked Questions: Sindh Public Sector Jobs
+            </h2>
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div style="border-bottom:1px solid #f5f5f4;padding-bottom:14px;">
+                <h3 style="font-family:serif;font-size:16px;font-weight:700;color:#1c1917;margin-bottom:6px;">
+                  What is the general age relaxation for Sindh Government jobs in 2026?
+                </h3>
+                <p style="font-size:13px;color:#44403c;line-height:1.6;">
+                  The Government of Sindh (S&amp;GAD) has notified a general relaxation of up to 15 years in the upper age limit for recruitment across provincial departments. This relaxation allows candidates up to 43 years (and up to 45 years in select quota categories) to apply for general posts.
+                </p>
+              </div>
+              <div style="border-bottom:1px solid #f5f5f4;padding-bottom:14px;">
+                <h3 style="font-family:serif;font-size:16px;font-weight:700;color:#1c1917;margin-bottom:6px;">
+                  Which testing agencies conduct recruitment for Sindh Government departments?
+                </h3>
+                <p style="font-size:13px;color:#44403c;line-height:1.6;">
+                  Recruitment in Sindh is conducted through three primary channels: 1) Sindh Public Service Commission (SPSC) for gazetted posts (BPS-16 and above), 2) Sukkur IBA Testing Services (STS / SIBA) for ministerial, teaching, and general departmental vacancies (BPS-05 to BPS-15), and 3) Departmental District Selection Committees for lower-cadre posts (BPS-01 to BPS-04).
+                </p>
+              </div>
+              <div style="border-bottom:1px solid #f5f5f4;padding-bottom:14px;">
+                <h3 style="font-family:serif;font-size:16px;font-weight:700;color:#1c1917;margin-bottom:6px;">
+                  Is PRC Form "D" mandatory for Sindh domicile applicants?
+                </h3>
+                <p style="font-size:13px;color:#44403c;line-height:1.6;">
+                  Yes. Permanent Residence Certificate (PRC) Form "D" along with a valid District Domicile Certificate issued under the Pakistan Citizenship Act is legally mandatory for all provincial and district quota posts in Sindh.
+                </p>
+              </div>
+              <div style="border-bottom:1px solid #f5f5f4;padding-bottom:14px;">
+                <h3 style="font-family:serif;font-size:16px;font-weight:700;color:#1c1917;margin-bottom:6px;">
+                  Where can I find BPS-1 to BPS-4 jobs (Naib Qasid, Peon, Mali, Driver) in Sindh?
+                </h3>
+                <p style="font-size:13px;color:#44403c;line-height:1.6;">
+                  BPS-01 to BPS-04 recruitment is decentralised and advertised directly by district administrative offices, including District and Sessions Courts, Municipal Corporations, Health Facilities, and the Education Department.
+                </p>
+              </div>
+              <div>
+                <h3 style="font-family:serif;font-size:16px;font-weight:700;color:#1c1917;margin-bottom:6px;">
+                  What are the quota allocations for Sindh Government recruitment?
+                </h3>
+                <p style="font-size:13px;color:#44403c;line-height:1.6;">
+                  Under the Sindh Civil Servants Rules, recruitment is allocated based on: 60% Rural Quota and 40% Urban Quota (for Karachi, Hyderabad, and Sukkur municipal limits) for provincial positions. Statutory quotas include 5% Women, 5% Minorities, and 5% Differently-Abled Persons.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          ${archivedRows ? `
+          <section style="margin-top:24px;">
+            <h2 style="font-family:serif;font-size:18px;font-weight:700;color:#1c1917;margin-bottom:10px;">
+              Recent Closed Notices (Reference Archive)
+            </h2>
+            ${archivedRows}
+          </section>` : ''}
+        </div>
+      </main>
+      <footer class="border-t border-line bg-white py-12 mt-16 font-sans" style="border-top:1px solid #e7e5e4;background:#ffffff;padding:48px 0;margin-top:48px;text-align:center;">
+        <div class="container-x text-center text-xs text-inksoft" style="font-size:12px;color:#78716c;">
+          <p>© 2026 CareerDost. Pakistan's Daily Career, Education &amp; Opportunity Hub.</p>
+        </div>
+      </footer>
+    </div>
+  `
+}
+
 function generateDailyUpdatesIndexHtml(updates, canonical, publishedArticleSlugs = new Set()) {
   const updatePills = [
     'All Updates',
@@ -925,36 +1279,64 @@ export async function onRequest(context) {
     return await context.next()
   }
 
-  // Canonicalize legacy, www, and alternative domains to https://careerdost.blog
-  if (host !== 'careerdost.blog') {
-    if (
-      host === 'careerdost.pages.dev' ||
+  const rawPath = url.pathname
+  const normalizedPath = rawPath.replace(/\/+$/, '') || '/'
+  const lowerPath = normalizedPath.toLowerCase()
+
+  // Resolve any static, legacy-prefix, or consolidated-slug redirect target in a single pass
+  // so that domain + protocol + trailing-slash + path redirects always complete in 1 hop.
+  let directRedirectTarget = null
+  if (lowerPath === '/cdn-cgi/l/email-protection') {
+    directRedirectTarget = '/contact'
+  } else if (STATIC_ROUTE_REDIRECTS.has(lowerPath)) {
+    directRedirectTarget = STATIC_ROUTE_REDIRECTS.get(lowerPath)
+  } else {
+    const routePrefixMatch = lowerPath.match(/^\/(jobs|daily-updates|article|articles|updates)\/([^/]+)$/)
+    if (routePrefixMatch) {
+      const prefix = routePrefixMatch[1]
+      const candidateSlug = routePrefixMatch[2]
+      if (CONSOLIDATED_SLUG_REDIRECTS.has(candidateSlug)) {
+        directRedirectTarget = CONSOLIDATED_SLUG_REDIRECTS.get(candidateSlug)
+      } else if (prefix === 'article' || prefix === 'articles') {
+        directRedirectTarget = `/jobs/${candidateSlug}`
+      } else if (prefix === 'updates') {
+        directRedirectTarget = `/daily-updates/${candidateSlug}`
+      }
+    }
+  }
+
+  const isNonCanonicalHost =
+    host !== 'careerdost.blog' &&
+    (host === 'careerdost.pages.dev' ||
       host === 'www.careerdost.pages.dev' ||
       host.endsWith('.careerdost.pages.dev') ||
       host === 'www.careerdost.blog' ||
       host === 'careerdost.pk' ||
       host === 'www.careerdost.pk' ||
       host === 'careersdost.pk' ||
-      host === 'www.careersdost.pk'
-    ) {
-      const targetUrl = new URL(context.request.url)
-      targetUrl.hostname = 'careerdost.blog'
-      targetUrl.protocol = 'https:'
-      targetUrl.port = ''
-      return Response.redirect(targetUrl.toString(), 301)
+      host === 'www.careersdost.pk')
+  const isHttpOnCanonical = url.protocol === 'http:' && host === 'careerdost.blog'
+  const hasTrailingSlash = rawPath.length > 1 && rawPath.endsWith('/')
+
+  if (isNonCanonicalHost || isHttpOnCanonical || hasTrailingSlash || directRedirectTarget) {
+    let finalPathAndHash = directRedirectTarget || `${normalizedPath}${url.search}`
+    // If this is a /daily-updates/:slug request that needs canonical redirect, also check if it belongs to /jobs/:slug so it resolves in 1 hop
+    const dailyMatch = (directRedirectTarget || lowerPath).match(/^\/daily-updates\/([^/?#]+)$/)
+    if (dailyMatch && context.env?.DB) {
+      try {
+        const primaryArt = await context.env.DB
+          .prepare(`SELECT slug FROM articles WHERE slug = ? AND status = 'published' LIMIT 1`)
+          .bind(dailyMatch[1])
+          .first()
+        if (primaryArt && primaryArt.slug) {
+          finalPathAndHash = `/jobs/${primaryArt.slug}`
+        }
+      } catch {
+        // Proceed with standard single-hop target if DB lookup fails
+      }
     }
+    return Response.redirect(`${SITE_URL}${finalPathAndHash}`, 301)
   }
-
-  // Ensure HTTPS enforcement on primary domain
-  if (url.protocol === 'http:' && host === 'careerdost.blog') {
-    const targetUrl = new URL(context.request.url)
-    targetUrl.protocol = 'https:'
-    return Response.redirect(targetUrl.toString(), 301)
-  }
-
-  const rawPath = url.pathname
-  const normalizedPath = rawPath.replace(/\/+$/, '') || '/'
-  const lowerPath = normalizedPath.toLowerCase()
 
   // 0. Dedicated Google Search Console verification token file handler
   if (lowerPath === '/googlefa0859c31163b27d.html') {
@@ -966,11 +1348,6 @@ export async function onRequest(context) {
         'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
       },
     })
-  }
-
-  // 0-cf. Cloudflare email protection fallback redirect (prevents 404 when bots strip hash)
-  if (lowerPath === '/cdn-cgi/l/email-protection') {
-    return Response.redirect(`${SITE_URL}/contact`, 301)
   }
 
   // 0-ads. Dedicated Ads.txt handler for Google AdSense compliance
@@ -998,9 +1375,16 @@ export async function onRequest(context) {
         .prepare(`SELECT slug FROM categories ORDER BY id ASC`)
         .all()
 
-      const allArticleSlugs = new Set((allArticleRows || []).map((r) => r.slug))
+      const publishedArticleRows = (allArticleRows || []).filter(
+        (r) =>
+          r.status === 'published' &&
+          r.slug !== 'httpswwwnjpgovpk' &&
+          !CONSOLIDATED_SLUG_REDIRECTS.has(r.slug)
+      )
+      const publishedArticleSlugs = new Set(publishedArticleRows.map((r) => r.slug))
       const staticPages = [
         { loc: '/', priority: '1.0', changefreq: 'daily', lastmod: todayStr },
+        { loc: '/jobs/sindh-government-jobs-2026', priority: '0.9', changefreq: 'daily', lastmod: todayStr },
         { loc: '/daily-updates', priority: '0.9', changefreq: 'daily', lastmod: todayStr },
         { loc: '/tools/job-readiness-checker', priority: '0.8', changefreq: 'monthly', lastmod: todayStr },
         { loc: '/about', priority: '0.5', changefreq: 'monthly', lastmod: todayStr },
@@ -1021,24 +1405,17 @@ export async function onRequest(context) {
         lastmod: todayStr,
       }))
 
-      const articleUrls = (allArticleRows || [])
-        .filter(
-          (r) =>
-            r.status === 'published' &&
-            r.slug !== 'httpswwwnjpgovpk' &&
-            !CONSOLIDATED_SLUG_REDIRECTS.has(r.slug)
-        )
-        .map((r) => ({
-          loc: `/jobs/${r.slug}`,
-          priority: '0.9',
-          changefreq: 'weekly',
-          lastmod: String(r.updated_at || r.publish_date || todayStr).split('T')[0].split(' ')[0],
-        }))
+      const articleUrls = publishedArticleRows.map((r) => ({
+        loc: `/jobs/${r.slug}`,
+        priority: '0.9',
+        changefreq: 'weekly',
+        lastmod: String(r.updated_at || r.publish_date || todayStr).split('T')[0].split(' ')[0],
+      }))
 
       const updateUrls = (publishedUpdateRows || [])
         .filter(
           (u) =>
-            !allArticleSlugs.has(u.slug) &&
+            !publishedArticleSlugs.has(u.slug) &&
             u.slug !== 'httpswwwnjpgovpk' &&
             !CONSOLIDATED_SLUG_REDIRECTS.has(u.slug)
         )
@@ -1072,20 +1449,6 @@ export async function onRequest(context) {
       })
     } catch {
       // Fallback to static sitemap if D1 query fails
-    }
-  }
-
-  // 0b. Permanent 301 redirects for static route aliases (/privacy, /terms, /editorial-policy, /jobs)
-  if (STATIC_ROUTE_REDIRECTS.has(lowerPath)) {
-    return Response.redirect(`${SITE_URL}${STATIC_ROUTE_REDIRECTS.get(lowerPath)}`, 301)
-  }
-
-  // 0c. Permanent 301 redirects for consolidated duplicate slugs across all article/update prefixes
-  const routePrefixMatch = lowerPath.match(/^\/(jobs|daily-updates|article|articles|updates)\/([^/]+)$/)
-  if (routePrefixMatch) {
-    const candidateSlug = routePrefixMatch[2]
-    if (CONSOLIDATED_SLUG_REDIRECTS.has(candidateSlug)) {
-      return Response.redirect(`${SITE_URL}${CONSOLIDATED_SLUG_REDIRECTS.get(candidateSlug)}`, 301)
     }
   }
 
@@ -1203,15 +1566,16 @@ export async function onRequest(context) {
 
   const pathname = normalizedPath
 
-  // 4. Admin & private pages: enforce noindex, nofollow on server response
+  // 4. Admin & private pages: enforce noindex, nofollow & no-store on server response
   if (lowerPath === '/admin' || lowerPath.startsWith('/admin/')) {
-    return new HTMLRewriter()
+    const adminRes = new HTMLRewriter()
       .on('head', {
         element(e) {
           e.append('<meta name="robots" content="noindex, nofollow" />', { html: true })
         },
       })
       .transform(response)
+    return withHtmlCacheHeaders(adminRes, 'no-store, no-cache, must-revalidate')
   }
 
   // 2. Daily updates pages: /daily-updates/:slug
@@ -1266,7 +1630,13 @@ export async function onRequest(context) {
               .on('head', {
                 element(e) {
                   if (ogImage) {
-                    e.append(`<link rel="preload" as="image" href="${ogImage}" fetchpriority="high" />\n`, { html: true })
+                    const isStatic = ogImage.includes('/images/')
+                    const webpUrl = isStatic && /\.(jpe?g|png)$/i.test(ogImage) ? ogImage.replace(/\.(jpe?g|png)$/i, '.webp') : null
+                    if (webpUrl) {
+                      e.append(`<link rel="preload" as="image" href="${webpUrl}" type="image/webp" fetchpriority="high" />\n`, { html: true })
+                    } else {
+                      e.append(`<link rel="preload" as="image" href="${ogImage}" fetchpriority="high" />\n`, { html: true })
+                    }
                   }
                   const jsonLd = {
                     '@context': 'https://schema.org',
@@ -1374,7 +1744,8 @@ export async function onRequest(context) {
                 },
               })
 
-            return rewriter.transform(response)
+            const updateEtag = `W/"ssr-upd-${update.id}-${encodeURIComponent(String(update.updated_at || update.publish_date || ''))}-${String(update.title || '').length}-${String(update.content || '').length}"`
+            return withHtmlCacheHeaders(rewriter.transform(response), 'public, max-age=0, s-maxage=300, stale-while-revalidate=86400', updateEtag)
           }
 
           // Not found in daily_updates: check if exists in articles table
@@ -1392,6 +1763,7 @@ export async function onRequest(context) {
             status: 404,
             headers: {
               'Content-Type': 'text/html; charset=utf-8',
+              'Cache-Control': 'no-store, no-cache, must-revalidate',
               'X-Robots-Tag': 'noindex, nofollow',
             },
           })
@@ -1406,6 +1778,190 @@ export async function onRequest(context) {
   if (pathname.startsWith('/jobs/')) {
     const slug = pathname.replace('/jobs/', '').split('/')[0]
     if (slug) {
+      if (slug === 'sindh-government-jobs-2026') {
+        const canonical = `${SITE_URL}/jobs/sindh-government-jobs-2026`
+        const ogImage = `${SITE_URL}/images/sindh-government-jobs-2026-spsc-sts-guide.webp`
+        const pageTitle = 'Sindh Government Jobs 2026 — Latest Vacancies | CareerDost'
+        const pageDesc = 'Verified Sindh Government Jobs 2026: SPSC, STS, District Courts, BPS-1 to 4, Junior Clerk, and Driver posts across Karachi, Hyderabad, Sukkur, Larkana, and Badin.'
+
+        let sindhArticles = []
+        if (context.env?.DB) {
+          try {
+            const { results } = await context.env.DB
+              .prepare(
+                `SELECT id, slug, title, category_slug, excerpt, featured_image, image_alt, organization, job_type, location, qualification, salary, positions, last_date, publish_date, logo_initial, is_verified
+                 FROM articles
+                 WHERE status = 'published'
+                   AND slug != 'sindh-government-jobs-2026'
+                   AND title NOT LIKE '%Balochistan Quota%'
+                   AND slug NOT LIKE '%-balochistan%'
+                   AND slug NOT LIKE 'kp-%'
+                   AND slug NOT LIKE 'punjab-%'
+                   AND (
+                     category_slug = 'government-jobs'
+                     OR (
+                       category_slug IN ('internships', 'career-guides')
+                       AND (
+                         title LIKE '%Sindh%'
+                         OR title LIKE '%SPSC%'
+                         OR title LIKE '%SESSI%'
+                         OR organization LIKE '%Sindh%'
+                       )
+                     )
+                   )
+                   AND (
+                     title LIKE '%Sindh%'
+                     OR title LIKE '%Karachi%'
+                     OR title LIKE '%Hyderabad%'
+                     OR title LIKE '%Sukkur%'
+                     OR title LIKE '%Larkana%'
+                     OR title LIKE '%Badin%'
+                     OR title LIKE '%Dadu%'
+                     OR title LIKE '%SPSC%'
+                     OR title LIKE '% STS %'
+                     OR title LIKE 'STS %'
+                     OR title LIKE '%(STS)%'
+                     OR organization LIKE '%Sindh%'
+                     OR organization LIKE '%Sukkur IBA%'
+                     OR location LIKE '%Sindh%'
+                     OR location LIKE '%Karachi%'
+                     OR location LIKE '%Hyderabad%'
+                     OR location LIKE '%Sukkur%'
+                     OR location LIKE '%Larkana%'
+                     OR location LIKE '%Badin%'
+                     OR location LIKE '%Dadu%'
+                   )
+                 ORDER BY publish_date DESC, id DESC
+                 LIMIT 40`
+              )
+              .all()
+            sindhArticles = (results || []).filter(
+              (a) => a.slug !== 'sindh-government-jobs-2026' && !CONSOLIDATED_SLUG_REDIRECTS.has(a.slug)
+            )
+          } catch (e) {
+            console.warn('Sindh pillar DB query error:', e)
+          }
+        }
+
+        const pillarHtml = generateSindhPillarHtml(sindhArticles, canonical)
+        const clientSindhArticles = sindhArticles.map((a) => ({
+          id: a.id,
+          slug: a.slug,
+          title: a.title,
+          excerpt: a.excerpt || '',
+          featuredImage: a.featured_image || '',
+          imageAlt: a.image_alt || '',
+          category: a.category_slug || 'government-jobs',
+          organization: a.organization || '',
+          location: a.location || 'Sindh, Pakistan',
+          qualification: a.qualification || '',
+          salary: a.salary || '',
+          positions: a.positions || '',
+          publishDate: a.publish_date || '',
+          lastDate: a.last_date || '',
+          jobType: a.job_type || '',
+          logoInitial: a.logo_initial || '',
+          isVerified: Boolean(a.is_verified),
+        }))
+        const faqs = [
+          {
+            question: 'What is the general age relaxation for Sindh Government jobs in 2026?',
+            answer: 'The Government of Sindh (S&GAD) has notified a general relaxation of up to 15 years in the upper age limit for recruitment across provincial departments. This relaxation allows candidates up to 43 years (and up to 45 years in select quota categories) to apply for general posts.',
+          },
+          {
+            question: 'Which testing agencies conduct recruitment for Sindh Government departments?',
+            answer: 'Recruitment in Sindh is conducted through three primary channels: 1) Sindh Public Service Commission (SPSC) for gazetted posts (BPS-16 and above), 2) Sukkur IBA Testing Services (STS / SIBA) for ministerial, teaching, and general departmental vacancies (BPS-05 to BPS-15), and 3) Departmental District Selection Committees for lower-cadre posts (BPS-01 to BPS-04).',
+          },
+          {
+            question: 'Is PRC Form "D" mandatory for Sindh domicile applicants?',
+            answer: 'Yes. Permanent Residence Certificate (PRC) Form "D" along with a valid District Domicile Certificate issued under the Pakistan Citizenship Act is legally mandatory for all provincial and district quota posts in Sindh.',
+          },
+          {
+            question: 'Where can I find BPS-1 to BPS-4 jobs (Naib Qasid, Peon, Mali, Driver) in Sindh?',
+            answer: 'BPS-01 to BPS-04 recruitment is decentralised and advertised directly by district administrative offices, including District and Sessions Courts, Municipal Corporations, Health Facilities, and the Education Department.',
+          },
+          {
+            question: 'What are the quota allocations for Sindh Government recruitment?',
+            answer: 'Under the Sindh Civil Servants Rules, recruitment is allocated based on: 60% Rural Quota and 40% Urban Quota (for Karachi, Hyderabad, and Sukkur municipal limits) for provincial positions. Statutory quotas include 5% Women, 5% Minorities, and 5% Differently-Abled Persons.',
+          },
+        ]
+
+        const jsonLd = {
+          '@context': 'https://schema.org',
+          '@graph': [
+            {
+              '@type': 'CollectionPage',
+              '@id': canonical,
+              url: canonical,
+              name: pageTitle,
+              description: pageDesc,
+              inLanguage: 'en-PK',
+              isPartOf: {
+                '@type': 'WebSite',
+                '@id': `${SITE_URL}/#website`,
+                name: 'CareerDost',
+              },
+              breadcrumb: {
+                '@type': 'BreadcrumbList',
+                itemListElement: [
+                  { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+                  { '@type': 'ListItem', position: 2, name: 'Government Jobs', item: `${SITE_URL}/category/government-jobs` },
+                  { '@type': 'ListItem', position: 3, name: 'Sindh Government Jobs 2026', item: canonical },
+                ],
+              },
+              mainEntity: {
+                '@type': 'ItemList',
+                numberOfItems: sindhArticles.length,
+                itemListElement: sindhArticles.slice(0, 15).map((a, idx) => ({
+                  '@type': 'ListItem',
+                  position: idx + 1,
+                  name: a.title,
+                  url: `${SITE_URL}/jobs/${a.slug}`,
+                })),
+              },
+            },
+            {
+              '@type': 'FAQPage',
+              '@id': `${canonical}#faq`,
+              mainEntity: faqs.map((f) => ({
+                '@type': 'Question',
+                name: f.question,
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: f.answer,
+                },
+              })),
+            },
+          ],
+        }
+
+        const response = await context.next()
+        const catRes = new HTMLRewriter()
+          .on('title', { element: (e) => e.setInnerContent(pageTitle) })
+          .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
+          .on('link[rel="canonical"]', { element: (e) => e.setAttribute('href', canonical) })
+          .on('meta[property="og:type"]', { element: (e) => e.setAttribute('content', 'website') })
+          .on('meta[property="og:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
+          .on('meta[property="og:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
+          .on('meta[property="og:url"]', { element: (e) => e.setAttribute('content', canonical) })
+          .on('meta[property="og:image"]', { element: (e) => e.setAttribute('content', ogImage) })
+          .on('meta[name="twitter:title"]', { element: (e) => e.setAttribute('content', pageTitle) })
+          .on('meta[name="twitter:description"]', { element: (e) => e.setAttribute('content', pageDesc) })
+          .on('meta[name="twitter:image"]', { element: (e) => e.setAttribute('content', ogImage) })
+          .on('head', {
+            element(e) {
+              e.append(`<link rel="preload" as="image" href="${ogImage}" fetchpriority="high" />\n`, { html: true })
+              e.append(`<script id="page-jsonld" type="application/ld+json">${JSON.stringify(jsonLd)}</script>`, { html: true })
+              if (clientSindhArticles.length > 0) {
+                e.append(`<script>window.__INITIAL_SINDH_ARTICLES__ = ${JSON.stringify(clientSindhArticles).replace(/</g, '\\u003c')};</script>\n`, { html: true })
+              }
+            },
+          })
+          .on('#root', { element: (e) => e.setInnerContent(pillarHtml, { html: true }) })
+          .transform(response)
+        return withHtmlCacheHeaders(catRes)
+      }
+
       if (context.env?.DB) {
         try {
           const article = await context.env.DB
@@ -1420,8 +1976,36 @@ export async function onRequest(context) {
             .first()
 
           if (article && article.status === 'published') {
-            const pageTitle = cleanPlainText(article.seo_title || `${article.title} — CareerDost`)
-            const pageDesc = cleanPlainText(article.meta_description || article.excerpt || `Check ${article.title} details, requirements, and official application process on CareerDost.`)
+            let pageTitle = cleanPlainText(article.seo_title || '')
+            if (pageTitle) {
+              pageTitle = pageTitle.replace(/\s*[-—|]\s*CareerDost\s*[-—|]\s*CareerDost/gi, ' — CareerDost')
+              if (!pageTitle.toLowerCase().includes('careerdost')) {
+                pageTitle = `${pageTitle} — CareerDost`
+              }
+            } else {
+              let baseTitle = cleanPlainText(article.title || '')
+              baseTitle = baseTitle.replace(/\s*[-—|]\s*CareerDost$/gi, '').trim()
+              if (baseTitle.length > 55) {
+                const words = baseTitle.split(' ')
+                let shortTitle = ''
+                for (const w of words) {
+                  if ((shortTitle + ' ' + w).length <= 50) {
+                    shortTitle += (shortTitle ? ' ' : '') + w
+                  } else break
+                }
+                baseTitle = shortTitle || baseTitle.slice(0, 50)
+                baseTitle = baseTitle.replace(/[,:;\-–—/&+]+$/, '').trim()
+                baseTitle = baseTitle.replace(/\s+(?:and|or|for|in|at|to|of|via|with|by|from|on|as|into|the|a|an|&|–|—|-|last)$/i, '').trim()
+              }
+              pageTitle = `${baseTitle} — CareerDost`
+            }
+
+            let pageDesc = cleanPlainText(article.meta_description || article.excerpt || `Check ${article.title} details, requirements, and official application process on CareerDost.`)
+            if (pageDesc.length > 160) {
+              const words = pageDesc.slice(0, 157).split(' ')
+              words.pop()
+              pageDesc = words.join(' ') + '...'
+            }
             const canonical = `${SITE_URL}/jobs/${slug}`
             const ogImage = getAbsoluteUrl(article.featured_image)
             const jobHtml = generateJobHtml(article, canonical)
@@ -1482,7 +2066,13 @@ export async function onRequest(context) {
               .on('head', {
                 element(e) {
                   if (ogImage) {
-                    e.append(`<link rel="preload" as="image" href="${ogImage}" fetchpriority="high" />\n`, { html: true })
+                    const isStatic = ogImage.includes('/images/')
+                    const webpUrl = isStatic && /\.(jpe?g|png)$/i.test(ogImage) ? ogImage.replace(/\.(jpe?g|png)$/i, '.webp') : null
+                    if (webpUrl) {
+                      e.append(`<link rel="preload" as="image" href="${webpUrl}" type="image/webp" fetchpriority="high" />\n`, { html: true })
+                    } else {
+                      e.append(`<link rel="preload" as="image" href="${ogImage}" fetchpriority="high" />\n`, { html: true })
+                    }
                   }
                   const jsonLd = {
                     '@context': 'https://schema.org',
@@ -1559,7 +2149,8 @@ export async function onRequest(context) {
                 },
               })
 
-            return rewriter.transform(response)
+            const articleEtag = `W/"ssr-art-${article.id}-${encodeURIComponent(String(article.updated_at || article.publish_date || ''))}-${String(article.title || '').length}-${String(article.content || '').length}"`
+            return withHtmlCacheHeaders(rewriter.transform(response), 'public, max-age=0, s-maxage=300, stale-while-revalidate=86400', articleEtag)
           }
 
           // Not found in articles: check if exists in daily_updates
@@ -1577,6 +2168,7 @@ export async function onRequest(context) {
             status: 404,
             headers: {
               'Content-Type': 'text/html; charset=utf-8',
+              'Cache-Control': 'no-store, no-cache, must-revalidate',
               'X-Robots-Tag': 'noindex, nofollow',
             },
           })
@@ -1661,7 +2253,7 @@ export async function onRequest(context) {
           isVerified: Boolean(a.is_verified),
         }))
 
-        return new HTMLRewriter()
+        const catRes = new HTMLRewriter()
           .on('title', { element: (e) => e.setInnerContent(pageTitle) })
           .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
           .on('link[rel="canonical"]', { element: (e) => e.setAttribute('href', canonical) })
@@ -1686,6 +2278,7 @@ export async function onRequest(context) {
             },
           })
           .transform(response)
+        return withHtmlCacheHeaders(catRes)
       } else {
         return new Response(generate404Html('Category Not Found', `The category "${escapeHtml(slug)}" does not exist.`), {
           status: 404,
@@ -1706,15 +2299,39 @@ export async function onRequest(context) {
     const ogImage = DEFAULT_OG_IMAGE
 
     let latestArticles = []
+    let latestDailyUpdates = []
     if (context.env?.DB) {
       try {
-        const { results } = await context.env.DB
-          .prepare(
-            `SELECT slug, title, excerpt, category_slug, organization, location, publish_date, last_date
-             FROM articles WHERE status = 'published' ORDER BY publish_date DESC LIMIT 25`
-          )
-          .all()
-        latestArticles = (results || []).filter((a) => !CONSOLIDATED_SLUG_REDIRECTS.has(a.slug)).slice(0, 12)
+        const [artRes, updRes, allPubSlugsRes] = await Promise.all([
+          context.env.DB
+            .prepare(
+              `SELECT slug, title, excerpt, category_slug, organization, location, publish_date, last_date
+               FROM articles WHERE status = 'published' ORDER BY publish_date DESC LIMIT 25`
+            )
+            .all(),
+          context.env.DB
+            .prepare(
+              `SELECT id, slug, title, category, short_description, featured_image, image_alt, publish_date, organization, deadline, no_deadline, is_verified, featured
+               FROM daily_updates WHERE status = 'published' ORDER BY publish_date DESC LIMIT 12`
+            )
+            .all(),
+          context.env.DB
+            .prepare(`SELECT slug FROM articles WHERE status = 'published'`)
+            .all(),
+        ])
+        const pubSlugsSet = new Set(
+          (allPubSlugsRes?.results || [])
+            .map((r) => r.slug)
+            .filter((s) => !CONSOLIDATED_SLUG_REDIRECTS.has(s))
+        )
+        latestArticles = (artRes?.results || []).filter((a) => !CONSOLIDATED_SLUG_REDIRECTS.has(a.slug)).slice(0, 12)
+        latestDailyUpdates = (updRes?.results || [])
+          .filter((u) => !CONSOLIDATED_SLUG_REDIRECTS.has(u.slug))
+          .slice(0, 6)
+          .map((u) => ({
+            ...u,
+            hasArticle: pubSlugsSet.has(u.slug),
+          }))
       } catch (err) {
         console.warn('Homepage articles query error:', err)
       }
@@ -1797,7 +2414,12 @@ export async function onRequest(context) {
         </footer>
       </div>`
 
-    return new HTMLRewriter()
+    const homeInitialData = {
+      dailyUpdates: latestDailyUpdates,
+      govJobs: latestArticles.filter((a) => a.category_slug === 'government-jobs').slice(0, 4),
+    }
+
+    const homeRes = new HTMLRewriter()
       .on('title', { element: (e) => e.setInnerContent(homeTitle) })
       .on('meta[name="description"]', { element: (e) => e.setAttribute('content', homeDesc) })
       .on('link[rel="canonical"]', { element: (e) => e.setAttribute('href', canonical) })
@@ -1808,8 +2430,14 @@ export async function onRequest(context) {
       .on('meta[name="twitter:title"]', { element: (e) => e.setAttribute('content', homeTitle) })
       .on('meta[name="twitter:description"]', { element: (e) => e.setAttribute('content', homeDesc) })
       .on('meta[name="twitter:image"]', { element: (e) => e.setAttribute('content', ogImage) })
+      .on('head', {
+        element(e) {
+          e.append(`<script>window.__INITIAL_HOME_DATA__ = ${JSON.stringify(homeInitialData).replace(/</g, '\\u003c')};</script>\n`, { html: true })
+        },
+      })
       .on('#root', { element: (e) => e.setInnerContent(homeHtml, { html: true }) })
       .transform(response)
+    return withHtmlCacheHeaders(homeRes)
   }
 
   // 6. About Page: /about
@@ -1977,7 +2605,9 @@ export async function onRequest(context) {
               '@type': 'ListItem',
               position: i + 1,
               name: u.title,
-              url: `${SITE_URL}/daily-updates/${u.slug}`,
+              url: publishedArticleSlugs.has(u.slug)
+                ? `${SITE_URL}/jobs/${u.slug}`
+                : `${SITE_URL}/daily-updates/${u.slug}`,
             })),
           },
         },
@@ -2001,7 +2631,7 @@ export async function onRequest(context) {
       ],
     }
 
-    return new HTMLRewriter()
+    const updatesRes = new HTMLRewriter()
       .on('title', { element: (e) => e.setInnerContent(pageTitle) })
       .on('meta[name="description"]', { element: (e) => e.setAttribute('content', pageDesc) })
       .on('link[rel="canonical"]', { element: (e) => e.setAttribute('href', canonical) })
@@ -2022,6 +2652,7 @@ export async function onRequest(context) {
         },
       })
       .transform(response)
+    return withHtmlCacheHeaders(updatesRes)
   }
 
   // 9. Search Page: /search

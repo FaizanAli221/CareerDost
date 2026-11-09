@@ -27,11 +27,25 @@ app.use('*', async (c, next) => {
   )
 })
 
-// Edge & Browser Cache for public read-only GET endpoints (eliminates D1 cold starts & waterfall delays)
+// Edge & Browser Cache policy:
+// - Never cache /api/admin/* responses
+// - Respect route-specific Cache-Control headers (e.g. immutable /api/uploads/*, ETag-revalidated detail endpoints)
+// - Default public GET endpoints to immediate browser revalidation with short edge TTL
 app.use('/api/*', async (c, next) => {
   await next()
-  if (c.req.method === 'GET' && !c.req.path.startsWith('/api/admin')) {
-    c.header('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600')
+  if (
+    !c.req.path.startsWith('/api/uploads') &&
+    c.req.path !== '/api/sitemap.xml' &&
+    c.req.path !== '/api/robots.txt'
+  ) {
+    c.header('X-Robots-Tag', 'noindex, nofollow')
+  }
+  if (c.req.path.startsWith('/api/admin')) {
+    c.header('Cache-Control', 'no-store, no-cache, must-revalidate')
+    return
+  }
+  if (c.req.method === 'GET' && !c.res.headers.get('Cache-Control')) {
+    c.header('Cache-Control', 'public, max-age=0, s-maxage=15, must-revalidate')
   }
 })
 

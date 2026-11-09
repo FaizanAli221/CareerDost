@@ -14,12 +14,71 @@ const API_BASE = '/api'
 // Simple in-memory cache to prevent data flickering during SPA route changes
 const cacheMap = new Map()
 
+const CONTENT_VERSION_KEY = 'careerdost_content_v'
+
+function getContentVersion() {
+  try {
+    if (typeof window === 'undefined') return ''
+    return (
+      window.localStorage?.getItem(CONTENT_VERSION_KEY) ||
+      window.sessionStorage?.getItem(CONTENT_VERSION_KEY) ||
+      ''
+    )
+  } catch {
+    return ''
+  }
+}
+
+function hasActiveAdminSession() {
+  try {
+    if (typeof window === 'undefined') return false
+    return Boolean(window.localStorage?.getItem('careerdost_admin_token'))
+  } catch {
+    return false
+  }
+}
+
+export function invalidateClientContentCache() {
+  cacheMap.clear()
+  const nextVersion = String(Date.now())
+  try {
+    if (typeof window !== 'undefined') {
+      window.localStorage?.setItem(CONTENT_VERSION_KEY, nextVersion)
+      window.sessionStorage?.setItem(CONTENT_VERSION_KEY, nextVersion)
+      delete window.__INITIAL_ARTICLE__
+      delete window.__INITIAL_UPDATE__
+      delete window.__INITIAL_UPDATES__
+      delete window.__INITIAL_CATEGORY_ARTICLES__
+      delete window.__INITIAL_CATEGORY_SLUG__
+      delete window.__INITIAL_SINDH_ARTICLES__
+    }
+  } catch {
+    // Ignore storage errors in restricted environments
+  }
+}
+
 async function apiFetch(endpoint, options = {}) {
-  const cacheKey = `${options.method || 'GET'}:${endpoint}`
+  const method = (options.method || 'GET').toUpperCase()
+  const isAdminEndpoint = endpoint.startsWith('/admin')
+  const contentVersion = method === 'GET' && !isAdminEndpoint ? getContentVersion() : ''
+  const cacheKey = `${method}:${endpoint}:${contentVersion}`
+
+  let requestUrl = `${API_BASE}${endpoint}`
+  if (method === 'GET' && !isAdminEndpoint && contentVersion) {
+    const sep = requestUrl.includes('?') ? '&' : '?'
+    requestUrl = `${requestUrl}${sep}_cv=${encodeURIComponent(contentVersion)}`
+  }
+
+  const fetchCacheMode = isAdminEndpoint
+    ? 'no-store'
+    : method === 'GET' && (contentVersion || hasActiveAdminSession())
+    ? 'no-cache'
+    : undefined
 
   try {
-    const res = await fetch(`${API_BASE}${endpoint}`, {
+    const res = await fetch(requestUrl, {
       credentials: 'same-origin',
+      ...(fetchCacheMode ? { cache: fetchCacheMode } : {}),
       headers: {
         'Content-Type': 'application/json',
         ...(options.headers || {}),
@@ -29,16 +88,18 @@ async function apiFetch(endpoint, options = {}) {
 
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}))
-      throw new Error(errData.error || `HTTP ${res.status}`)
+      const httpErr = new Error(errData.error || `HTTP ${res.status}`)
+      httpErr.status = res.status
+      throw httpErr
     }
 
     const data = await res.json()
-    if ((!options.method || options.method === 'GET') && data.success) {
+    if (method === 'GET' && !isAdminEndpoint && data.success) {
       cacheMap.set(cacheKey, data)
     }
     return data
   } catch (err) {
-    if ((!options.method || options.method === 'GET') && cacheMap.has(cacheKey)) {
+    if (method === 'GET' && !isAdminEndpoint && err?.status !== 404 && cacheMap.has(cacheKey)) {
       return cacheMap.get(cacheKey)
     }
     throw err
@@ -128,8 +189,12 @@ export async function getArticleBySlugFromDb(slug) {
     if (json.success && json.data) {
       return json.data
     }
-  } catch {
-    // Fallback
+    return null
+  } catch (err) {
+    // If server explicitly confirmed 404 (draft or deleted in D1), do NOT resurrect stale static fallback
+    if (err?.status === 404) {
+      return null
+    }
   }
   const fallbackListings = await getFallbackListings()
   return fallbackListings.find((l) => l.slug === slug) || null
@@ -188,7 +253,7 @@ export async function adminLogin(username, password, turnstileToken = '') {
 }
 
 export async function adminLogout() {
-  cacheMap.clear()
+  invalidateClientContentCache()
   return await apiFetch('/admin/logout', {
     method: 'POST',
   })
@@ -214,64 +279,71 @@ export async function adminGetArticles(token, statusFilter = '') {
 }
 
 export async function adminCreateArticle(token, articleData) {
-  cacheMap.clear()
-  return await apiFetch('/admin/articles', {
+  const res = await apiFetch('/admin/articles', {
     method: 'POST',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: JSON.stringify(articleData),
   })
+  invalidateClientContentCache()
+  return res
 }
 
 export async function adminUpdateArticle(token, slug, articleData) {
-  cacheMap.clear()
-  return await apiFetch(`/admin/articles/${slug}`, {
+  const res = await apiFetch(`/admin/articles/${slug}`, {
     method: 'PUT',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: JSON.stringify(articleData),
   })
+  invalidateClientContentCache()
+  return res
 }
 
 export async function adminToggleArticleStatus(token, slug, status) {
-  cacheMap.clear()
-  return await apiFetch(`/admin/articles/${slug}/status`, {
+  const res = await apiFetch(`/admin/articles/${slug}/status`, {
     method: 'PATCH',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: JSON.stringify({ status }),
   })
+  invalidateClientContentCache()
+  return res
 }
 
 export async function adminDeleteArticle(token, slug) {
-  cacheMap.clear()
-  return await apiFetch(`/admin/articles/${slug}`, {
+  const res = await apiFetch(`/admin/articles/${slug}`, {
     method: 'DELETE',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   })
+  invalidateClientContentCache()
+  return res
 }
 
 export async function adminCreateCategory(token, categoryData) {
-  cacheMap.clear()
-  return await apiFetch('/admin/categories', {
+  const res = await apiFetch('/admin/categories', {
     method: 'POST',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: JSON.stringify(categoryData),
   })
+  invalidateClientContentCache()
+  return res
 }
 
 export async function adminUpdateCategory(token, slug, categoryData) {
-  cacheMap.clear()
-  return await apiFetch(`/admin/categories/${slug}`, {
+  const res = await apiFetch(`/admin/categories/${slug}`, {
     method: 'PUT',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: JSON.stringify(categoryData),
   })
+  invalidateClientContentCache()
+  return res
 }
 
 export async function adminDeleteCategory(token, slug) {
-  cacheMap.clear()
-  return await apiFetch(`/admin/categories/${slug}`, {
+  const res = await apiFetch(`/admin/categories/${slug}`, {
     method: 'DELETE',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   })
+  invalidateClientContentCache()
+  return res
 }
 
 // Daily Updates Public API
@@ -368,38 +440,42 @@ export async function adminGetUpdates(token, statusFilter = '') {
 }
 
 export async function adminCreateUpdate(token, updateData) {
-  cacheMap.clear()
-  return await apiFetch('/admin/updates', {
+  const res = await apiFetch('/admin/updates', {
     method: 'POST',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: JSON.stringify(updateData),
   })
+  invalidateClientContentCache()
+  return res
 }
 
 export async function adminUpdateUpdate(token, slug, updateData) {
-  cacheMap.clear()
-  return await apiFetch(`/admin/updates/${slug}`, {
+  const res = await apiFetch(`/admin/updates/${slug}`, {
     method: 'PUT',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: JSON.stringify(updateData),
   })
+  invalidateClientContentCache()
+  return res
 }
 
 export async function adminToggleUpdateStatus(token, slug, status) {
-  cacheMap.clear()
-  return await apiFetch(`/admin/updates/${slug}/status`, {
+  const res = await apiFetch(`/admin/updates/${slug}/status`, {
     method: 'PATCH',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: JSON.stringify({ status }),
   })
+  invalidateClientContentCache()
+  return res
 }
 
 export async function adminDeleteUpdate(token, slug) {
-  cacheMap.clear()
-  return await apiFetch(`/admin/updates/${slug}`, {
+  const res = await apiFetch(`/admin/updates/${slug}`, {
     method: 'DELETE',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   })
+  invalidateClientContentCache()
+  return res
 }
 
 export async function generateClientImageVariants(file) {

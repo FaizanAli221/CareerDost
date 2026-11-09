@@ -135,6 +135,7 @@ function generateSitemap() {
 
   const staticPages = [
     { loc: '/', priority: '1.0', changefreq: 'daily', lastmod: todayStr },
+    { loc: '/jobs/sindh-government-jobs-2026', priority: '0.9', changefreq: 'daily', lastmod: todayStr },
     { loc: '/daily-updates', priority: '0.9', changefreq: 'daily', lastmod: todayStr },
     { loc: '/tools/job-readiness-checker', priority: '0.8', changefreq: 'monthly', lastmod: todayStr },
     { loc: '/about', priority: '0.5', changefreq: 'monthly', lastmod: todayStr },
@@ -258,33 +259,38 @@ User-agent: Googlebot
 Allow: /
 Disallow: /admin
 Allow: /api/uploads/
-Disallow: /api/
+Disallow: /api/admin
+Disallow: /api/auth/
 
 User-agent: Bingbot
 Allow: /
 Disallow: /admin
 Allow: /api/uploads/
-Disallow: /api/
+Disallow: /api/admin
+Disallow: /api/auth/
 
 # Generative Engine Optimization (GEO) & Answer Search Bots (Allowed for real-time citations)
 User-agent: OAI-SearchBot
 Allow: /
 Disallow: /admin
 Allow: /api/uploads/
-Disallow: /api/
+Disallow: /api/admin
+Disallow: /api/auth/
 
 User-agent: PerplexityBot
 Allow: /
 Disallow: /admin
 Allow: /api/uploads/
-Disallow: /api/
+Disallow: /api/admin
+Disallow: /api/auth/
 
 # Default Crawlers
 User-agent: *
 Allow: /
 Disallow: /admin
 Allow: /api/uploads/
-Disallow: /api/
+Disallow: /api/admin
+Disallow: /api/auth/
 
 # XML Sitemap
 Sitemap: ${SITE_URL}/sitemap.xml
