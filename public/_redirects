@@ -6,5 +6,8 @@
 /googlefa0859c31163b27d.html /googlefa0859c31163b27d.html 200
 /llms.txt /llms.txt 200
 
+# Permanent 301 Redirects
+/category/career-guides /category/guides-and-resources 301
+
 # SPA fallback rule for React Router
 /* /index.html 200

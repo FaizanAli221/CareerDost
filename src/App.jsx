@@ -42,6 +42,7 @@ export default function App() {
               <Route path="/" element={<Home />} />
               <Route path="/daily-updates" element={<DailyUpdatesPage />} />
               <Route path="/daily-updates/:slug" element={<UpdateDetailPage />} />
+              <Route path="/category/career-guides" element={<Navigate to="/category/guides-and-resources" replace />} />
               <Route path="/category/:slug" element={<CategoryPage />} />
               <Route path="/jobs" element={<Navigate to="/" replace />} />
               <Route path="/jobs/sindh-government-jobs-2026" element={<SindhGovJobsPillarPage />} />

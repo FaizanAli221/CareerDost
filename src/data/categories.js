@@ -75,24 +75,19 @@ export const categories = [
       'Announced results and roll-number slips for board exams, entry tests and recruitment tests across Pakistan.',
   },
   {
-    slug: 'career-guides',
-    label: 'Career Guides',
-    short: 'Career Guides',
-    tone: 'green',
-    description:
-      'Evergreen educational guides on CV writing, interview preparation, career planning and job application strategies.',
-  },
-  {
     slug: 'guides-and-resources',
-    label: 'CareerDost Guides & Resources',
+    label: 'Career Guides & Resources',
     short: 'Guides & Resources',
     tone: 'green',
     description:
-      'Original Pakistani job application guides, NJP portal walkthroughs, document checklists, and interactive career readiness tools.',
+      'Original Pakistani recruitment test guides, application walkthroughs, document checklists, CV templates, interview preparation, and career resources.',
   },
 ]
 
-export const categoryBySlug = (slug) => categories.find((c) => c.slug === slug)
+export const categoryBySlug = (slug) => {
+  if (slug === 'career-guides') return categories.find((c) => c.slug === 'guides-and-resources')
+  return categories.find((c) => c.slug === slug)
+}
 
 export const toneClasses = {
   green: {

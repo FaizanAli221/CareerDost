@@ -25,7 +25,6 @@ const VALID_CATEGORIES = new Set([
   'admissions',
   'government-schemes',
   'results',
-  'career-guides',
   'guides-and-resources'
 ])
 
@@ -42,6 +41,7 @@ const KNOWN_STATIC_ROUTES = new Set([
 ])
 
 const STATIC_ROUTE_REDIRECTS = new Map([
+  ['/category/career-guides', '/category/guides-and-resources'],
   ['/privacy', '/privacy-policy'],
   ['/terms', '/terms-and-conditions'],
   ['/editorial-policy', '/about#editorial-policy'],
@@ -848,20 +848,16 @@ const CATEGORY_META = {
     short: 'Results',
     description: 'Announced results and roll-number slips for board exams, entry tests and recruitment tests across Pakistan.'
   },
-  'career-guides': {
-    label: 'Career Guides',
-    short: 'Guides',
-    description: 'Comprehensive citizen guides, eligibility checks, verification steps, and official portal walkthroughs across Pakistan.'
-  },
   'guides-and-resources': {
-    label: 'CareerDost Guides & Resources',
+    label: 'Career Guides & Resources',
     short: 'Guides & Resources',
-    description: 'Original Pakistani job application guides, NJP portal walkthroughs, document checklists, and interactive career readiness tools.'
+    description: 'Original Pakistani recruitment test guides, application walkthroughs, document checklists, CV templates, interview preparation, and career resources.'
   }
 }
 
 function getCategoryLabel(slug) {
   if (!slug) return 'Update'
+  if (slug === 'career-guides') return 'Career Guides & Resources'
   if (CATEGORY_META[slug]?.label) return CATEGORY_META[slug].label
   return slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
@@ -881,7 +877,6 @@ function generateCategoryHtml(slug, catMeta, articles, canonical) {
     { slug: 'admissions', label: 'Admissions' },
     { slug: 'government-schemes', label: 'Schemes' },
     { slug: 'results', label: 'Results' },
-    { slug: 'career-guides', label: 'Guides' },
     { slug: 'guides-and-resources', label: 'Guides & Resources' },
   ]
 
@@ -962,7 +957,7 @@ function generateCategoryHtml(slug, catMeta, articles, canonical) {
               <a href="/category/government-jobs" style="color:#1c1917;text-decoration:none;margin-right:16px;">Govt Jobs</a>
               <a href="/category/scholarships" style="color:#1c1917;text-decoration:none;margin-right:16px;">Scholarships</a>
               <a href="/category/admissions" style="color:#1c1917;text-decoration:none;margin-right:16px;">Admissions</a>
-              <a href="/category/career-guides" style="color:#1c1917;text-decoration:none;margin-right:16px;">Career Guides</a>
+              <a href="/category/guides-and-resources" style="color:#1c1917;text-decoration:none;margin-right:16px;">Guides &amp; Resources</a>
               <a href="/about" style="color:#1c1917;text-decoration:none;">About</a>
             </nav>
           </div>
@@ -1080,7 +1075,7 @@ function generateSindhPillarHtml(articles, canonical) {
               <a href="/category/government-jobs" style="color:#1c1917;text-decoration:none;margin-right:16px;">Govt Jobs</a>
               <a href="/category/scholarships" style="color:#1c1917;text-decoration:none;margin-right:16px;">Scholarships</a>
               <a href="/category/admissions" style="color:#1c1917;text-decoration:none;margin-right:16px;">Admissions</a>
-              <a href="/category/career-guides" style="color:#1c1917;text-decoration:none;margin-right:16px;">Career Guides</a>
+              <a href="/category/guides-and-resources" style="color:#1c1917;text-decoration:none;margin-right:16px;">Guides &amp; Resources</a>
               <a href="/about" style="color:#1c1917;text-decoration:none;">About</a>
             </nav>
           </div>
@@ -1375,7 +1370,7 @@ function generateDailyUpdatesIndexHtml(updates, canonical, publishedArticleSlugs
               <a href="/category/government-jobs" style="color:#1c1917;text-decoration:none;margin-right:16px;">Govt Jobs</a>
               <a href="/category/scholarships" style="color:#1c1917;text-decoration:none;margin-right:16px;">Scholarships</a>
               <a href="/category/admissions" style="color:#1c1917;text-decoration:none;margin-right:16px;">Admissions</a>
-              <a href="/category/career-guides" style="color:#1c1917;text-decoration:none;margin-right:16px;">Career Guides</a>
+              <a href="/category/guides-and-resources" style="color:#1c1917;text-decoration:none;margin-right:16px;">Guides &amp; Resources</a>
               <a href="/about" style="color:#1c1917;text-decoration:none;">About</a>
             </nav>
           </div>
@@ -1972,7 +1967,7 @@ export async function onRequest(context) {
                    AND (
                      category_slug = 'government-jobs'
                      OR (
-                       category_slug IN ('internships', 'career-guides')
+                       category_slug IN ('internships', 'guides-and-resources', 'career-guides')
                        AND (
                          title LIKE '%Sindh%'
                          OR title LIKE '%SPSC%'
@@ -2560,7 +2555,7 @@ export async function onRequest(context) {
               <a href="/category/government-schemes">Government Schemes</a>
               <a href="/category/scholarships">Scholarships</a>
               <a href="/category/admissions">Admissions</a>
-              <a href="/category/career-guides">Career Guides</a>
+              <a href="/category/guides-and-resources">Guides &amp; Resources</a>
               <a href="/about">About</a>
             </nav>
           </div>
@@ -2582,8 +2577,7 @@ export async function onRequest(context) {
               <li><a href="/category/scholarships">Local &amp; International Scholarships</a></li>
               <li><a href="/category/admissions">University Admissions</a></li>
               <li><a href="/category/results">Merit Lists &amp; Exam Results</a></li>
-              <li><a href="/category/career-guides">Career Guides &amp; Procedures</a></li>
-              <li><a href="/category/guides-and-resources">CareerDost Guides &amp; Resources</a></li>
+              <li><a href="/category/guides-and-resources">Career Guides &amp; Resources</a></li>
               <li><a href="/tools/job-readiness-checker">Government Job Application Readiness Checker</a></li>
               <li><a href="/daily-updates">Daily Career &amp; Policy Updates</a></li>
             </ul>

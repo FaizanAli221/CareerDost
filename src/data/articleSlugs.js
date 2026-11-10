@@ -2,6 +2,10 @@
 // Decoupled from full listings to avoid pulling 980+ KB into homepage bundle
 
 export const KNOWN_ARTICLE_SLUGS = new Set([
+  'pakistan-cnic-domicile-prc-application-guide',
+  'ots-jobs-online-application-registration-guide',
+  'fresh-graduate-cv-format-guide-pakistan',
+  'government-job-interview-preparation-guide-pakistan',
   'sindh-government-jobs-2026',
   'paec-foundation-jobs-advertisement-05-2026',
   'lesco-jobs-2026-balochistan-quota-ots',
