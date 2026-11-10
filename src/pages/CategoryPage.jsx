@@ -6,6 +6,7 @@ import ListingRow from '../components/ListingRow'
 import OpportunityCard from '../components/OpportunityCard'
 import { useSeo } from '../lib/useSeo'
 import { getAbsoluteUrl } from '../lib/config'
+import { getPktTodayYMD, normalizeDateToYMD } from '../lib/contentType'
 
 export default function CategoryPage() {
   const { slug } = useParams()
@@ -154,10 +155,13 @@ export default function CategoryPage() {
     )
   }
 
-  const todayStr = new Date().toISOString().split('T')[0]
+  const todayStr = getPktTodayYMD()
   const isItemExpired = (item) => {
     const d = item.lastDate || item.last_date
-    return Boolean(d && /^\d{4}-\d{2}-\d{2}$/.test(d) && d < todayStr)
+    const ymd = normalizeDateToYMD(d)
+    if (ymd && ymd < todayStr) return true
+    if (d && /closed|expired/i.test(String(d))) return true
+    return false
   }
 
   let sortedItems = [...items]

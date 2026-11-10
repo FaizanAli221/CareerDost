@@ -8,7 +8,7 @@
  */
 
 import { isGenuineJobVacancy, buildJobPostingSchema } from '../src/lib/jobSchema.js'
-import { getContentType, getContentTypeLabels, getContextualStatus, getSectorTransparencyNote, getVerificationTier } from '../src/lib/contentType.js'
+import { getContentType, getContentTypeLabels, getContextualStatus, getPktTodayYMD, getSectorTransparencyNote, getVerificationTier, normalizeDateToYMD } from '../src/lib/contentType.js'
 import { CONSOLIDATED_SLUG_REDIRECTS } from '../src/data/consolidatedRedirects.js'
 
 const SITE_URL = 'https://careerdost.blog'
@@ -437,6 +437,62 @@ function generate404Html(title, message) {
 </html>`
 }
 
+function generateSsrFooterHtml() {
+  const year = 2026
+  return `
+    <footer class="border-t border-line bg-white py-12 mt-16 font-sans" style="border-top:1px solid #e7e5e4;background:#ffffff;padding:48px 0;margin-top:48px;">
+      <div class="container-x" style="max-width:1200px;margin:0 auto;padding:0 16px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:32px;padding-bottom:32px;border-bottom:1px solid #e7e5e4;">
+          <div>
+            <a href="/" style="font-family:serif;font-size:24px;font-weight:700;color:#1c1917;text-decoration:none;">CareerDost</a>
+            <p style="font-size:12px;color:#78716c;line-height:1.6;margin-top:12px;">
+              Pakistan's trusted opportunity portal for government vacancies, private jobs, bank jobs, scholarships, internships, schemes and admissions. Updated daily from verified official sources.
+            </p>
+            <div style="font-size:12px;color:#78716c;margin-top:12px;line-height:1.8;">
+              <p>Email: <a href="mailto:careerdost02@gmail.com" style="color:#059669;text-decoration:none;">careerdost02@gmail.com</a></p>
+              <p>Helpline: <strong style="color:#1c1917;">03173425680</strong></p>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#78716c;margin-bottom:12px;">Popular Categories</div>
+            <ul style="list-style:none;padding:0;margin:0;font-size:12px;line-height:2;">
+              <li><a href="/category/government-jobs" style="color:#1c1917;text-decoration:none;">Government Jobs</a></li>
+              <li><a href="/category/private-jobs" style="color:#1c1917;text-decoration:none;">Private Sector Jobs</a></li>
+              <li><a href="/category/bank-jobs" style="color:#1c1917;text-decoration:none;">Bank Jobs</a></li>
+              <li><a href="/category/it-jobs" style="color:#1c1917;text-decoration:none;">IT &amp; Software Jobs</a></li>
+              <li><a href="/category/scholarships" style="color:#1c1917;text-decoration:none;">Scholarships</a></li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#78716c;margin-bottom:12px;">Opportunities &amp; Tools</div>
+            <ul style="list-style:none;padding:0;margin:0;font-size:12px;line-height:2;">
+              <li><a href="/category/internships" style="color:#1c1917;text-decoration:none;">Graduate Internships</a></li>
+              <li><a href="/category/government-schemes" style="color:#1c1917;text-decoration:none;">Government Schemes</a></li>
+              <li><a href="/category/admissions" style="color:#1c1917;text-decoration:none;">University Admissions</a></li>
+              <li><a href="/category/results" style="color:#1c1917;text-decoration:none;">Merit Lists &amp; Results</a></li>
+              <li><a href="/tools/job-readiness-checker" style="color:#059669;font-weight:600;text-decoration:none;">Job Readiness Checker</a></li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#78716c;margin-bottom:12px;">Company &amp; Legal</div>
+            <ul style="list-style:none;padding:0;margin:0;font-size:12px;line-height:2;">
+              <li><a href="/about" style="color:#1c1917;text-decoration:none;">About Us</a></li>
+              <li><a href="/about#editorial-policy" style="color:#1c1917;text-decoration:none;">Editorial &amp; Verification Policy</a></li>
+              <li><a href="/contact" style="color:#1c1917;text-decoration:none;">Contact Us</a></li>
+              <li><a href="/privacy-policy" style="color:#1c1917;text-decoration:none;">Privacy Policy</a></li>
+              <li><a href="/terms-and-conditions" style="color:#1c1917;text-decoration:none;">Terms &amp; Conditions</a></li>
+              <li><a href="/disclaimer" style="color:#1c1917;text-decoration:none;">Disclaimer</a></li>
+            </ul>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:24px;font-size:12px;color:#78716c;flex-wrap:wrap;gap:8px;">
+          <span>© ${year} CareerDost — All rights reserved.</span>
+          <span>Informational portal only — verify all details on official recruitment websites.</span>
+        </div>
+      </div>
+    </footer>`
+}
+
 function generateDailyUpdateHtml(update, canonical, hasArticle = false) {
   const title = escapeHtml(update.title || '')
   const rawCat = update.category || 'Daily Update'
@@ -577,11 +633,7 @@ function generateDailyUpdateHtml(update, canonical, hasArticle = false) {
           ${actionButtons}
         </article>
       </main>
-      <footer class="border-t border-line bg-white py-12 mt-16 font-sans">
-        <div class="container-x text-center text-xs text-inksoft">
-          <p>© 2026 CareerDost. Pakistan's Daily Career, Education &amp; Opportunity Hub.</p>
-        </div>
-      </footer>
+      ${generateSsrFooterHtml()}
     </div>
   `
 }
@@ -745,11 +797,7 @@ function generateJobHtml(article, canonical) {
           ${actionButtons}
         </article>
       </main>
-      <footer class="border-t border-line bg-white py-12 mt-16 font-sans">
-        <div class="container-x text-center text-xs text-inksoft">
-          <p>© 2026 CareerDost. Pakistan's Daily Career, Education &amp; Opportunity Hub.</p>
-        </div>
-      </footer>
+      ${generateSsrFooterHtml()}
     </div>
   `
 }
@@ -845,13 +893,18 @@ function generateCategoryHtml(slug, catMeta, articles, canonical) {
     return `<a href="/category/${c.slug}" style="${style}">${escapeHtml(c.label)}</a>`
   }).join(' ')
 
-  const todayYmd = new Date().toISOString().split('T')[0]
+  const todayYmd = getPktTodayYMD()
   const articleCards = articles.length > 0 ? articles.map((art) => {
     const artTitle = escapeHtml(art.title || '')
     const artOrg = art.organization ? escapeHtml(art.organization) : ''
     const artLoc = art.location ? escapeHtml(art.location) : 'Pakistan'
-    const isExpired = Boolean(art.last_date && /^\d{4}-\d{2}-\d{2}$/.test(art.last_date) && art.last_date < todayYmd)
-    const artDate = art.last_date ? escapeHtml(art.last_date) : (art.publish_date ? `Posted ${escapeHtml(art.publish_date)}` : '')
+    const lastDateVal = art.last_date || art.lastDate
+    const lastDateYmd = normalizeDateToYMD(lastDateVal)
+    const isExpired = Boolean(
+      (lastDateYmd && lastDateYmd < todayYmd) ||
+      (lastDateVal && /closed|expired/i.test(String(lastDateVal)))
+    )
+    const artDate = lastDateVal ? escapeHtml(lastDateVal) : (art.publish_date ? `Posted ${escapeHtml(art.publish_date)}` : '')
     const artExcerpt = art.excerpt ? escapeHtml(art.excerpt) : ''
     const artImg = art.featured_image ? getAbsoluteUrl(art.featured_image) : ''
     const artAlt = escapeHtml(art.image_alt || art.title || '')
@@ -939,17 +992,13 @@ function generateCategoryHtml(slug, catMeta, articles, canonical) {
           </div>
         </div>
       </main>
-      <footer class="border-t border-line bg-white py-12 mt-16 font-sans" style="border-top:1px solid #e7e5e4;background:#ffffff;padding:48px 0;margin-top:64px;text-align:center;">
-        <div class="container-x text-center text-xs text-inksoft" style="font-size:12px;color:#78716c;">
-          <p>© 2026 CareerDost. Pakistan's Daily Career, Education &amp; Opportunity Hub.</p>
-        </div>
-      </footer>
+      ${generateSsrFooterHtml()}
     </div>
   `
 }
 
 function generateSindhPillarHtml(articles, canonical) {
-  const todayIso = new Date().toISOString().slice(0, 10)
+  const todayIso = getPktTodayYMD()
   const activeArticles = []
   const archivedArticles = []
 
@@ -958,7 +1007,12 @@ function generateSindhPillarHtml(articles, canonical) {
       continue
     }
     const lastDate = art.last_date || art.lastDate
-    if (lastDate && /^\d{4}-\d{2}-\d{2}$/.test(lastDate) && lastDate < todayIso) {
+    const lastYmd = normalizeDateToYMD(lastDate)
+    const isClosed = Boolean(
+      (lastYmd && lastYmd < todayIso) ||
+      (lastDate && /closed|expired/i.test(String(lastDate)))
+    )
+    if (isClosed) {
       archivedArticles.push(art)
     } else {
       activeArticles.push(art)
@@ -1238,11 +1292,7 @@ function generateSindhPillarHtml(articles, canonical) {
           </section>` : ''}
         </div>
       </main>
-      <footer class="border-t border-line bg-white py-12 mt-16 font-sans" style="border-top:1px solid #e7e5e4;background:#ffffff;padding:48px 0;margin-top:48px;text-align:center;">
-        <div class="container-x text-center text-xs text-inksoft" style="font-size:12px;color:#78716c;">
-          <p>© 2026 CareerDost. Pakistan's Daily Career, Education &amp; Opportunity Hub.</p>
-        </div>
-      </footer>
+      ${generateSsrFooterHtml()}
     </div>
   `
 }
@@ -1376,11 +1426,7 @@ function generateDailyUpdatesIndexHtml(updates, canonical, publishedArticleSlugs
           </div>
         </div>
       </main>
-      <footer class="border-t border-line bg-white py-12 mt-16 font-sans" style="border-top:1px solid #e7e5e4;background:#ffffff;padding:48px 0;margin-top:64px;text-align:center;">
-        <div class="container-x text-center text-xs text-inksoft" style="font-size:12px;color:#78716c;">
-          <p>© 2026 CareerDost. Pakistan's Daily Career, Education &amp; Opportunity Hub.</p>
-        </div>
-      </footer>
+      ${generateSsrFooterHtml()}
     </div>
   `
 }
@@ -2335,15 +2381,26 @@ export async function onRequest(context) {
               .prepare(
                 `SELECT id, slug, title, excerpt, featured_image, image_alt,
                         category_slug, organization, location, qualification, salary,
-                        publish_date, last_date, job_type, is_verified, no_deadline
+                        publish_date, last_date, job_type, is_verified, official_link, no_deadline
                  FROM articles
                  WHERE category_slug = ? AND status = 'published'
-                 ORDER BY (CASE WHEN (last_date GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' AND last_date < strftime('%Y-%m-%d', 'now')) THEN 1 ELSE 0 END) ASC, publish_date DESC, id DESC
+                 ORDER BY (CASE WHEN (last_date GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' AND last_date < strftime('%Y-%m-%d', 'now')) OR last_date LIKE '%October 2026' OR last_date LIKE '%September 2026' OR last_date LIKE '%August 2026' OR last_date LIKE '%Closed%' OR last_date LIKE '%Expired%' THEN 1 ELSE 0 END) ASC, publish_date DESC, id DESC
                  LIMIT 55`
               )
               .bind(slug)
               .all()
-            articles = (results || []).filter((a) => !CONSOLIDATED_SLUG_REDIRECTS.has(a.slug)).slice(0, 40)
+            const todayPktYmd = getPktTodayYMD()
+            articles = (results || [])
+              .filter((a) => !CONSOLIDATED_SLUG_REDIRECTS.has(a.slug))
+              .sort((a, b) => {
+                const aYmd = normalizeDateToYMD(a.last_date)
+                const bYmd = normalizeDateToYMD(b.last_date)
+                const aExp = (aYmd && aYmd < todayPktYmd) || /closed|expired/i.test(String(a.last_date || '')) ? 1 : 0
+                const bExp = (bYmd && bYmd < todayPktYmd) || /closed|expired/i.test(String(b.last_date || '')) ? 1 : 0
+                if (aExp !== bExp) return aExp - bExp
+                return (b.publish_date || '').localeCompare(a.publish_date || '') || (b.id - a.id)
+              })
+              .slice(0, 40)
           } catch (err) {
             console.warn('Category articles query error:', err)
           }
@@ -2386,6 +2443,9 @@ export async function onRequest(context) {
           lastDate: a.last_date || '',
           jobType: a.job_type || '',
           isVerified: Boolean(a.is_verified),
+          officialLink: a.official_link || '',
+          is_verified: a.is_verified,
+          official_link: a.official_link || '',
         }))
 
         const catRes = new HTMLRewriter()
@@ -2440,18 +2500,19 @@ export async function onRequest(context) {
         const [artRes, updRes, allPubSlugsRes] = await Promise.all([
           context.env.DB
             .prepare(
-              `SELECT slug, title, excerpt, category_slug, organization, location, publish_date, last_date, no_deadline
+              `SELECT id, slug, title, excerpt, category_slug, organization, location, publish_date, last_date, no_deadline, is_verified, official_link
                FROM articles WHERE status = 'published'
-               ORDER BY (CASE WHEN (last_date GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' AND last_date < strftime('%Y-%m-%d', 'now')) THEN 1 ELSE 0 END) ASC, publish_date DESC, id DESC
+               ORDER BY (CASE WHEN (last_date GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' AND last_date < strftime('%Y-%m-%d', 'now')) OR last_date LIKE '%October 2026' OR last_date LIKE '%September 2026' OR last_date LIKE '%August 2026' OR last_date LIKE '%Closed%' OR last_date LIKE '%Expired%' THEN 1 ELSE 0 END) ASC, publish_date DESC, id DESC
                LIMIT 25`
             )
             .all(),
           context.env.DB
             .prepare(
-              `SELECT id, slug, title, category, short_description, featured_image, image_alt, publish_date, organization, deadline, no_deadline, is_verified, featured
+              `SELECT id, slug, title, category, short_description, featured_image, image_alt, publish_date, organization, deadline, no_deadline, is_verified, official_link, featured
                FROM daily_updates WHERE status = 'published'
+               AND id NOT IN (1, 2)
                AND slug NOT IN ('fpsc-consolidated-advertisement-09-2026-announced', 'hec-fully-funded-phd-scholarships-2026-open')
-               ORDER BY (CASE WHEN (deadline GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' AND deadline < strftime('%Y-%m-%d', 'now')) THEN 1 ELSE 0 END) ASC, publish_date DESC, id DESC
+               ORDER BY (CASE WHEN (deadline GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' AND deadline < strftime('%Y-%m-%d', 'now')) OR deadline LIKE '%October 2026' OR deadline LIKE '%September 2026' OR deadline LIKE '%August 2026' OR deadline LIKE '%Closed%' OR deadline LIKE '%Expired%' THEN 1 ELSE 0 END) ASC, publish_date DESC, id DESC
                LIMIT 12`
             )
             .all(),
@@ -2464,9 +2525,20 @@ export async function onRequest(context) {
             .map((r) => r.slug)
             .filter((s) => !CONSOLIDATED_SLUG_REDIRECTS.has(s))
         )
-        latestArticles = (artRes?.results || []).filter((a) => !CONSOLIDATED_SLUG_REDIRECTS.has(a.slug)).slice(0, 12)
+        const todayPktYmd = getPktTodayYMD()
+        latestArticles = (artRes?.results || [])
+          .filter((a) => !CONSOLIDATED_SLUG_REDIRECTS.has(a.slug))
+          .sort((a, b) => {
+            const aYmd = normalizeDateToYMD(a.last_date)
+            const bYmd = normalizeDateToYMD(b.last_date)
+            const aExp = (aYmd && aYmd < todayPktYmd) || /closed|expired/i.test(String(a.last_date || '')) ? 1 : 0
+            const bExp = (bYmd && bYmd < todayPktYmd) || /closed|expired/i.test(String(b.last_date || '')) ? 1 : 0
+            if (aExp !== bExp) return aExp - bExp
+            return (b.publish_date || '').localeCompare(a.publish_date || '') || (b.id - a.id)
+          })
+          .slice(0, 12)
         latestDailyUpdates = (updRes?.results || [])
-          .filter((u) => !CONSOLIDATED_SLUG_REDIRECTS.has(u.slug) && !NOINDEX_UPDATE_SLUGS.has(u.slug))
+          .filter((u) => !CONSOLIDATED_SLUG_REDIRECTS.has(u.slug) && !NOINDEX_UPDATE_SLUGS.has(u.slug) && u.id !== 1 && u.id !== 2)
           .slice(0, 6)
           .map((u) => ({
             ...u,
@@ -2537,8 +2609,12 @@ export async function onRequest(context) {
             <h2 class="font-serif text-xl font-bold text-ink mb-4">Latest Verified Opportunities &amp; Official Updates</h2>
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               ${latestArticles.map((a) => {
-                const todayStr = new Date().toISOString().split('T')[0]
-                const isExp = Boolean(a.last_date && /^\d{4}-\d{2}-\d{2}$/.test(a.last_date) && a.last_date < todayStr)
+                const todayStr = getPktTodayYMD()
+                const lastDateYmd = normalizeDateToYMD(a.last_date)
+                const isExp = Boolean(
+                  (lastDateYmd && lastDateYmd < todayStr) ||
+                  (a.last_date && /closed|expired/i.test(String(a.last_date)))
+                )
                 const vTier = getVerificationTier(a)
                 return `
                 <article class="bg-white border border-line p-4 rounded-xs">
@@ -2559,14 +2635,29 @@ export async function onRequest(context) {
             </div>
           </section>
         </main>
-        <footer class="border-t border-line bg-white py-8 text-center text-xs text-inksoft">
-          <p>© 2026 CareerDost. Independent Pakistani Career, Education &amp; Public Information Platform.</p>
-        </footer>
+        ${generateSsrFooterHtml()}
       </div>`
 
     const homeInitialData = {
       dailyUpdates: latestDailyUpdates,
-      govJobs: latestArticles.filter((a) => a.category_slug === 'government-jobs').slice(0, 4),
+      govJobs: latestArticles
+        .filter((a) => a.category_slug === 'government-jobs')
+        .slice(0, 4)
+        .map((a) => ({
+          id: a.id,
+          slug: a.slug,
+          title: a.title,
+          excerpt: a.excerpt || '',
+          category: a.category_slug,
+          organization: a.organization || '',
+          location: a.location || 'Pakistan',
+          publishDate: a.publish_date || '',
+          lastDate: a.last_date || '',
+          isVerified: Boolean(a.is_verified),
+          officialLink: a.official_link || '',
+          is_verified: a.is_verified,
+          official_link: a.official_link || '',
+        })),
     }
 
     const homeRes = new HTMLRewriter()

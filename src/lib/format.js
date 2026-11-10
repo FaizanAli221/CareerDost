@@ -14,16 +14,33 @@ const MONTH_MAP = {
 }
 
 /**
+ * Deterministically returns the current date in Pakistan Standard Time (PKT, UTC+5)
+ * as 'YYYY-MM-DD' calendar string, with zero dependency on client OS locale.
+ */
+export function getPktTodayYMD() {
+  const now = new Date()
+  const pkt = new Date(now.getTime() + (5 * 60 * 60 * 1000))
+  const y = pkt.getUTCFullYear()
+  const m = String(pkt.getUTCMonth() + 1).padStart(2, '0')
+  const d = String(pkt.getUTCDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+/**
  * Normalizes any supported date string to 'YYYY-MM-DD' calendar date string.
- * Supports ISO dates ('2026-10-19'), long English dates ('19 October 2026', 'October 19, 2026').
+ * Supports:
+ * - ISO dates ('2026-11-04', '2026/11/04')
+ * - Long & short English dates ('19 October 2026', '04-Nov-2026', '4 Nov 2026')
+ * - Month Day, Year ('October 19, 2026', 'Nov 04, 2026')
+ * - Numeric dates ('04-11-2026', '04/11/2026')
  */
 export function normalizeDateToYMD(dateStr) {
   if (!dateStr || (typeof dateStr !== 'string' && typeof dateStr !== 'number')) return null
   const s = String(dateStr).trim()
   if (!s) return null
 
-  // 1. ISO YYYY-MM-DD (or YYYY-MM-DDTHH:mm:ss)
-  const isoMatch = s.match(/\b(\d{4})-(\d{1,2})-(\d{1,2})\b/)
+  // 1. ISO YYYY-MM-DD (or YYYY/MM/DD)
+  const isoMatch = s.match(/\b(\d{4})[-/](\d{1,2})[-/](\d{1,2})\b/)
   if (isoMatch) {
     const y = isoMatch[1]
     const m = String(isoMatch[2]).padStart(2, '0')
@@ -31,8 +48,8 @@ export function normalizeDateToYMD(dateStr) {
     return `${y}-${m}-${d}`
   }
 
-  // 2. Day Month Year: e.g. '19 October 2026' or '19 Oct 2026'
-  const dmyMatch = s.match(/\b(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})\b/)
+  // 2. Day Month Year: e.g. '19 October 2026', '04-Nov-2026', '4 Nov 2026'
+  const dmyMatch = s.match(/\b(\d{1,2})[-/\s]+([a-zA-Z]+)[-/\s]+(\d{4})\b/)
   if (dmyMatch) {
     const d = String(dmyMatch[1]).padStart(2, '0')
     const monthKey = dmyMatch[2].toLowerCase()
@@ -41,14 +58,25 @@ export function normalizeDateToYMD(dateStr) {
     if (m) return `${y}-${m}-${d}`
   }
 
-  // 3. Month Day, Year: e.g. 'October 19, 2026' or 'Oct 19 2026'
-  const mdyMatch = s.match(/\b([a-zA-Z]+)\s+(\d{1,2}),?\s+(\d{4})\b/)
+  // 3. Month Day, Year: e.g. 'October 19, 2026', 'Nov 04, 2026'
+  const mdyMatch = s.match(/\b([a-zA-Z]+)[-/\s]+(\d{1,2}),?[-/\s]+(\d{4})\b/)
   if (mdyMatch) {
     const monthKey = mdyMatch[1].toLowerCase()
     const m = MONTH_MAP[monthKey] || MONTH_MAP[monthKey.slice(0, 3)]
     const d = String(mdyMatch[2]).padStart(2, '0')
     const y = mdyMatch[3]
     if (m) return `${y}-${m}-${d}`
+  }
+
+  // 4. DD-MM-YYYY or DD/MM/YYYY: e.g. '04-11-2026', '04/11/2026'
+  const dmyNumMatch = s.match(/\b(\d{1,2})[-/](\d{1,2})[-/](\d{4})\b/)
+  if (dmyNumMatch) {
+    const d = String(dmyNumMatch[1]).padStart(2, '0')
+    const m = String(dmyNumMatch[2]).padStart(2, '0')
+    const y = dmyNumMatch[3]
+    if (Number(m) >= 1 && Number(m) <= 12 && Number(d) >= 1 && Number(d) <= 31) {
+      return `${y}-${m}-${d}`
+    }
   }
 
   return null
@@ -77,17 +105,32 @@ export function formatDate(iso) {
 
 export function daysRemaining(iso) {
   if (!iso) return null
+  const todayPkt = getPktTodayYMD()
   const ymd = normalizeDateToYMD(iso)
+
+  // Direct chronological comparison: expired dates must NEVER return positive remaining days
+  if (ymd && ymd < todayPkt) {
+    const [ty, tm, td] = ymd.split('-').map(Number)
+    const [cy, cm, cd] = todayPkt.split('-').map(Number)
+    const targetUtc = Date.UTC(ty, tm - 1, td)
+    const currentUtc = Date.UTC(cy, cm - 1, cd)
+    const diff = Math.round((targetUtc - currentUtc) / (1000 * 60 * 60 * 24))
+    return Math.min(-1, diff)
+  }
+
   if (!ymd) {
+    const raw = String(iso).trim().toLowerCase()
+    if (raw.includes('closed') || raw.includes('expired') || raw.includes('passed')) {
+      return -1
+    }
     const fallback = new Date(String(iso).trim())
     if (isNaN(fallback.getTime())) return null
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    return Math.ceil((fallback - today) / (1000 * 60 * 60 * 24))
+    const diff = Math.ceil((fallback - today) / (1000 * 60 * 60 * 24))
+    return diff
   }
 
-  // Calculate calendar days difference in Pakistan Standard Time (PKT, UTC+5)
-  const todayPkt = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Karachi' })
   const [ty, tm, td] = ymd.split('-').map(Number)
   const [cy, cm, cd] = todayPkt.split('-').map(Number)
   const targetUtc = Date.UTC(ty, tm - 1, td)
@@ -98,7 +141,7 @@ export function daysRemaining(iso) {
 export function deadlineLabel(iso) {
   const days = daysRemaining(iso)
   if (days === null) return { text: 'N/A', urgent: false, closed: false, days: 999 }
-  if (days < 0) return { text: 'Expired', urgent: false, closed: true, days: -1 }
+  if (days < 0) return { text: 'Applications Closed', urgent: false, closed: true, days: -1 }
   if (days === 0) return { text: 'Closes Today', urgent: true, closed: false, days: 0 }
   if (days === 1) return { text: '1 Day Left', urgent: true, closed: false, days: 1 }
   if (days <= 5) return { text: `${days} Days Left`, urgent: true, closed: false, days }
@@ -116,6 +159,22 @@ export function getOpportunityStatus(iso, noDeadline = false) {
     }
   }
 
+  const rawLower = String(iso).trim().toLowerCase()
+  const todayPkt = getPktTodayYMD()
+  const ymd = normalizeDateToYMD(iso)
+  const isExpiredByDate = Boolean(ymd && ymd < todayPkt)
+  const isExplicitClosed = rawLower.includes('closed') || rawLower.includes('expired') || rawLower.includes('passed')
+
+  if (isExpiredByDate || isExplicitClosed) {
+    return {
+      status: 'EXPIRED',
+      label: 'APPLICATIONS CLOSED',
+      badgeClass: 'bg-slate-200 text-slate-700 border-slate-300',
+      isExpired: true,
+      days: -1,
+    }
+  }
+
   const days = daysRemaining(iso)
   if (days === null) {
     return {
@@ -129,7 +188,7 @@ export function getOpportunityStatus(iso, noDeadline = false) {
   if (days < 0) {
     return {
       status: 'EXPIRED',
-      label: 'EXPIRED',
+      label: 'APPLICATIONS CLOSED',
       badgeClass: 'bg-slate-200 text-slate-700 border-slate-300',
       isExpired: true,
       days,
@@ -147,7 +206,7 @@ export function getOpportunityStatus(iso, noDeadline = false) {
   if (days <= 3) {
     return {
       status: 'CLOSING SOON',
-      label: `CLOSING SOON (${days}d left)`,
+      label: `${days}d Left`,
       badgeClass: 'bg-amber-100 text-amber-800 border-amber-300 font-bold',
       isExpired: false,
       days,

@@ -11,8 +11,8 @@
  * 7. 'guide': Educational guides, career strategies, citizen how-to references
  */
 
-import { formatDate, normalizeDateToYMD } from './format.js'
-export { normalizeDateToYMD }
+import { formatDate, getPktTodayYMD, normalizeDateToYMD } from './format.js'
+export { getPktTodayYMD, normalizeDateToYMD }
 
 /**
  * Sector-aware transparency notice describing source origin without
@@ -432,16 +432,24 @@ export function getContextualStatus(item, type) {
     String(item.status || '').toLowerCase() === 'closed' ||
     lowerDate.includes('closed') ||
     lowerDate.includes('expired') ||
+    lowerDate.includes('passed') ||
     slug.includes('closed') ||
     String(item.title || '').toLowerCase().includes('(closed') ||
     String(item.title || '').toLowerCase().includes('applications closed')
 
-  if (isExplicitClosed) {
+  // Direct chronological check against PKT calendar date: expired listings must NEVER display positive days
+  const todayPkt = getPktTodayYMD()
+  const ymd = normalizeDateToYMD(lastDate)
+  const isPastDate = Boolean(ymd && ymd < todayPkt)
+
+  if (isExplicitClosed || isPastDate) {
     return {
       status: 'EXPIRED',
       label: 'APPLICATIONS CLOSED',
       badgeClass: 'bg-slate-200 text-slate-700 border-slate-300',
-      description: lastDate ? `Applications officially closed on ${formatDate(lastDate)}.` : 'Applications for this recruitment cycle have officially closed.',
+      description: ymd
+        ? `Applications officially closed on ${formatDate(ymd)}.`
+        : (lastDate ? `Applications officially closed on ${lastDate}.` : 'Applications for this recruitment cycle have officially closed.'),
       isExpired: true,
       days: -1,
     }
@@ -562,7 +570,6 @@ export function getContextualStatus(item, type) {
     }
   }
 
-  const ymd = normalizeDateToYMD(lastDate)
   if (!ymd) {
     if (lastDate && lastDate.length > 0) {
       return {
@@ -583,21 +590,20 @@ export function getContextualStatus(item, type) {
   }
 
   // Calculate calendar days difference in Pakistan Standard Time (PKT, UTC+5)
-  const todayPkt = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Karachi' })
   const [ty, tm, td] = ymd.split('-').map(Number)
   const [cy, cm, cd] = todayPkt.split('-').map(Number)
   const targetUtc = Date.UTC(ty, tm - 1, td)
   const currentUtc = Date.UTC(cy, cm - 1, cd)
   const diffDays = Math.round((targetUtc - currentUtc) / (1000 * 60 * 60 * 24))
 
-  if (diffDays < 0) {
+  if (diffDays < 0 || ymd < todayPkt) {
     return {
       status: 'EXPIRED',
       label: 'APPLICATIONS CLOSED',
       badgeClass: 'bg-slate-200 text-slate-700 border-slate-300',
       description: `Applications officially closed on ${formatDate(ymd)}.`,
       isExpired: true,
-      days: diffDays,
+      days: Math.min(-1, diffDays),
     }
   }
 
@@ -664,6 +670,7 @@ export function getVerificationTier(item) {
   // Tier 2: Credible Announcement from Government / Authority — Formal Notification Awaited
   const isAnnouncementPhase =
     slug.includes('iwork4sindh') ||
+    slug.includes('sindh-government-graduate-internship') ||
     slug.includes('kp-government-20000-paid-internships') ||
     slug.includes('announcement-phase') ||
     slug.includes('formal-notification-awaited') ||
@@ -675,7 +682,21 @@ export function getVerificationTier(item) {
     lastDate.includes('unconfirmed') ||
     lastDate.includes('not yet announced') ||
     lastDate.includes('tba') ||
-    lastDate.includes('expected')
+    lastDate.includes('expected') ||
+    lastDate.includes('opening soon') ||
+    lastDate.includes('portal guidelines') ||
+    lastDate.includes('registration rollout pending')
+
+  const hasUnconfirmedOrTbaMarkers =
+    lastDate.includes('tba') ||
+    lastDate.includes('expected') ||
+    lastDate.includes('pending') ||
+    lastDate.includes('unconfirmed') ||
+    lastDate.includes('not yet announced') ||
+    lastDate.includes('opening soon') ||
+    title.includes('tba') ||
+    title.includes('unconfirmed') ||
+    slug.includes('what-is-confirmed')
 
   if (isAnnouncementPhase) {
     return {
@@ -690,8 +711,8 @@ export function getVerificationTier(item) {
     }
   }
 
-  // Tier 1: Official Notification Verified
-  if (isVerified && hasValidOfficialLink) {
+  // Tier 1: Official Notification Verified (Must have primary official notice, valid URL, and NO unconfirmed/TBA markers)
+  if (isVerified && hasValidOfficialLink && !hasUnconfirmedOrTbaMarkers) {
     return {
       tier: 1,
       status: 'OFFICIAL_VERIFIED',
