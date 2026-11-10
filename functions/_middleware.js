@@ -8,7 +8,7 @@
  */
 
 import { isGenuineJobVacancy, buildJobPostingSchema } from '../src/lib/jobSchema.js'
-import { getContentType, getContentTypeLabels, getContextualStatus, getSectorTransparencyNote } from '../src/lib/contentType.js'
+import { getContentType, getContentTypeLabels, getContextualStatus, getSectorTransparencyNote, getVerificationTier } from '../src/lib/contentType.js'
 import { CONSOLIDATED_SLUG_REDIRECTS } from '../src/data/consolidatedRedirects.js'
 
 const SITE_URL = 'https://careerdost.blog'
@@ -163,6 +163,61 @@ function formatInline(str) {
   return s
 }
 
+function isDraftMetadataLine(line) {
+  return /^(?:Title|Meta description|Focus keyword|Secondary keywords|Suggested slug):\s*/i.test(line.trim())
+}
+
+function renderOrderedListWithNesting(text) {
+  const lines = text.split('\n')
+  let html = '<ol class="list-decimal pl-5 space-y-2 text-ink my-4">\n'
+  let inSubList = false
+  let subListItems = []
+
+  function flushSubList() {
+    if (inSubList && subListItems.length > 0) {
+      let subHtml = '\n    <ul class="list-disc pl-5 my-2 space-y-1 text-sm text-inksoft">\n'
+      for (const sub of subListItems) {
+        subHtml += `      <li>${formatInline(sub)}</li>\n`
+      }
+      subHtml += '    </ul>'
+      subListItems = []
+      inSubList = false
+      return subHtml
+    }
+    return ''
+  }
+
+  let currentItemHtml = ''
+  let hasItem = false
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (!trimmed) continue
+
+    const isNum = /^\d+\.\s+(.*)/.exec(trimmed)
+    const isBullet = /^[-*]\s+(.*)/.exec(trimmed)
+
+    if (isNum) {
+      if (hasItem) {
+        html += `  <li>${currentItemHtml}${flushSubList()}</li>\n`
+      }
+      currentItemHtml = formatInline(isNum[1])
+      hasItem = true
+    } else if (isBullet && hasItem) {
+      inSubList = true
+      subListItems.push(isBullet[1])
+    } else if (hasItem) {
+      currentItemHtml += ' ' + formatInline(trimmed)
+    }
+  }
+
+  if (hasItem) {
+    html += `  <li>${currentItemHtml}${flushSubList()}</li>\n`
+  }
+  html += '</ol>\n'
+  return html
+}
+
 function renderContentBlocks(content, targetTitle = '') {
   if (!content) return ''
   let rawBlocks = []
@@ -188,14 +243,40 @@ function renderContentBlocks(content, targetTitle = '') {
     rawBlocks = [String(content)]
   }
 
-  // Split any multi-paragraph blocks that contain double newlines
+  // Split any multi-paragraph blocks and isolate headings/horizontal rules
   const blocks = []
   for (const rb of rawBlocks) {
     if (!rb) continue
     const normalizedRb = normalizeLegacyBlockHtml(rb)
-    const parts = String(normalizedRb).split(/\n\s*\n/)
-    for (const p of parts) {
-      if (p.trim()) blocks.push(p.trim())
+    const rawParts = String(normalizedRb).split(/\n\s*\n/)
+    for (const part of rawParts) {
+      const trimmed = part.trim()
+      if (!trimmed) continue
+
+      const lines = trimmed.split('\n')
+      let currentChunk = []
+
+      function flushChunk() {
+        if (currentChunk.length > 0) {
+          const s = currentChunk.join('\n').trim()
+          if (s) blocks.push(s)
+          currentChunk = []
+        }
+      }
+
+      for (const line of lines) {
+        const t = line.trim()
+        if (isDraftMetadataLine(t)) {
+          continue
+        }
+        if (/^#{1,4}\s+/.test(t) || /^([-*_])\1{2,}$/.test(t)) {
+          flushChunk()
+          blocks.push(t)
+        } else {
+          currentChunk.push(line)
+        }
+      }
+      flushChunk()
     }
   }
 
@@ -220,13 +301,16 @@ function renderContentBlocks(content, targetTitle = '') {
 
   for (const text of blocks) {
     if (!text) continue
+    if (isDraftMetadataLine(text)) continue
 
-    if (text === '---' || text === '***') {
+    if (/^([-*_])\1{2,}$/.test(text)) {
       html += `<hr class="my-6 border-line" />\n`
       continue
     }
 
-    if (text.startsWith('### ')) {
+    if (/^####\s+/.test(text)) {
+      html += `<h4 class="font-serif text-base sm:text-lg font-bold text-ink mt-5 mb-2">${formatInline(text.replace(/^####\s+/, ''))}</h4>\n`
+    } else if (text.startsWith('### ')) {
       html += `<h3 class="font-serif text-lg sm:text-xl font-bold text-ink mt-6 mb-3">${formatInline(text.replace(/^###\s+/, ''))}</h3>\n`
     } else if (text.startsWith('## ')) {
       const headingText = text.replace(/^##\s+/, '').trim()
@@ -285,21 +369,23 @@ function renderContentBlocks(content, targetTitle = '') {
         html += `</blockquote>\n`
       }
     } else if (text.startsWith('- ') || text.startsWith('* ')) {
-      const items = text.split('\n').filter((l) => l.trim().startsWith('- ') || l.trim().startsWith('* '))
+      const lines = text.split('\n')
       html += `<ul class="list-disc pl-5 space-y-2 text-ink my-4">\n`
-      for (const item of items) {
-        const itemText = item.replace(/^[-*]\s+/, '').trim()
-        html += `  <li>${formatInline(itemText)}</li>\n`
+      let currentItem = ''
+      for (const line of lines) {
+        const t = line.trim()
+        if (!t) continue
+        if (/^[-*]\s+/.test(t)) {
+          if (currentItem) html += `  <li>${formatInline(currentItem)}</li>\n`
+          currentItem = t.replace(/^[-*]\s+/, '')
+        } else if (currentItem) {
+          currentItem += ' ' + t
+        }
       }
+      if (currentItem) html += `  <li>${formatInline(currentItem)}</li>\n`
       html += `</ul>\n`
     } else if (/^\d+\.\s+/.test(text)) {
-      const items = text.split('\n').filter((l) => /^\d+\.\s+/.test(l.trim()))
-      html += `<ol class="list-decimal pl-5 space-y-2 text-ink my-4">\n`
-      for (const item of items) {
-        const itemText = item.trim().replace(/^\d+\.\s+/, '').trim()
-        html += `  <li>${formatInline(itemText)}</li>\n`
-      }
-      html += `</ol>\n`
+      html += renderOrderedListWithNesting(text)
     } else {
       const lines = text.split('\n')
       let pContent = ''
@@ -463,7 +549,9 @@ function generateDailyUpdateHtml(update, canonical, hasArticle = false) {
               <span class="bg-green/10 text-green text-xs font-sans font-bold px-3 py-1 rounded-full border border-green/20">
                 ${typeBadge}
               </span>
-              ${update.is_verified ? '<span class="bg-emerald-100 text-emerald-800 text-xs font-sans font-bold px-3 py-1 rounded-full border border-emerald-300">✓ Official Source Verified</span>' : ''}
+              <span class="${getVerificationTier(update).pillClass} text-xs font-sans font-bold px-3 py-1 rounded-full border">
+                ${getVerificationTier(update).icon} ${getVerificationTier(update).label}
+              </span>
               <span class="text-xs font-sans text-inksoft">
                 Published: ${pubDate}
               </span>
@@ -629,7 +717,9 @@ function generateJobHtml(article, canonical) {
               <a href="/category/${categorySlug}" class="bg-green/10 text-green text-xs font-sans font-bold px-3 py-1 rounded-full border border-green/20">
                 ${typeBadge}
               </a>
-              ${article.is_verified ? '<span class="bg-emerald-100 text-emerald-800 text-xs font-sans font-bold px-3 py-1 rounded-full border border-emerald-300">✓ Official Source Verified</span>' : ''}
+              <span class="${getVerificationTier(article).pillClass} text-xs font-sans font-bold px-3 py-1 rounded-full border">
+                ${getVerificationTier(article).icon} ${getVerificationTier(article).label}
+              </span>
               <span class="text-xs font-sans text-inksoft">
                 Published: ${pubDate}
               </span>
@@ -755,14 +845,20 @@ function generateCategoryHtml(slug, catMeta, articles, canonical) {
     return `<a href="/category/${c.slug}" style="${style}">${escapeHtml(c.label)}</a>`
   }).join(' ')
 
+  const todayYmd = new Date().toISOString().split('T')[0]
   const articleCards = articles.length > 0 ? articles.map((art) => {
     const artTitle = escapeHtml(art.title || '')
     const artOrg = art.organization ? escapeHtml(art.organization) : ''
     const artLoc = art.location ? escapeHtml(art.location) : 'Pakistan'
+    const isExpired = Boolean(art.last_date && /^\d{4}-\d{2}-\d{2}$/.test(art.last_date) && art.last_date < todayYmd)
     const artDate = art.last_date ? escapeHtml(art.last_date) : (art.publish_date ? `Posted ${escapeHtml(art.publish_date)}` : '')
     const artExcerpt = art.excerpt ? escapeHtml(art.excerpt) : ''
     const artImg = art.featured_image ? getAbsoluteUrl(art.featured_image) : ''
     const artAlt = escapeHtml(art.image_alt || art.title || '')
+    const vTier = getVerificationTier(art)
+    const tierStyle = vTier.tier === 1
+      ? 'background:#ecfdf5;color:#065f46;border:1px solid #6ee7b7;'
+      : (vTier.tier === 2 ? 'background:#fffbeb;color:#92400e;border:1px solid #fcd34d;' : 'background:#f8fafc;color:#475569;border:1px solid #cbd5e1;')
 
     return `
       <article class="bg-white border border-line rounded-xs overflow-hidden shadow-xs hover:border-green transition-all flex flex-col justify-between" style="background:#ffffff;border:1px solid #e7e5e4;border-radius:2px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 1px 2px rgba(0,0,0,0.05);">
@@ -771,9 +867,14 @@ function generateCategoryHtml(slug, catMeta, articles, canonical) {
           <img src="${artImg}" alt="${artAlt}" width="600" height="338" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" />
         </div>` : ''}
         <div style="padding:16px;flex:1;display:flex;flex-direction:column;">
-          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:8px;">
-            <span style="color:#059669;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">${label}</span>
-            ${artDate ? `<span style="color:#78716c;">${artDate}</span>` : ''}
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:8px;flex-wrap:wrap;gap:4px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="color:#059669;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">${label}</span>
+              <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:2px;${tierStyle}">${vTier.icon} ${escapeHtml(vTier.shortLabel)}</span>
+            </div>
+            ${isExpired
+              ? '<span style="background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;padding:2px 6px;border-radius:2px;font-size:10px;font-weight:700;">CLOSED / EXPIRED</span>'
+              : (artDate ? `<span style="color:#78716c;">${artDate}</span>` : '')}
           </div>
           <h2 style="font-family:serif;font-size:16px;font-weight:700;line-height:1.35;margin-bottom:8px;color:#1c1917;">
             <a href="/jobs/${art.slug}" style="color:#1c1917;text-decoration:none;">${artTitle}</a>
@@ -2234,10 +2335,10 @@ export async function onRequest(context) {
               .prepare(
                 `SELECT id, slug, title, excerpt, featured_image, image_alt,
                         category_slug, organization, location, qualification, salary,
-                        publish_date, last_date, job_type, is_verified
+                        publish_date, last_date, job_type, is_verified, no_deadline
                  FROM articles
                  WHERE category_slug = ? AND status = 'published'
-                 ORDER BY publish_date DESC
+                 ORDER BY (CASE WHEN (last_date GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' AND last_date < strftime('%Y-%m-%d', 'now')) THEN 1 ELSE 0 END) ASC, publish_date DESC, id DESC
                  LIMIT 55`
               )
               .bind(slug)
@@ -2339,14 +2440,19 @@ export async function onRequest(context) {
         const [artRes, updRes, allPubSlugsRes] = await Promise.all([
           context.env.DB
             .prepare(
-              `SELECT slug, title, excerpt, category_slug, organization, location, publish_date, last_date
-               FROM articles WHERE status = 'published' ORDER BY publish_date DESC LIMIT 25`
+              `SELECT slug, title, excerpt, category_slug, organization, location, publish_date, last_date, no_deadline
+               FROM articles WHERE status = 'published'
+               ORDER BY (CASE WHEN (last_date GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' AND last_date < strftime('%Y-%m-%d', 'now')) THEN 1 ELSE 0 END) ASC, publish_date DESC, id DESC
+               LIMIT 25`
             )
             .all(),
           context.env.DB
             .prepare(
               `SELECT id, slug, title, category, short_description, featured_image, image_alt, publish_date, organization, deadline, no_deadline, is_verified, featured
-               FROM daily_updates WHERE status = 'published' ORDER BY publish_date DESC LIMIT 12`
+               FROM daily_updates WHERE status = 'published'
+               AND slug NOT IN ('fpsc-consolidated-advertisement-09-2026-announced', 'hec-fully-funded-phd-scholarships-2026-open')
+               ORDER BY (CASE WHEN (deadline GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' AND deadline < strftime('%Y-%m-%d', 'now')) THEN 1 ELSE 0 END) ASC, publish_date DESC, id DESC
+               LIMIT 12`
             )
             .all(),
           context.env.DB
@@ -2360,7 +2466,7 @@ export async function onRequest(context) {
         )
         latestArticles = (artRes?.results || []).filter((a) => !CONSOLIDATED_SLUG_REDIRECTS.has(a.slug)).slice(0, 12)
         latestDailyUpdates = (updRes?.results || [])
-          .filter((u) => !CONSOLIDATED_SLUG_REDIRECTS.has(u.slug))
+          .filter((u) => !CONSOLIDATED_SLUG_REDIRECTS.has(u.slug) && !NOINDEX_UPDATE_SLUGS.has(u.slug))
           .slice(0, 6)
           .map((u) => ({
             ...u,
@@ -2430,16 +2536,26 @@ export async function onRequest(context) {
           <section>
             <h2 class="font-serif text-xl font-bold text-ink mb-4">Latest Verified Opportunities &amp; Official Updates</h2>
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              ${latestArticles.map((a) => `
+              ${latestArticles.map((a) => {
+                const todayStr = new Date().toISOString().split('T')[0]
+                const isExp = Boolean(a.last_date && /^\d{4}-\d{2}-\d{2}$/.test(a.last_date) && a.last_date < todayStr)
+                const vTier = getVerificationTier(a)
+                return `
                 <article class="bg-white border border-line p-4 rounded-xs">
-                  <span class="text-xs font-bold text-green uppercase">${escapeHtml(getCategoryLabel(a.category_slug))}</span>
+                  <div class="flex items-center justify-between mb-1 gap-2 flex-wrap">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-green uppercase">${escapeHtml(getCategoryLabel(a.category_slug))}</span>
+                      <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border ${vTier.pillClass}">${vTier.icon} ${escapeHtml(vTier.shortLabel)}</span>
+                    </div>
+                    ${isExp ? '<span class="bg-slate-100 text-slate-700 border border-slate-300 text-[10px] font-bold px-1.5 py-0.5 rounded">CLOSED / EXPIRED</span>' : ''}
+                  </div>
                   <h3 class="font-serif text-base font-bold text-ink mt-1 mb-1">
                     <a href="/jobs/${escapeHtml(a.slug)}">${escapeHtml(a.title)}</a>
                   </h3>
                   <p class="text-xs text-inksoft mb-2">${escapeHtml(a.organization || '')} • ${escapeHtml(a.location || 'Pakistan')}</p>
                   <p class="text-xs text-inksoft">${escapeHtml(a.excerpt || '')}</p>
-                </article>
-              `).join('\n')}
+                </article>`
+              }).join('\n')}
             </div>
           </section>
         </main>

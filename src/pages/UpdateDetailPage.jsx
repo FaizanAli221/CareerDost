@@ -12,7 +12,7 @@ import AdsterraNativeBanner from '../components/AdsterraNativeBanner'
 import { useSeo } from '../lib/useSeo'
 import { getAbsoluteUrl } from '../lib/config'
 import { trackApplyNowClick, trackOfficialSourceClick } from '../lib/analytics'
-import { getContentType, getContentTypeLabels, getContextualStatus } from '../lib/contentType'
+import { getContentType, getContentTypeLabels, getContextualStatus, getVerificationTier } from '../lib/contentType'
 import { KNOWN_ARTICLE_SLUGS } from '../data/articleSlugs'
 
 function formatDate(dateStr) {
@@ -53,6 +53,7 @@ export default function UpdateDetailPage() {
   const contentType = useMemo(() => getContentType(updateItem), [updateItem])
   const labels = useMemo(() => getContentTypeLabels(contentType, updateItem), [contentType, updateItem])
   const statusInfo = useMemo(() => getContextualStatus(updateItem, contentType), [updateItem, contentType])
+  const verification = useMemo(() => getVerificationTier(updateItem), [updateItem])
 
   const hasMatchingArticle = useMemo(() => {
     if (updateItem?.hasArticle === true) return true
@@ -261,11 +262,9 @@ export default function UpdateDetailPage() {
           >
             {updateItem.category}
           </Link>
-          {updateItem.isVerified && (
-            <span className="bg-emerald-100 text-emerald-800 text-xs font-sans font-bold px-3 py-1 rounded-full border border-emerald-300">
-              ✓ Official Source Verified
-            </span>
-          )}
+          <span className={`text-xs font-sans font-bold px-3 py-1 rounded-full border ${verification.pillClass}`}>
+            {verification.icon} {verification.label}
+          </span>
           <span className="text-xs font-sans text-inksoft">
             Published: {formatDate(updateItem.publishDate)}
           </span>

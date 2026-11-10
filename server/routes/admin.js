@@ -146,10 +146,92 @@ app.get('/articles', authMiddleware, async (c) => {
   return c.json({ success: true, data: articles })
 })
 
+// Scoped, non-destructive Cloudflare Edge Cache invalidation for mutated article/update routes
+async function purgeEdgeCacheForContent(c, slugs = [], categorySlugs = []) {
+  try {
+    const edgeCache = typeof caches !== 'undefined' ? caches.default : null
+    if (!edgeCache || typeof edgeCache.delete !== 'function') return
+
+    const origins = new Set(['https://careerdost.blog'])
+    try {
+      const reqOrigin = new URL(c.req.url).origin
+      if (reqOrigin) origins.add(reqOrigin)
+    } catch {}
+
+    const paths = new Set([
+      '/',
+      '/daily-updates',
+      '/sitemap.xml',
+      '/api/articles',
+      '/api/articles?latest=true&limit=10',
+      '/api/articles?latest=true&limit=12',
+      '/api/articles?featured=true&limit=4',
+      '/api/articles?closingSoon=true&limit=6',
+      '/api/updates',
+      '/api/updates/latest',
+      '/api/updates/latest?limit=4',
+      '/api/updates/latest?limit=6',
+    ])
+
+    for (const s of slugs.filter(Boolean)) {
+      paths.add(`/jobs/${s}`)
+      paths.add(`/daily-updates/${s}`)
+      paths.add(`/api/articles/${s}`)
+      paths.add(`/api/updates/${s}`)
+    }
+
+    for (const cat of categorySlugs.filter(Boolean)) {
+      paths.add(`/category/${cat}`)
+      paths.add(`/api/categories/${cat}`)
+      paths.add(`/api/articles?category=${encodeURIComponent(cat)}`)
+      paths.add(`/api/articles?category=${encodeURIComponent(cat)}&limit=5`)
+    }
+
+    const tasks = []
+    for (const origin of origins) {
+      for (const p of paths) {
+        tasks.push(edgeCache.delete(new Request(`${origin}${p}`, { method: 'GET' })).catch(() => false))
+      }
+    }
+
+    if (c.executionCtx && typeof c.executionCtx.waitUntil === 'function') {
+      c.executionCtx.waitUntil(Promise.allSettled(tasks))
+    } else {
+      await Promise.allSettled(tasks)
+    }
+  } catch {
+    // Ignore cache API unavailability in non-edge runtimes
+  }
+}
+
+function deriveSummaryFromContent(contentInput, fallback = '') {
+  const blocks = Array.isArray(contentInput) ? contentInput : [String(contentInput || '')]
+  for (const raw of blocks) {
+    const line = String(raw || '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/^#+\s+/gm, '')
+      .replace(/^>\s*\[![A-Z]+\]\s*/gim, '')
+      .replace(/^>\s*/gm, '')
+      .replace(/^Title:\s*/i, '')
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/[*_`]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+    if (line.length >= 30) {
+      return line.length > 260 ? line.slice(0, 257).trim() + '...' : line
+    }
+  }
+  return fallback
+}
+
 // Article Admin CRUD with Input Validation
 app.post('/articles', authMiddleware, async (c) => {
   const db = getDb(c)
   const body = await c.req.json()
+
+  if (!body.excerpt || !String(body.excerpt).trim()) {
+    body.excerpt = deriveSummaryFromContent(body.content, body.title || '')
+  }
 
   const validation = sanitizeArticleInput(body)
   if (!validation.valid) {
@@ -164,6 +246,7 @@ app.post('/articles', authMiddleware, async (c) => {
 
   await ArticleModel.create(db, articleData)
   const created = await ArticleModel.getBySlug(db, articleData.slug)
+  await purgeEdgeCacheForContent(c, [articleData.slug], [articleData.category])
   return c.json({ success: true, data: created })
 })
 
@@ -177,13 +260,115 @@ app.put('/articles/:slug', authMiddleware, async (c) => {
     return c.json({ success: false, error: 'Article not found.' }, 404)
   }
 
-  const validation = sanitizeArticleInput(body, existing.status)
+  const normalizedInput = { ...body }
+  const incomingTitle = typeof body.title === 'string' ? body.title.trim() : ''
+  const titleChanged = Boolean(incomingTitle && incomingTitle !== existing.title)
+
+  // If title changed and SEO/OG title were not independently customized in this edit, regenerate from new title
+  if (titleChanged) {
+    if (!body.seoTitle || body.seoTitle === existing.seoTitle || body.seoTitle === existing.title) {
+      normalizedInput.seoTitle = ''
+    }
+    if (
+      !body.ogTitle ||
+      body.ogTitle === existing.ogTitle ||
+      body.ogTitle === existing.seoTitle ||
+      body.ogTitle === existing.title
+    ) {
+      normalizedInput.ogTitle = ''
+    }
+  }
+
+  if (!normalizedInput.excerpt || !String(normalizedInput.excerpt).trim()) {
+    normalizedInput.excerpt = deriveSummaryFromContent(body.content, existing.excerpt || incomingTitle)
+  }
+
+  const incomingExcerpt = String(normalizedInput.excerpt || '').trim()
+  const excerptChanged = Boolean(incomingExcerpt && incomingExcerpt !== (existing.excerpt || '').trim())
+  if (excerptChanged) {
+    if (
+      !body.metaDescription ||
+      body.metaDescription === existing.metaDescription ||
+      body.metaDescription === existing.excerpt
+    ) {
+      normalizedInput.metaDescription = ''
+    }
+    if (
+      !body.ogDescription ||
+      body.ogDescription === existing.ogDescription ||
+      body.ogDescription === existing.metaDescription ||
+      body.ogDescription === existing.excerpt
+    ) {
+      normalizedInput.ogDescription = ''
+    }
+  }
+
+  const targetSlug = (typeof body.slug === 'string' && body.slug.trim()) ? body.slug.trim().toLowerCase() : slug
+  if (!body.canonicalUrl || body.canonicalUrl === existing.canonicalUrl || targetSlug !== slug) {
+    normalizedInput.canonicalUrl = `https://careerdost.blog/jobs/${targetSlug}`
+  }
+
+  const validation = sanitizeArticleInput(normalizedInput, existing.status)
   if (!validation.valid) {
     return c.json({ success: false, error: validation.errors.join(' ') }, 400)
   }
 
-  await ArticleModel.update(db, slug, validation.data, existing.status)
-  const updated = await ArticleModel.getBySlug(db, validation.data.slug || slug)
+  const updatedData = validation.data
+  if (updatedData.slug !== slug) {
+    const slugCollision = await ArticleModel.getBySlug(db, updatedData.slug)
+    if (slugCollision) {
+      return c.json({ success: false, error: `Another article already uses slug "${updatedData.slug}".` }, 400)
+    }
+  }
+
+  await ArticleModel.update(db, slug, updatedData, existing.status)
+
+  // Keep paired daily_updates record (if one shares this slug) synchronized so feeds & redirects never diverge
+  const linkedUpdate = await DailyUpdateModel.getBySlug(db, slug)
+  if (linkedUpdate) {
+    await DailyUpdateModel.update(
+      db,
+      slug,
+      {
+        slug: updatedData.slug,
+        title: updatedData.title,
+        category: linkedUpdate.category || 'Latest Jobs',
+        shortDescription: updatedData.excerpt || linkedUpdate.shortDescription,
+        content: updatedData.content,
+        featuredImage: updatedData.featuredImage || linkedUpdate.featuredImage,
+        imageAlt: updatedData.imageAlt || linkedUpdate.imageAlt,
+        officialLink: updatedData.officialLink,
+        applyLink: updatedData.applyLink,
+        deadline: updatedData.lastDate || linkedUpdate.deadline,
+        noDeadline: updatedData.noDeadline,
+        publishDate: linkedUpdate.publishDate || updatedData.publishDate,
+        organization: updatedData.organization,
+        location: updatedData.location,
+        qualification: updatedData.qualification,
+        experience: updatedData.experience,
+        positions: updatedData.positions,
+        jobType: updatedData.jobType,
+        salary: updatedData.salary,
+        isVerified: updatedData.isVerified,
+        featured: updatedData.featured,
+        seoTitle: updatedData.seoTitle,
+        metaDescription: updatedData.metaDescription,
+        focusKeyword: updatedData.focusKeyword,
+        canonicalUrl: `https://careerdost.blog/jobs/${updatedData.slug}`,
+        ogTitle: updatedData.ogTitle,
+        ogDescription: updatedData.ogDescription,
+        status: updatedData.status,
+      },
+      linkedUpdate.status
+    )
+  }
+
+  const updated = await ArticleModel.getBySlug(db, updatedData.slug || slug)
+  await purgeEdgeCacheForContent(
+    c,
+    [slug, updatedData.slug],
+    [existing.category, updatedData.category]
+  )
   return c.json({ success: true, data: updated })
 })
 
@@ -203,7 +388,14 @@ app.patch('/articles/:slug/status', authMiddleware, async (c) => {
   }
 
   await ArticleModel.updateStatus(db, slug, status)
+
+  const linkedUpdate = await DailyUpdateModel.getBySlug(db, slug)
+  if (linkedUpdate) {
+    await DailyUpdateModel.updateStatus(db, slug, status)
+  }
+
   const updated = await ArticleModel.getBySlug(db, slug)
+  await purgeEdgeCacheForContent(c, [slug], [existing.category])
   return c.json({ success: true, data: updated })
 })
 
@@ -217,6 +409,7 @@ app.delete('/articles/:slug', authMiddleware, async (c) => {
   }
 
   await ArticleModel.delete(db, slug)
+  await purgeEdgeCacheForContent(c, [slug], [existing.category])
   return c.json({ success: true, message: 'Article deleted successfully.' })
 })
 
@@ -292,6 +485,10 @@ app.post('/updates', authMiddleware, async (c) => {
   const db = getDb(c)
   const body = await c.req.json()
 
+  if (!body.shortDescription && !body.short_description) {
+    body.shortDescription = deriveSummaryFromContent(body.content, body.title || '')
+  }
+
   const validation = sanitizeUpdateInput(body)
   if (!validation.valid) {
     return c.json({ success: false, error: validation.errors.join(' ') }, 400)
@@ -305,6 +502,7 @@ app.post('/updates', authMiddleware, async (c) => {
 
   await DailyUpdateModel.create(db, updateData)
   const created = await DailyUpdateModel.getBySlug(db, updateData.slug)
+  await purgeEdgeCacheForContent(c, [updateData.slug], [])
   return c.json({ success: true, data: created })
 })
 
@@ -318,13 +516,110 @@ app.put('/updates/:slug', authMiddleware, async (c) => {
     return c.json({ success: false, error: 'Daily update not found.' }, 404)
   }
 
-  const validation = sanitizeUpdateInput(body, existing.status)
+  const normalizedInput = { ...body }
+  const incomingTitle = typeof body.title === 'string' ? body.title.trim() : ''
+  const titleChanged = Boolean(incomingTitle && incomingTitle !== existing.title)
+
+  if (titleChanged) {
+    if (!body.seoTitle || body.seoTitle === existing.seoTitle || body.seoTitle === existing.title) {
+      normalizedInput.seoTitle = ''
+    }
+    if (
+      !body.ogTitle ||
+      body.ogTitle === existing.ogTitle ||
+      body.ogTitle === existing.seoTitle ||
+      body.ogTitle === existing.title
+    ) {
+      normalizedInput.ogTitle = ''
+    }
+  }
+
+  if (!normalizedInput.shortDescription && !normalizedInput.short_description) {
+    normalizedInput.shortDescription = deriveSummaryFromContent(body.content, existing.shortDescription || incomingTitle)
+  }
+
+  const incomingShort = String(normalizedInput.shortDescription || normalizedInput.short_description || '').trim()
+  const descChanged = Boolean(incomingShort && incomingShort !== (existing.shortDescription || '').trim())
+  if (descChanged) {
+    if (
+      !body.metaDescription ||
+      body.metaDescription === existing.metaDescription ||
+      body.metaDescription === existing.shortDescription
+    ) {
+      normalizedInput.metaDescription = ''
+    }
+    if (
+      !body.ogDescription ||
+      body.ogDescription === existing.ogDescription ||
+      body.ogDescription === existing.metaDescription ||
+      body.ogDescription === existing.shortDescription
+    ) {
+      normalizedInput.ogDescription = ''
+    }
+  }
+
+  const validation = sanitizeUpdateInput(normalizedInput, existing.status)
   if (!validation.valid) {
     return c.json({ success: false, error: validation.errors.join(' ') }, 400)
   }
 
-  await DailyUpdateModel.update(db, slug, validation.data, existing.status)
-  const updated = await DailyUpdateModel.getBySlug(db, validation.data.slug || slug)
+  const updatedData = validation.data
+  if (updatedData.slug !== slug) {
+    const slugCollision = await DailyUpdateModel.getBySlug(db, updatedData.slug)
+    if (slugCollision) {
+      return c.json({ success: false, error: `Another daily update already uses slug "${updatedData.slug}".` }, 400)
+    }
+  }
+
+  await DailyUpdateModel.update(db, slug, updatedData, existing.status)
+
+  // If a paired article exists with the same slug (which /daily-updates/:slug 301-redirects to), keep it synchronized
+  const linkedArticle = await ArticleModel.getBySlug(db, slug)
+  if (linkedArticle) {
+    await ArticleModel.update(
+      db,
+      slug,
+      {
+        slug: updatedData.slug,
+        title: updatedData.title,
+        category: linkedArticle.category || 'government-jobs',
+        organization: updatedData.organization || linkedArticle.organization,
+        jobType: updatedData.jobType || linkedArticle.jobType || 'Full Time',
+        location: updatedData.location || linkedArticle.location,
+        qualification: updatedData.qualification || linkedArticle.qualification,
+        salary: updatedData.salary || linkedArticle.salary,
+        experience: updatedData.experience || linkedArticle.experience,
+        positions: updatedData.positions || linkedArticle.positions,
+        lastDate: updatedData.deadline || linkedArticle.lastDate,
+        noDeadline: updatedData.noDeadline,
+        publishDate: (updatedData.publishDate || '').split('T')[0] || linkedArticle.publishDate,
+        officialLink: updatedData.officialLink || linkedArticle.officialLink,
+        applyLink: updatedData.applyLink || linkedArticle.applyLink,
+        isVerified: updatedData.isVerified,
+        featured: updatedData.featured,
+        logoInitial: linkedArticle.logoInitial || '',
+        featuredImage: updatedData.featuredImage || linkedArticle.featuredImage,
+        imageAlt: updatedData.imageAlt || linkedArticle.imageAlt,
+        excerpt: updatedData.shortDescription || linkedArticle.excerpt,
+        content: updatedData.content,
+        seoTitle: updatedData.seoTitle,
+        metaDescription: updatedData.metaDescription,
+        focusKeyword: updatedData.focusKeyword || linkedArticle.focusKeyword,
+        canonicalUrl: `https://careerdost.blog/jobs/${updatedData.slug}`,
+        ogTitle: updatedData.ogTitle,
+        ogDescription: updatedData.ogDescription,
+        status: updatedData.status,
+      },
+      linkedArticle.status
+    )
+  }
+
+  const updated = await DailyUpdateModel.getBySlug(db, updatedData.slug || slug)
+  await purgeEdgeCacheForContent(
+    c,
+    [slug, updatedData.slug],
+    linkedArticle ? [linkedArticle.category] : []
+  )
   return c.json({ success: true, data: updated })
 })
 
@@ -343,7 +638,14 @@ app.patch('/updates/:slug/status', authMiddleware, async (c) => {
   }
 
   await DailyUpdateModel.updateStatus(db, slug, status)
+
+  const linkedArticle = await ArticleModel.getBySlug(db, slug)
+  if (linkedArticle) {
+    await ArticleModel.updateStatus(db, slug, status)
+  }
+
   const updated = await DailyUpdateModel.getBySlug(db, slug)
+  await purgeEdgeCacheForContent(c, [slug], linkedArticle ? [linkedArticle.category] : [])
   return c.json({ success: true, data: updated })
 })
 
@@ -357,6 +659,7 @@ app.delete('/updates/:slug', authMiddleware, async (c) => {
   }
 
   await DailyUpdateModel.delete(db, slug)
+  await purgeEdgeCacheForContent(c, [slug], [])
   return c.json({ success: true, message: 'Daily update deleted successfully.' })
 })
 

@@ -7,7 +7,7 @@ const app = new Hono()
 
 // Get all categories
 app.get('/', async (c) => {
-  c.header('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400')
+  c.header('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600')
   const db = getDb(c)
   const categories = await CategoryModel.getAll(db)
   return c.json({ success: true, data: categories })
@@ -15,6 +15,7 @@ app.get('/', async (c) => {
 
 // Get category by slug + its published articles
 app.get('/:slug', async (c) => {
+  c.header('Cache-Control', 'public, max-age=0, s-maxage=15, must-revalidate')
   const db = getDb(c)
   const slug = c.req.param('slug')
   const category = await CategoryModel.getBySlug(db, slug)

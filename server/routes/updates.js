@@ -6,9 +6,14 @@ import { KNOWN_ARTICLE_SLUGS } from '../../src/data/articleSlugs.js'
 
 const updatesRouter = new Hono()
 
-async function filterAndAttachArticleStatus(db, updates) {
+export const NOINDEX_UPDATE_SLUGS = new Set([
+  'fpsc-consolidated-advertisement-09-2026-announced',
+  'hec-fully-funded-phd-scholarships-2026-open',
+])
+
+async function filterAndAttachArticleStatus(db, updates, excludeNoindex = false) {
   const filtered = (updates || []).filter(
-    (u) => u && u.slug && !CONSOLIDATED_SLUGS_SET.has(u.slug)
+    (u) => u && u.slug && !CONSOLIDATED_SLUGS_SET.has(u.slug) && (!excludeNoindex || !NOINDEX_UPDATE_SLUGS.has(u.slug))
   )
   if (filtered.length === 0) return []
 
@@ -45,6 +50,7 @@ updatesRouter.get('/', async (c) => {
   const category = c.req.query('category')
   const limitQuery = c.req.query('limit')
   const q = c.req.query('q')
+  const excludeNoindex = c.req.query('exclude_noindex') === 'true' || c.req.query('home') === 'true'
 
   let updates = []
   if (q) {
@@ -55,7 +61,7 @@ updatesRouter.get('/', async (c) => {
     updates = await DailyUpdateModel.getAll(db, 'published', false)
   }
 
-  updates = await filterAndAttachArticleStatus(db, updates)
+  updates = await filterAndAttachArticleStatus(db, updates, excludeNoindex)
 
   if (limitQuery) {
     const limit = parseInt(limitQuery, 10)
@@ -78,7 +84,7 @@ updatesRouter.get('/latest', async (c) => {
   const limit = Math.min(parseInt(limitQuery, 10) || 6, 20)
 
   const rawUpdates = await DailyUpdateModel.getLatest(db, limit + 10, 'published', false)
-  const updates = (await filterAndAttachArticleStatus(db, rawUpdates)).slice(0, limit)
+  const updates = (await filterAndAttachArticleStatus(db, rawUpdates, true)).slice(0, limit)
   return c.json({
     success: true,
     data: updates,

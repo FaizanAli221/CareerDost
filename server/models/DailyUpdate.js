@@ -59,7 +59,7 @@ export class DailyUpdateModel {
       sql += ' WHERE status = ?'
       params.push(statusOnly)
     }
-    sql += ' ORDER BY publish_date DESC, id DESC'
+    sql += " ORDER BY (CASE WHEN (deadline GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' AND deadline < strftime('%Y-%m-%d', 'now')) THEN 1 ELSE 0 END) ASC, publish_date DESC, id DESC"
 
     const stmt = db.prepare(sql)
     const { results } = params.length > 0 ? await stmt.bind(...params).all() : await stmt.all()
@@ -85,7 +85,7 @@ export class DailyUpdateModel {
       sql += ' AND status = ?'
       params.push(statusOnly)
     }
-    sql += ' ORDER BY publish_date DESC, id DESC'
+    sql += " ORDER BY (CASE WHEN (deadline GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' AND deadline < strftime('%Y-%m-%d', 'now')) THEN 1 ELSE 0 END) ASC, publish_date DESC, id DESC"
 
     const { results } = await db.prepare(sql).bind(...params).all()
     return (results || []).map(formatUpdate)
@@ -99,7 +99,7 @@ export class DailyUpdateModel {
       sql += ' WHERE status = ?'
       params.push(statusOnly)
     }
-    sql += ' ORDER BY publish_date DESC, id DESC LIMIT ?'
+    sql += " ORDER BY (CASE WHEN (deadline GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' AND deadline < strftime('%Y-%m-%d', 'now')) THEN 1 ELSE 0 END) ASC, publish_date DESC, id DESC LIMIT ?"
     params.push(limit)
 
     const { results } = await db.prepare(sql).bind(...params).all()
@@ -117,7 +117,7 @@ export class DailyUpdateModel {
       sql += ' AND status = ?'
       params.push(statusOnly)
     }
-    sql += ' ORDER BY publish_date DESC, id DESC'
+    sql += " ORDER BY (CASE WHEN (deadline GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' AND deadline < strftime('%Y-%m-%d', 'now')) THEN 1 ELSE 0 END) ASC, publish_date DESC, id DESC"
 
     const { results } = await db.prepare(sql).bind(...params).all()
     return (results || []).map(formatUpdate)

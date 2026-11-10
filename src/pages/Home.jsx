@@ -11,6 +11,11 @@ import WhatsAppCTA from '../components/WhatsAppCTA'
 import { useSeo } from '../lib/useSeo'
 import { SITE_URL } from '../lib/config'
 
+const NOINDEX_UPDATE_SLUGS = new Set([
+  'fpsc-consolidated-advertisement-09-2026-announced',
+  'hec-fully-funded-phd-scholarships-2026-open',
+])
+
 const QUICK_CATEGORIES = [
   { label: 'Government Jobs', path: '/category/government-jobs', icon: '🏛️', desc: 'FPSC, PPSC, NTS, Federal & Provincial' },
   { label: 'Private Jobs', path: '/category/private-jobs', icon: '🏢', desc: 'Corporate, MNCs & National Enterprises' },
@@ -63,15 +68,30 @@ function LoadingGrid({ count = 4, cols = 'grid sm:grid-cols-2 lg:grid-cols-4' })
 
 export default function Home() {
   const [heroSearch, setHeroSearch] = useState('')
-  const [dailyUpdates, setDailyUpdates] = useState([])
-  const [govJobs, setGovJobs] = useState([])
+  const [dailyUpdates, setDailyUpdates] = useState(() => {
+    if (typeof window !== 'undefined' && window.__INITIAL_HOME_DATA__?.dailyUpdates?.length > 0) {
+      return window.__INITIAL_HOME_DATA__.dailyUpdates.filter((u) => !NOINDEX_UPDATE_SLUGS.has(u.slug))
+    }
+    return []
+  })
+  const [govJobs, setGovJobs] = useState(() => {
+    if (typeof window !== 'undefined' && window.__INITIAL_HOME_DATA__?.govJobs?.length > 0) {
+      return window.__INITIAL_HOME_DATA__.govJobs
+    }
+    return []
+  })
   const [pvtJobs, setPvtJobs] = useState([])
   const [admissions, setAdmissions] = useState([])
   const [results, setResults] = useState([])
   const [scholarships, setScholarships] = useState([])
   const [internships, setInternships] = useState([])
   const [closingSoon, setClosingSoon] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined' && window.__INITIAL_HOME_DATA__?.dailyUpdates?.length > 0) {
+      return false
+    }
+    return true
+  })
   const [belowFoldLoaded, setBelowFoldLoaded] = useState(false)
   const [feedReady] = useState(true)
   const navigate = useNavigate()
@@ -145,16 +165,21 @@ export default function Home() {
   useEffect(() => {
     let isMounted = true
 
-    // Phase 1: Prioritize above-the-fold content (Daily Updates and Government Jobs)
-    Promise.allSettled([
-      getLatestDailyUpdatesFromDb(6),
-      getArticlesByCategoryFromDb('government-jobs', 4),
-    ]).then(([updRes, govRes]) => {
-      if (!isMounted) return
-      if (updRes.status === 'fulfilled' && updRes.value) setDailyUpdates(updRes.value)
-      if (govRes.status === 'fulfilled' && govRes.value) setGovJobs(govRes.value.slice(0, 4))
-      setLoading(false)
-    })
+    // Phase 1: Only fetch if initial SSR data was not pre-populated
+    const hasInitialData = dailyUpdates.length > 0 && govJobs.length > 0
+    if (!hasInitialData) {
+      Promise.allSettled([
+        getLatestDailyUpdatesFromDb(6),
+        getArticlesByCategoryFromDb('government-jobs', 4),
+      ]).then(([updRes, govRes]) => {
+        if (!isMounted) return
+        if (updRes.status === 'fulfilled' && updRes.value) {
+          setDailyUpdates(updRes.value.filter((u) => !NOINDEX_UPDATE_SLUGS.has(u.slug)))
+        }
+        if (govRes.status === 'fulfilled' && govRes.value) setGovJobs(govRes.value.slice(0, 4))
+        setLoading(false)
+      })
+    }
 
     // Phase 2: Load below-the-fold categories on interaction or idle timeout
     let timerHandle = null

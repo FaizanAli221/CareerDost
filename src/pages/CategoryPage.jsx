@@ -16,15 +16,15 @@ export default function CategoryPage() {
   const [cat, setCat] = useState(() => defaultCategoryBySlug(slug) || null)
   const [items, setItems] = useState(() => {
     if (typeof window !== 'undefined' && Array.isArray(window.__INITIAL_CATEGORY_ARTICLES__) && window.__INITIAL_CATEGORY_SLUG__ === slug) {
-      return window.__INITIAL_CATEGORY_ARTICLES__
+      const preloaded = window.__INITIAL_CATEGORY_ARTICLES__
+      delete window.__INITIAL_CATEGORY_ARTICLES__
+      delete window.__INITIAL_CATEGORY_SLUG__
+      return preloaded
     }
     return []
   })
   const [loading, setLoading] = useState(() => {
-    if (typeof window !== 'undefined' && Array.isArray(window.__INITIAL_CATEGORY_ARTICLES__) && window.__INITIAL_CATEGORY_SLUG__ === slug) {
-      return false
-    }
-    return true
+    return items.length === 0
   })
   const [notFound, setNotFound] = useState(false)
 
@@ -154,11 +154,28 @@ export default function CategoryPage() {
     )
   }
 
+  const todayStr = new Date().toISOString().split('T')[0]
+  const isItemExpired = (item) => {
+    const d = item.lastDate || item.last_date
+    return Boolean(d && /^\d{4}-\d{2}-\d{2}$/.test(d) && d < todayStr)
+  }
+
   let sortedItems = [...items]
   if (sort === 'deadline') {
-    sortedItems.sort((a, b) => new Date(a.lastDate) - new Date(b.lastDate))
+    sortedItems.sort((a, b) => {
+      const expA = isItemExpired(a) ? 1 : 0
+      const expB = isItemExpired(b) ? 1 : 0
+      if (expA !== expB) return expA - expB
+      return new Date(a.lastDate || a.last_date || '9999-12-31') - new Date(b.lastDate || b.last_date || '9999-12-31')
+    })
   } else {
-    sortedItems.sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate))
+    // Active first, then newest publish date
+    sortedItems.sort((a, b) => {
+      const expA = isItemExpired(a) ? 1 : 0
+      const expB = isItemExpired(b) ? 1 : 0
+      if (expA !== expB) return expA - expB
+      return new Date(b.publishDate || b.publish_date || 0) - new Date(a.publishDate || a.publish_date || 0)
+    })
   }
 
   return (

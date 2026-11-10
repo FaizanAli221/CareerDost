@@ -20,14 +20,17 @@ const UPDATE_CATEGORIES = [
 ]
 
 export default function DailyUpdatesPage() {
-  const initialUpdates =
-    typeof window !== 'undefined' && Array.isArray(window.__INITIAL_UPDATES__) && window.__INITIAL_UPDATES__.length > 0
-      ? window.__INITIAL_UPDATES__
-      : []
-  const [updates, setUpdates] = useState(initialUpdates)
+  const [updates, setUpdates] = useState(() => {
+    if (typeof window !== 'undefined' && Array.isArray(window.__INITIAL_UPDATES__) && window.__INITIAL_UPDATES__.length > 0) {
+      const preloaded = window.__INITIAL_UPDATES__
+      delete window.__INITIAL_UPDATES__
+      return preloaded
+    }
+    return []
+  })
   const [selectedCategory, setSelectedCategory] = useState('All Updates')
   const [searchQuery, setSearchQuery] = useState('')
-  const [loading, setLoading] = useState(initialUpdates.length === 0)
+  const [loading, setLoading] = useState(updates.length === 0)
   const [visibleCount, setVisibleCount] = useState(24)
 
   const jsonLd = useMemo(() => ({

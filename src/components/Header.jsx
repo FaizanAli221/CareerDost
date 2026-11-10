@@ -2,6 +2,22 @@ import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import WhatsAppCTA, { WHATSAPP_CHANNEL_URL, WhatsAppIcon } from './WhatsAppCTA'
 
+// Static menu structure defined outside component to avoid recreation on every render
+const MAIN_NAV_ITEMS = [
+  { label: 'Home', path: '/' },
+  { label: 'Daily Updates', path: '/daily-updates' },
+  { label: 'Government Jobs', path: '/category/government-jobs' },
+  { label: 'Private Jobs', path: '/category/private-jobs' },
+  { label: 'Bank Jobs', path: '/category/bank-jobs' },
+  { label: 'Scholarships', path: '/category/scholarships' },
+  { label: 'Internships', path: '/category/internships' },
+  { label: 'Admissions', path: '/category/admissions' },
+  { label: 'Results', path: '/category/results' },
+  { label: 'Schemes', path: '/category/government-schemes' },
+  { label: 'Guides & Resources', path: '/category/guides-and-resources' },
+  { label: 'Readiness Tool', path: '/tools/job-readiness-checker' },
+]
+
 export default function Header() {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -14,22 +30,6 @@ export default function Header() {
       setOpen(false)
     }
   }
-
-  // Pre-defined menu structure
-  const mainNavItems = [
-    { label: 'Home', path: '/' },
-    { label: 'Daily Updates', path: '/daily-updates' },
-    { label: 'Government Jobs', path: '/category/government-jobs' },
-    { label: 'Private Jobs', path: '/category/private-jobs' },
-    { label: 'Bank Jobs', path: '/category/bank-jobs' },
-    { label: 'Scholarships', path: '/category/scholarships' },
-    { label: 'Internships', path: '/category/internships' },
-    { label: 'Admissions', path: '/category/admissions' },
-    { label: 'Results', path: '/category/results' },
-    { label: 'Schemes', path: '/category/government-schemes' },
-    { label: 'Guides & Resources', path: '/category/guides-and-resources' },
-    { label: 'Readiness Tool', path: '/tools/job-readiness-checker' },
-  ]
 
   return (
     <header className="border-b border-line bg-white sticky top-0 z-40 shadow-xs">
@@ -100,7 +100,7 @@ export default function Header() {
         {/* Desktop Navigation Bar */}
         <nav className="hidden md:flex items-center justify-between overflow-x-auto font-sans text-sm py-1">
           <div className="flex items-center space-x-1 whitespace-nowrap">
-            {mainNavItems.map((item, idx) => (
+            {MAIN_NAV_ITEMS.map((item, idx) => (
               <NavLink
                 key={idx}
                 to={item.path}
@@ -165,7 +165,7 @@ export default function Header() {
           </form>
 
           <div className="grid grid-cols-2 font-sans text-sm p-3 gap-2">
-            {mainNavItems.map((item, idx) => (
+            {MAIN_NAV_ITEMS.map((item, idx) => (
               <Link
                 key={idx}
                 to={item.path}

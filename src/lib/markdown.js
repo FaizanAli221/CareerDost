@@ -28,6 +28,14 @@ export function parseMarkdownToHtml(md, options = {}) {
   } else {
     rawText = String(md)
   }
+  rawText = rawText
+    .replace(/\r\n/g, '\n')
+    .replace(/<(strong|b)>([\s\S]*?)<\/\1>/gi, '**$2**')
+    .replace(/<(em|i)>([\s\S]*?)<\/\1>/gi, '*$2*')
+    .replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, '\n\n## $1\n\n')
+    .replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi, '\n\n### $1\n\n')
+    .replace(/<\/?(ul|ol)[^>]*>/gi, '\n')
+    .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '- $1\n')
   const lines = rawText.split('\n')
   const html = []
 
@@ -36,6 +44,7 @@ export function parseMarkdownToHtml(md, options = {}) {
   let tableRows = []
   let inList = false
   let listType = null
+  let inSubList = false
   let inBlockquote = false
   let quoteType = 'note'
   let quoteContent = []
@@ -47,7 +56,16 @@ export function parseMarkdownToHtml(md, options = {}) {
 
   function flushList() {
     if (inList) {
-      html.push(listType === 'ol' ? '</ol>' : '</ul>')
+      if (inSubList) {
+        html.push('</ul>')
+        inSubList = false
+      }
+      if (listType === 'ol') {
+        html.push('</li>')
+        html.push('</ol>')
+      } else {
+        html.push('</ul>')
+      }
       inList = false
       listType = null
     }
@@ -133,6 +151,20 @@ export function parseMarkdownToHtml(md, options = {}) {
       continue
     }
 
+    // Strip leaked internal draft metadata
+    if (/^(?:Title|Meta description|Focus keyword|Secondary keywords|Suggested slug):\s*/i.test(line)) {
+      continue
+    }
+
+    // Horizontal Rule
+    if (/^([-*_])\1{2,}$/.test(line)) {
+      flushTable()
+      flushList()
+      flushBlockquote()
+      html.push('<hr class="my-6 border-line" />')
+      continue
+    }
+
     // Callout / Blockquote
     if (line.startsWith('>')) {
       flushTable()
@@ -198,6 +230,11 @@ export function parseMarkdownToHtml(md, options = {}) {
     }
 
     // Headings
+    if (line.startsWith('#### ')) {
+      flushList()
+      html.push('<h4 class="font-serif text-base sm:text-lg font-bold text-ink mt-5 mb-2">' + formatInline(line.slice(5)) + '</h4>')
+      continue
+    }
     if (line.startsWith('### ')) {
       flushList()
       html.push('<h3 class="font-serif text-lg sm:text-xl font-bold text-ink mt-6 mb-3">' + formatInline(line.slice(4)) + '</h3>')
@@ -229,21 +266,36 @@ export function parseMarkdownToHtml(md, options = {}) {
         flushList()
         inList = true
         listType = 'ol'
-        html.push('<ol class="list-decimal list-inside space-y-2 my-3 text-inksoft leading-relaxed">')
+        html.push('<ol class="list-decimal pl-5 space-y-2 text-ink my-3 leading-relaxed">')
+        html.push('<li>' + formatInline(line.replace(/^\d+\.\s*/, '')))
+      } else {
+        if (inSubList) {
+          html.push('</ul>')
+          inSubList = false
+        }
+        html.push('</li>')
+        html.push('<li>' + formatInline(line.replace(/^\d+\.\s*/, '')))
       }
-      html.push('<li>' + formatInline(line.replace(/^\d+\.\s*/, '')) + '</li>')
       continue
     }
 
     // Unordered list
     if (/^[-*]\s/.test(line)) {
-      if (!inList || listType !== 'ul') {
-        flushList()
-        inList = true
-        listType = 'ul'
-        html.push('<ul class="list-disc list-inside space-y-2 my-3 text-inksoft leading-relaxed">')
+      if (inList && listType === 'ol') {
+        if (!inSubList) {
+          inSubList = true
+          html.push('<ul class="list-disc pl-5 my-2 space-y-1 text-xs sm:text-sm text-inksoft">')
+        }
+        html.push('<li>' + formatInline(line.replace(/^[-*]\s*/, '')) + '</li>')
+      } else {
+        if (!inList || listType !== 'ul') {
+          flushList()
+          inList = true
+          listType = 'ul'
+          html.push('<ul class="list-disc list-inside space-y-2 my-3 text-inksoft leading-relaxed">')
+        }
+        html.push('<li>' + formatInline(line.replace(/^[-*]\s*/, '')) + '</li>')
       }
-      html.push('<li>' + formatInline(line.replace(/^[-*]\s*/, '')) + '</li>')
       continue
     }
 

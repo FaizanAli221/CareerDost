@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { formatDate } from '../lib/format'
-import { getContentType, getContentTypeLabels, getContextualStatus, normalizeDateToYMD } from '../lib/contentType'
+import { getContentType, getContentTypeLabels, getContextualStatus, getVerificationTier, normalizeDateToYMD } from '../lib/contentType'
 import { categoryBySlug } from '../data/categories'
 import CategoryFallbackImage from './CategoryFallbackImage'
 import OptimizedImage from './OptimizedImage'
@@ -12,6 +12,7 @@ export default function OpportunityCard({ opportunity, showDeadlineBadge = true,
   const contentType = getContentType(opportunity)
   const labels = getContentTypeLabels(contentType, opportunity)
   const statusInfo = getContextualStatus(opportunity, contentType)
+  const verification = getVerificationTier(opportunity)
   const hasImage = opportunity.featuredImage && opportunity.featuredImage.trim().length > 0
   const categoryLabel = categoryBySlug(opportunity.category)?.label || opportunity.categoryLabel || opportunity.category
 
@@ -44,9 +45,12 @@ export default function OpportunityCard({ opportunity, showDeadlineBadge = true,
                 ⭐ Featured
               </span>
             )}
-            {(opportunity.isVerified || opportunity.is_verified) && (
-              <span className="bg-green text-white text-[11px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
-                ✓ Verified
+            <span className={`text-[10px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs border ${verification.badgeClass}`}>
+              {verification.icon} {verification.shortLabel}
+            </span>
+            {statusInfo.isExpired && (
+              <span className="bg-slate-900/90 text-white text-[10px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs border border-white/20">
+                Closed / Expired
               </span>
             )}
             <span className={`text-white text-[11px] font-sans font-medium px-2.5 py-0.5 rounded-xs border border-white/20 capitalize bg-slate-950/80 backdrop-blur-xs`}>

@@ -53,7 +53,7 @@ export function resolveRecordStatus(inputStatus, existingStatus = null) {
 }
 
 export function isBrokenSeoTitle(seoStr, rawTitleStr = '') {
-  if (!seoStr || seoStr.length < 15 || seoStr.length > 60) return true
+  if (!seoStr || seoStr.length < 15 || seoStr.length > 70) return true
 
   const prefix = seoStr
     .replace(/\s*\|\s*CareerDost\s*$/i, '')
@@ -75,7 +75,7 @@ export function isBrokenSeoTitle(seoStr, rawTitleStr = '') {
   if (/[,:;\-–—/&+([\].]$/.test(prefix) || /\.\.\.$/.test(prefix)) return true
 
   // 3. Dangling preposition, conjunction, or article at end of prefix
-  if (/\s+(?:and|or|for|in|at|to|of|via|with|by|from|on|as|into|the|a|an|&)$/i.test(prefix)) {
+  if (/\s+(?:and|or|for|in|at|to|of|via|with|by|from|on|as|into|the|a|an|&|last)$/i.test(prefix)) {
     return true
   }
 
@@ -145,7 +145,7 @@ export function buildCleanSeoTitle(rawTitle, existingSeoTitle = '') {
     return `${cleanT}${suffix}`
   }
 
-  const clauseParts = cleanT.split(/\s*[:|–—-]\s*/)
+  const clauseParts = cleanT.split(/\s+[-–—:]\s+|\s*[:|–—]\s*/)
   if (
     clauseParts[0] &&
     clauseParts[0].trim().length >= 20 &&
@@ -173,7 +173,7 @@ export function buildCleanSeoTitle(rawTitle, existingSeoTitle = '') {
   acc = acc.replace(/\s*\([^)]*$/, '').trim()
   acc = acc.replace(/[,:;\-–—/&+]+$/, '').trim()
   while (
-    /\s+(?:and|or|for|in|at|to|of|via|with|by|from|on|as|into|the|a|an|&)$/i.test(acc) ||
+    /\s+(?:and|or|for|in|at|to|of|via|with|by|from|on|as|into|the|a|an|&|last)$/i.test(acc) ||
     /(?:\s|[,:;\-–—(/])[A-Za-z0-9]$/.test(acc)
   ) {
     acc = acc.replace(/\s+\S+$/, '').replace(/[,:;\-–—/&+]+$/, '').trim()

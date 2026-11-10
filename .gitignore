@@ -13,6 +13,8 @@ scratch/
 
 # Local Environment & SQLite DB
 careerdost.sqlite
+*.sqlite*
+*.db
 backups/
 .env
 .env.local

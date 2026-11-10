@@ -10,7 +10,7 @@ import { safeUrl } from '../lib/security'
 import { useSeo } from '../lib/useSeo'
 import { getAbsoluteUrl } from '../lib/config'
 import { trackApplyNowClick, trackOfficialSourceClick } from '../lib/analytics'
-import { getContentType, getContentTypeLabels, getContextualStatus, isLabourWageNotification, normalizeDateToYMD } from '../lib/contentType'
+import { getContentType, getContentTypeLabels, getContextualStatus, getVerificationTier, isLabourWageNotification, normalizeDateToYMD } from '../lib/contentType'
 import { isGenuineJobVacancy, buildJobPostingSchema } from '../lib/jobSchema'
 
 import CategoryFallbackImage from '../components/CategoryFallbackImage'
@@ -151,6 +151,7 @@ export default function ArticlePage() {
   const contentType = useMemo(() => getContentType(listing), [listing])
   const labels = useMemo(() => getContentTypeLabels(contentType, listing), [contentType, listing])
   const statusInfo = useMemo(() => getContextualStatus(listing, contentType), [listing, contentType])
+  const verification = useMemo(() => getVerificationTier(listing), [listing])
   const isWageNotice = useMemo(() => isLabourWageNotification(listing), [listing])
   const hasFaqInContent = useMemo(() => {
     const raw = Array.isArray(listing?.content) ? listing.content.join('\n') : String(listing?.content || '')
@@ -319,11 +320,10 @@ export default function ArticlePage() {
               {labels.badge}
             </span>
             <CategoryTag slug={listing.category} />
-            {(listing.isVerified || listing.is_verified) && (
-              <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-[11px] font-sans font-bold px-2.5 py-0.5 rounded-full border border-emerald-300">
-                ✓ Official Source Verified
-              </span>
-            )}
+            <span className={`inline-flex items-center gap-1 text-[11px] font-sans font-bold px-2.5 py-0.5 rounded-full border ${verification.pillClass}`}>
+              <span>{verification.icon}</span>
+              <span>{verification.label}</span>
+            </span>
           </div>
 
           {/* Primary H1 Heading */}

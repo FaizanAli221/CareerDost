@@ -76,6 +76,7 @@ export default function AdminPage() {
   const [previewUpdate, setPreviewUpdate] = useState(null)
   const [previewArticle, setPreviewArticle] = useState(null)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [savingContent, setSavingContent] = useState(false)
   const [formMsg, setFormMsg] = useState('')
   const [nanoPromptBox, setNanoPromptBox] = useState('')
 
@@ -229,7 +230,18 @@ export default function AdminPage() {
       .replace(/^-+|-+$/g, '')
   }
 
-  // Toolbar Injectors for Content Editor
+  const splitContentBlocks = (rawText) => {
+    if (Array.isArray(rawText)) {
+      return rawText.map((p) => String(p || '').trim()).filter(Boolean)
+    }
+    return String(rawText || '')
+      .replace(/\r\n/g, '\n')
+      .split(/\n{2,}/)
+      .map((p) => p.trim())
+      .filter(Boolean)
+  }
+
+  // Toolbar Injectors for Content Editor (uses clean Markdown supported identically by Edge SSR and React SafeContent)
   const insertFormatting = (targetForm, setFormState, tagOpen, tagClose = '', placeholder = '') => {
     const current = targetForm.content || ''
     const injection = `${tagOpen}${placeholder}${tagClose}`
@@ -240,35 +252,21 @@ export default function AdminPage() {
   }
 
   const insertTableTemplate = (targetForm, setFormState) => {
-    const tableHtml = `<table className="w-full border border-line my-4 text-sm font-sans">
-  <thead>
-    <tr className="bg-paper border-b border-line">
-      <th className="p-2.5 text-left font-bold">Position / Scale</th>
-      <th className="p-2.5 text-left font-bold">Qualification</th>
-      <th className="p-2.5 text-left font-bold">Vacancies</th>
-    </tr>
-  </thead>
-  <tbody className="divide-y divide-line">
-    <tr>
-      <td className="p-2.5">Assistant Director (BPS-17)</td>
-      <td className="p-2.5">Master's / Sixteen Years Education</td>
-      <td className="p-2.5">12 Posts</td>
-    </tr>
-    <tr>
-      <td className="p-2.5">Inspector (BPS-16)</td>
-      <td className="p-2.5">Bachelor's Degree (Four Years)</td>
-      <td className="p-2.5">25 Posts</td>
-    </tr>
-  </tbody>
-</table>`
-    insertFormatting(targetForm, setFormState, tableHtml)
+    const tableMd = [
+      '| Position / Scale | Qualification | Vacancies |',
+      '| --- | --- | --- |',
+      "| Assistant Director (BPS-17) | Master's / Sixteen Years Education | 12 Posts |",
+      "| Inspector (BPS-16) | Bachelor's Degree (Four Years) | 25 Posts |",
+    ].join('\n')
+    insertFormatting(targetForm, setFormState, tableMd)
   }
 
   const insertNoticeBoxTemplate = (targetForm, setFormState) => {
-    const noticeHtml = `<div className="border-l-4 border-green bg-green-light p-4 my-4 font-sans text-sm text-green">
-  <strong>Important Verification Notice:</strong> Applicants are instructed to verify documents on the official department portal before submitting fees.
-</div>`
-    insertFormatting(targetForm, setFormState, noticeHtml)
+    const noticeMd = [
+      '> [!IMPORTANT]',
+      '> **Important Verification Notice:** Applicants are instructed to verify documents on the official department portal before submitting fees.',
+    ].join('\n')
+    insertFormatting(targetForm, setFormState, noticeMd)
   }
 
   // Daily Updates Handlers
@@ -498,6 +496,7 @@ export default function AdminPage() {
   }
 
   const handleSaveUpdate = async (requestedStatus = null) => {
+    if (savingContent) return
     const targetStatus =
       requestedStatus === 'published' || requestedStatus === 'draft'
         ? requestedStatus
@@ -511,6 +510,7 @@ export default function AdminPage() {
       }
     }
 
+    setSavingContent(true)
     try {
       const finalSlug = updateForm.slug || generateSlug(updateForm.title)
       const payload = {
@@ -518,7 +518,7 @@ export default function AdminPage() {
         slug: finalSlug,
         canonicalUrl: updateForm.canonicalUrl || `${SITE_PRODUCTION_URL}/daily-updates/${finalSlug}`,
         status: targetStatus,
-        content: updateForm.content.split('\n\n').filter((p) => p.trim()),
+        content: splitContentBlocks(updateForm.content),
       }
 
       let res
@@ -529,18 +529,23 @@ export default function AdminPage() {
       }
 
       if (res.success) {
+        if (res.data) {
+          setEditingUpdate(res.data)
+        }
         setFormMsg(
           targetStatus === 'published'
-            ? 'Daily Update published successfully!'
-            : 'Daily Update saved as draft!'
+            ? '✅ Daily Update saved & published live!'
+            : '✅ Daily Update saved as draft!'
         )
         await loadDashboardData()
-        setTimeout(() => setActiveTab('updates'), 1000)
+        setTimeout(() => setActiveTab('updates'), 900)
       } else {
-        setFormMsg(`Error: ${res.error || 'Failed to save update'}`)
+        setFormMsg(`❌ Error: ${res.error || 'Failed to save update'}`)
       }
     } catch (err) {
-      setFormMsg(`Error: ${err.message}`)
+      setFormMsg(`❌ Error: ${err.message}`)
+    } finally {
+      setSavingContent(false)
     }
   }
 
@@ -641,6 +646,7 @@ export default function AdminPage() {
   }
 
   const handleSaveArticle = async (requestedStatus = null) => {
+    if (savingContent) return
     const targetStatus =
       requestedStatus === 'published' || requestedStatus === 'draft'
         ? requestedStatus
@@ -654,6 +660,7 @@ export default function AdminPage() {
       }
     }
 
+    setSavingContent(true)
     try {
       const finalSlug = articleForm.slug || generateSlug(articleForm.title)
       const payload = {
@@ -661,7 +668,7 @@ export default function AdminPage() {
         slug: finalSlug,
         canonicalUrl: articleForm.canonicalUrl || `${SITE_PRODUCTION_URL}/jobs/${finalSlug}`,
         status: targetStatus,
-        content: articleForm.content.split('\n\n').filter((p) => p.trim()),
+        content: splitContentBlocks(articleForm.content),
       }
 
       let res
@@ -672,18 +679,23 @@ export default function AdminPage() {
       }
 
       if (res.success) {
+        if (res.data) {
+          setEditingArticle(res.data)
+        }
         setFormMsg(
           targetStatus === 'published'
-            ? 'Article published successfully!'
-            : 'Article saved as draft!'
+            ? '✅ Article saved & published live!'
+            : '✅ Article saved as draft!'
         )
         await loadDashboardData()
-        setTimeout(() => setActiveTab('articles'), 1000)
+        setTimeout(() => setActiveTab('articles'), 900)
       } else {
-        setFormMsg(`Error: ${res.error || 'Failed to save article'}`)
+        setFormMsg(`❌ Error: ${res.error || 'Failed to save article'}`)
       }
     } catch (err) {
-      setFormMsg(`Error: ${err.message}`)
+      setFormMsg(`❌ Error: ${err.message}`)
+    } finally {
+      setSavingContent(false)
     }
   }
 
@@ -1071,6 +1083,16 @@ export default function AdminPage() {
                         )}
                       </td>
                       <td className="p-3 text-right space-x-2">
+                        {upd.status === 'published' && (
+                          <a
+                            href={`/daily-updates/${upd.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-green hover:underline font-bold"
+                          >
+                            Live ↗
+                          </a>
+                        )}
                         <button
                           onClick={() => setPreviewUpdate(upd)}
                           className="text-inksoft hover:text-green underline"
@@ -1166,6 +1188,16 @@ export default function AdminPage() {
                         )}
                       </td>
                       <td className="p-3 text-right space-x-2">
+                        {art.status === 'published' && (
+                          <a
+                            href={`/jobs/${art.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-green hover:underline font-bold"
+                          >
+                            Live ↗
+                          </a>
+                        )}
                         <button
                           onClick={() => setPreviewArticle(art)}
                           className="text-inksoft hover:text-green underline"
@@ -1293,13 +1325,25 @@ export default function AdminPage() {
                     value={updateForm.title}
                     onChange={(e) => {
                       const titleVal = e.target.value
-                      setUpdateForm((prev) => ({
-                        ...prev,
-                        title: titleVal,
-                        slug: prev.slug || generateSlug(titleVal),
-                        seoTitle: prev.seoTitle || titleVal,
-                        canonicalUrl: `${SITE_PRODUCTION_URL}/daily-updates/${prev.slug || generateSlug(titleVal)}`,
-                      }))
+                      setUpdateForm((prev) => {
+                        const seoMatchesPrev =
+                          !prev.seoTitle ||
+                          prev.seoTitle === prev.title ||
+                          (prev.title && prev.seoTitle.startsWith(prev.title))
+                        const ogMatchesPrev =
+                          !prev.ogTitle ||
+                          prev.ogTitle === prev.title ||
+                          prev.ogTitle === prev.seoTitle
+                        const nextSlug = prev.slug || generateSlug(titleVal)
+                        return {
+                          ...prev,
+                          title: titleVal,
+                          slug: nextSlug,
+                          seoTitle: seoMatchesPrev ? titleVal : prev.seoTitle,
+                          ogTitle: ogMatchesPrev ? titleVal : prev.ogTitle,
+                          canonicalUrl: `${SITE_PRODUCTION_URL}/daily-updates/${nextSlug}`,
+                        }
+                      })
                     }}
                     className="w-full border border-line p-2.5 bg-white text-sm focus:border-green"
                     placeholder="e.g. FPSC Advertisement No. 09/2026 – 450+ Federal Vacancies Announced"
@@ -1447,11 +1491,18 @@ export default function AdminPage() {
                   value={updateForm.shortDescription}
                   onChange={(e) => {
                     const text = e.target.value
-                    setUpdateForm((prev) => ({
-                      ...prev,
-                      shortDescription: text,
-                      metaDescription: prev.metaDescription || text,
-                    }))
+                    setUpdateForm((prev) => {
+                      const metaMatchesPrev =
+                        !prev.metaDescription || prev.metaDescription === prev.shortDescription
+                      const ogDescMatchesPrev =
+                        !prev.ogDescription || prev.ogDescription === prev.shortDescription
+                      return {
+                        ...prev,
+                        shortDescription: text,
+                        metaDescription: metaMatchesPrev ? text : prev.metaDescription,
+                        ogDescription: ogDescMatchesPrev ? text : prev.ogDescription,
+                      }
+                    })
                   }}
                   className="w-full border border-line p-2.5 bg-white h-20 text-xs focus:border-green"
                   placeholder="Summarize key advertisement facts (1-2 clear sentences for card view & meta tags)..."
@@ -1656,42 +1707,42 @@ export default function AdminPage() {
               <div className="flex flex-wrap items-center gap-1.5 p-2 bg-white border border-line rounded-xs text-xs">
                 <button
                   type="button"
-                  onClick={() => insertFormatting(updateForm, setUpdateForm, '<h2>', '</h2>', 'Section Heading Title')}
+                  onClick={() => insertFormatting(updateForm, setUpdateForm, '\n\n## ', '\n\n', 'Section Heading Title')}
                   className="px-2.5 py-1 bg-paper border border-line hover:bg-green hover:text-white font-bold"
                 >
                   H2 Heading
                 </button>
                 <button
                   type="button"
-                  onClick={() => insertFormatting(updateForm, setUpdateForm, '<h3>', '</h3>', 'Subheading Title')}
+                  onClick={() => insertFormatting(updateForm, setUpdateForm, '\n\n### ', '\n\n', 'Subheading Title')}
                   className="px-2.5 py-1 bg-paper border border-line hover:bg-green hover:text-white font-bold"
                 >
                   H3 Subheading
                 </button>
                 <button
                   type="button"
-                  onClick={() => insertFormatting(updateForm, setUpdateForm, '<strong>', '</strong>', 'Bold text')}
+                  onClick={() => insertFormatting(updateForm, setUpdateForm, '**', '**', 'Bold text')}
                   className="px-2.5 py-1 bg-paper border border-line hover:bg-green hover:text-white font-bold"
                 >
                   Bold
                 </button>
                 <button
                   type="button"
-                  onClick={() => insertFormatting(updateForm, setUpdateForm, '<em>', '</em>', 'Italic text')}
+                  onClick={() => insertFormatting(updateForm, setUpdateForm, '*', '*', 'Italic text')}
                   className="px-2.5 py-1 bg-paper border border-line hover:bg-green hover:text-white italic font-bold"
                 >
                   Italic
                 </button>
                 <button
                   type="button"
-                  onClick={() => insertFormatting(updateForm, setUpdateForm, '<ul>\n  <li>', '</li>\n  <li>Second requirement</li>\n</ul>', 'First requirement')}
+                  onClick={() => insertFormatting(updateForm, setUpdateForm, '\n\n- ', '\n- Second requirement\n\n', 'First requirement')}
                   className="px-2.5 py-1 bg-paper border border-line hover:bg-green hover:text-white font-bold"
                 >
                   • Bullet List
                 </button>
                 <button
                   type="button"
-                  onClick={() => insertFormatting(updateForm, setUpdateForm, '<ol>\n  <li>', '</li>\n  <li>Second step</li>\n</ol>', 'First step')}
+                  onClick={() => insertFormatting(updateForm, setUpdateForm, '\n\n1. ', '\n2. Second step\n\n', 'First step')}
                   className="px-2.5 py-1 bg-paper border border-line hover:bg-green hover:text-white font-bold"
                 >
                   1. Numbered List
@@ -1834,6 +1885,17 @@ export default function AdminPage() {
             </div>
 
             {/* ACTION CONTROLS */}
+            {formMsg && (
+              <div
+                className={`p-3.5 text-xs font-bold border rounded-xs ${
+                  formMsg.includes('Error') || formMsg.includes('❌')
+                    ? 'bg-brick-light text-brick border-brick/30'
+                    : 'bg-green-light text-green border-green/30'
+                }`}
+              >
+                {formMsg}
+              </div>
+            )}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6">
               <div className="flex items-center gap-3">
                 <button
@@ -1841,7 +1903,7 @@ export default function AdminPage() {
                   onClick={() =>
                     setPreviewUpdate({
                       ...updateForm,
-                      content: updateForm.content.split('\n\n').filter((p) => p.trim()),
+                      content: splitContentBlocks(updateForm.content),
                     })
                   }
                   className="border border-line bg-paper text-ink px-4 py-2.5 text-xs font-bold hover:border-green"
@@ -1866,25 +1928,28 @@ export default function AdminPage() {
                 {editingUpdate && (
                   <button
                     type="button"
+                    disabled={savingContent}
                     onClick={() => handleSaveUpdate()}
-                    className="border border-line bg-paper text-ink px-5 py-2.5 text-xs font-bold hover:border-green transition-colors"
+                    className="border border-line bg-paper text-ink px-5 py-2.5 text-xs font-bold hover:border-green transition-colors disabled:opacity-50"
                   >
-                    💾 Save Changes ({editingUpdate.status === 'published' ? 'Keep Published' : 'Keep Draft'})
+                    💾 {savingContent ? 'Saving...' : `Save Changes (${editingUpdate.status === 'published' ? 'Keep Published' : 'Keep Draft'})`}
                   </button>
                 )}
                 <button
                   type="button"
+                  disabled={savingContent}
                   onClick={() => handleSaveUpdate('draft')}
-                  className="border border-gold bg-gold/10 text-gold-dark px-5 py-2.5 text-xs font-bold hover:bg-gold hover:text-slate-950 transition-colors"
+                  className="border border-gold bg-gold/10 text-gold-dark px-5 py-2.5 text-xs font-bold hover:bg-gold hover:text-slate-950 transition-colors disabled:opacity-50"
                 >
                   💾 Save Draft
                 </button>
                 <button
                   type="button"
+                  disabled={savingContent}
                   onClick={() => handleSaveUpdate('published')}
-                  className="bg-green text-white px-6 py-2.5 text-xs font-bold hover:bg-green-dark transition-all shadow-xs"
+                  className="bg-green text-white px-6 py-2.5 text-xs font-bold hover:bg-green-dark transition-all shadow-xs disabled:opacity-50"
                 >
-                  🚀 Publish Update Now
+                  🚀 {savingContent ? 'Publishing...' : 'Publish Update Now'}
                 </button>
               </div>
             </div>
@@ -1913,7 +1978,7 @@ export default function AdminPage() {
           {formMsg && (
             <div
               className={`p-3.5 mb-6 text-xs font-bold border rounded-xs ${
-                formMsg.includes('Error')
+                formMsg.includes('Error') || formMsg.includes('❌')
                   ? 'bg-brick-light text-brick border-brick/30'
                   : 'bg-green-light text-green border-green/30'
               }`}
@@ -1934,13 +1999,25 @@ export default function AdminPage() {
                     value={articleForm.title}
                     onChange={(e) => {
                       const titleVal = e.target.value
-                      setArticleForm((prev) => ({
-                        ...prev,
-                        title: titleVal,
-                        slug: prev.slug || generateSlug(titleVal),
-                        seoTitle: prev.seoTitle || titleVal,
-                        canonicalUrl: `${SITE_PRODUCTION_URL}/jobs/${prev.slug || generateSlug(titleVal)}`,
-                      }))
+                      setArticleForm((prev) => {
+                        const seoMatchesPrev =
+                          !prev.seoTitle ||
+                          prev.seoTitle === prev.title ||
+                          (prev.title && prev.seoTitle.startsWith(prev.title))
+                        const ogMatchesPrev =
+                          !prev.ogTitle ||
+                          prev.ogTitle === prev.title ||
+                          prev.ogTitle === prev.seoTitle
+                        const nextSlug = prev.slug || generateSlug(titleVal)
+                        return {
+                          ...prev,
+                          title: titleVal,
+                          slug: nextSlug,
+                          seoTitle: seoMatchesPrev ? titleVal : prev.seoTitle,
+                          ogTitle: ogMatchesPrev ? titleVal : prev.ogTitle,
+                          canonicalUrl: `${SITE_PRODUCTION_URL}/jobs/${nextSlug}`,
+                        }
+                      })
                     }}
                     className="w-full border border-line p-2.5 bg-white text-sm focus:border-green"
                     required
@@ -2079,6 +2156,30 @@ export default function AdminPage() {
                   </div>
                 </div>
               </div>
+
+              <div>
+                <label className="block text-ink font-bold mb-1">Short Description / Excerpt *</label>
+                <textarea
+                  value={articleForm.excerpt || ''}
+                  onChange={(e) => {
+                    const text = e.target.value
+                    setArticleForm((prev) => {
+                      const metaMatchesPrev =
+                        !prev.metaDescription || prev.metaDescription === prev.excerpt
+                      const ogDescMatchesPrev =
+                        !prev.ogDescription || prev.ogDescription === prev.excerpt
+                      return {
+                        ...prev,
+                        excerpt: text,
+                        metaDescription: metaMatchesPrev ? text : prev.metaDescription,
+                        ogDescription: ogDescMatchesPrev ? text : prev.ogDescription,
+                      }
+                    })
+                  }}
+                  className="w-full border border-line p-2.5 bg-white h-20 text-xs focus:border-green"
+                  placeholder="Lead summary shown right below the article headline, in listing cards, and in search meta description..."
+                />
+              </div>
             </div>
 
             {/* DATES & DEADLINE */}
@@ -2170,21 +2271,28 @@ export default function AdminPage() {
               <div className="flex flex-wrap items-center gap-1.5 p-2 bg-white border border-line rounded-xs text-xs">
                 <button
                   type="button"
-                  onClick={() => insertFormatting(articleForm, setArticleForm, '<h2>', '</h2>', 'Section Heading')}
+                  onClick={() => insertFormatting(articleForm, setArticleForm, '\n\n## ', '\n\n', 'Section Heading')}
                   className="px-2.5 py-1 bg-paper border hover:bg-green hover:text-white font-bold"
                 >
                   H2 Heading
                 </button>
                 <button
                   type="button"
-                  onClick={() => insertFormatting(articleForm, setArticleForm, '<strong>', '</strong>', 'Bold text')}
+                  onClick={() => insertFormatting(articleForm, setArticleForm, '\n\n### ', '\n\n', 'Subheading')}
+                  className="px-2.5 py-1 bg-paper border hover:bg-green hover:text-white font-bold"
+                >
+                  H3 Subheading
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertFormatting(articleForm, setArticleForm, '**', '**', 'Bold text')}
                   className="px-2.5 py-1 bg-paper border hover:bg-green hover:text-white font-bold"
                 >
                   Bold
                 </button>
                 <button
                   type="button"
-                  onClick={() => insertFormatting(articleForm, setArticleForm, '<ul>\n  <li>', '</li>\n</ul>', 'Requirement item')}
+                  onClick={() => insertFormatting(articleForm, setArticleForm, '\n\n- ', '\n- Second requirement\n\n', 'Requirement item')}
                   className="px-2.5 py-1 bg-paper border hover:bg-green hover:text-white font-bold"
                 >
                   • List
@@ -2416,6 +2524,17 @@ export default function AdminPage() {
             </div>
 
             {/* ACTION BUTTONS */}
+            {formMsg && (
+              <div
+                className={`p-3.5 text-xs font-bold border rounded-xs ${
+                  formMsg.includes('Error') || formMsg.includes('❌')
+                    ? 'bg-brick-light text-brick border-brick/30'
+                    : 'bg-green-light text-green border-green/30'
+                }`}
+              >
+                {formMsg}
+              </div>
+            )}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6">
               <div className="flex items-center gap-3">
                 <button
@@ -2423,7 +2542,7 @@ export default function AdminPage() {
                   onClick={() =>
                     setPreviewArticle({
                       ...articleForm,
-                      content: articleForm.content.split('\n\n').filter((p) => p.trim()),
+                      content: splitContentBlocks(articleForm.content),
                     })
                   }
                   className="border border-line bg-paper text-ink px-4 py-2.5 text-xs font-bold hover:border-green"
@@ -2448,25 +2567,28 @@ export default function AdminPage() {
                 {editingArticle && (
                   <button
                     type="button"
+                    disabled={savingContent}
                     onClick={() => handleSaveArticle()}
-                    className="border border-line bg-paper text-ink px-5 py-2.5 text-xs font-bold hover:border-green transition-colors"
+                    className="border border-line bg-paper text-ink px-5 py-2.5 text-xs font-bold hover:border-green transition-colors disabled:opacity-50"
                   >
-                    💾 Save Changes ({editingArticle.status === 'published' ? 'Keep Published' : 'Keep Draft'})
+                    💾 {savingContent ? 'Saving...' : `Save Changes (${editingArticle.status === 'published' ? 'Keep Published' : 'Keep Draft'})`}
                   </button>
                 )}
                 <button
                   type="button"
+                  disabled={savingContent}
                   onClick={() => handleSaveArticle('draft')}
-                  className="border border-gold bg-gold/10 text-gold-dark px-5 py-2.5 text-xs font-bold hover:bg-gold hover:text-slate-950 transition-colors"
+                  className="border border-gold bg-gold/10 text-gold-dark px-5 py-2.5 text-xs font-bold hover:bg-gold hover:text-slate-950 transition-colors disabled:opacity-50"
                 >
                   💾 Save Draft
                 </button>
                 <button
                   type="button"
+                  disabled={savingContent}
                   onClick={() => handleSaveArticle('published')}
-                  className="bg-green text-white px-6 py-2.5 text-xs font-bold hover:bg-green-dark transition-all shadow-xs"
+                  className="bg-green text-white px-6 py-2.5 text-xs font-bold hover:bg-green-dark transition-all shadow-xs disabled:opacity-50"
                 >
-                  🚀 Publish Article Now
+                  🚀 {savingContent ? 'Publishing...' : 'Publish Article Now'}
                 </button>
               </div>
             </div>

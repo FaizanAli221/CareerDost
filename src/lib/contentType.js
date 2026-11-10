@@ -632,3 +632,87 @@ export function getContextualStatus(item, type) {
     days: diffDays,
   }
 }
+
+/**
+ * Three-Tier Source Verification Badge System
+ * Differentiates:
+ * Tier 1: Official Notification Verified (Emerald) — Primary statutory/departmental notice with valid portal link
+ * Tier 2: Official Announcement — Formal Notification Awaited (Amber) — Credible government announcement / cabinet decision (e.g. iwork4Sindh, KP 20k internships)
+ * Tier 3: Unconfirmed / Under Review (Slate) — Secondary press coverage or editorial review pending primary document
+ */
+export function getVerificationTier(item) {
+  if (!item) {
+    return {
+      tier: 3,
+      status: 'UNDER_REVIEW',
+      label: 'Unconfirmed / Under Review',
+      shortLabel: 'Under Review',
+      icon: '⚠️',
+      badgeClass: 'bg-slate-200 text-slate-800 border-slate-300 font-bold',
+      pillClass: 'bg-slate-100 text-slate-700 border-slate-300 font-bold',
+      description: 'Sourced from secondary news reports or under editorial review. Formal primary document verification pending.',
+    }
+  }
+
+  const slug = String(item.slug || '').toLowerCase()
+  const title = String(item.title || '').toLowerCase()
+  const lastDate = String(item.lastDate || item.last_date || item.deadline || '').toLowerCase()
+  const isVerified = Boolean(item.isVerified || item.is_verified)
+  const officialLink = String(item.officialLink || item.official_link || '').trim()
+  const hasValidOfficialLink = /^https?:\/\//i.test(officialLink)
+
+  // Tier 2: Credible Announcement from Government / Authority — Formal Notification Awaited
+  const isAnnouncementPhase =
+    slug.includes('iwork4sindh') ||
+    slug.includes('kp-government-20000-paid-internships') ||
+    slug.includes('announcement-phase') ||
+    slug.includes('formal-notification-awaited') ||
+    title.includes('formal notification awaited') ||
+    title.includes('announcement phase') ||
+    title.includes('cabinet approves') ||
+    title.includes('announces 20,000 paid') ||
+    lastDate.includes('pending') ||
+    lastDate.includes('unconfirmed') ||
+    lastDate.includes('not yet announced') ||
+    lastDate.includes('tba') ||
+    lastDate.includes('expected')
+
+  if (isAnnouncementPhase) {
+    return {
+      tier: 2,
+      status: 'ANNOUNCEMENT_AWAITED',
+      label: 'Official Announcement — Formal Notification Awaited',
+      shortLabel: 'Formal Notification Awaited',
+      icon: '⏳',
+      badgeClass: 'bg-amber-500 text-slate-950 border-amber-600 font-bold',
+      pillClass: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
+      description: 'High-level government announcement or cabinet decision confirmed. Formal gazette / departmental notification awaited.',
+    }
+  }
+
+  // Tier 1: Official Notification Verified
+  if (isVerified && hasValidOfficialLink) {
+    return {
+      tier: 1,
+      status: 'OFFICIAL_VERIFIED',
+      label: 'Official Notification Verified',
+      shortLabel: 'Official Verified',
+      icon: '✓',
+      badgeClass: 'bg-emerald-600 text-white border-emerald-700 font-bold',
+      pillClass: 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold',
+      description: 'Verified against primary official recruitment notification, gazette, or accredited institutional portal.',
+    }
+  }
+
+  // Tier 3: Unconfirmed / Under Review
+  return {
+    tier: 3,
+    status: 'UNDER_REVIEW',
+    label: 'Unconfirmed / Under Review',
+    shortLabel: 'Under Review',
+    icon: '⚠️',
+    badgeClass: 'bg-slate-200 text-slate-800 border-slate-300 font-bold',
+    pillClass: 'bg-slate-100 text-slate-700 border-slate-300 font-bold',
+    description: 'Sourced from secondary news reports or under editorial review. Formal primary document verification pending.',
+  }
+}
