@@ -662,6 +662,7 @@ export function getVerificationTier(item) {
 
   const slug = String(item.slug || '').toLowerCase()
   const title = String(item.title || '').toLowerCase()
+  const cat = String(item.category_slug || item.category || '').toLowerCase().trim()
   const lastDate = String(item.lastDate || item.last_date || item.deadline || '').toLowerCase()
   const isVerified = Boolean(item.isVerified || item.is_verified)
   const officialLink = String(item.officialLink || item.official_link || '').trim()
@@ -708,6 +709,31 @@ export function getVerificationTier(item) {
       badgeClass: 'bg-amber-500 text-slate-950 border-amber-600 font-bold',
       pillClass: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
       description: 'High-level government announcement or cabinet decision confirmed. Formal gazette / departmental notification awaited.',
+    }
+  }
+
+  // Editorial Guide Tier: Informational career/procedural guides are distinct from official job notifications
+  const isGuide =
+    cat === 'guides-and-resources' ||
+    cat === 'career-guides' ||
+    getContentType(item) === 'guide' ||
+    slug.includes('cv-format') ||
+    slug.includes('documents-checklist') ||
+    slug.includes('mistakes-avoid') ||
+    slug.includes('cnic-domicile-prc') ||
+    slug.includes('interview-preparation') ||
+    (slug.endsWith('-guide') && !slug.includes('jobs-') && !slug.includes('internship') && !slug.includes('scholarship'))
+
+  if (isGuide) {
+    return {
+      tier: 'editorial',
+      status: 'EDITORIAL_GUIDE',
+      label: 'CareerDost Editorial Guide',
+      shortLabel: 'Editorial Guide',
+      icon: '📖',
+      badgeClass: 'bg-emerald-800 text-white border-emerald-900 font-bold',
+      pillClass: 'bg-emerald-50 text-emerald-900 border-emerald-300 font-bold',
+      description: 'Researched and editorially reviewed procedural guidance by CareerDost based on current regulations, official portals, and testing schemes.',
     }
   }
 

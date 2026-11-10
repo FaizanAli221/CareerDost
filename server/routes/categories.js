@@ -17,7 +17,8 @@ app.get('/', async (c) => {
 app.get('/:slug', async (c) => {
   c.header('Cache-Control', 'public, max-age=0, s-maxage=15, must-revalidate')
   const db = getDb(c)
-  const slug = c.req.param('slug')
+  const rawSlug = c.req.param('slug')
+  const slug = rawSlug === 'career-guides' ? 'guides-and-resources' : rawSlug
   const category = await CategoryModel.getBySlug(db, slug)
 
   if (!category) {

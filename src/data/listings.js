@@ -1,6 +1,69 @@
 // Auto-generated listings from CareerDost database
 export const listings = [
   {
+    id: 557,
+    slug: "fpsc-online-application-challan-form-32a-guide",
+    title: "FPSC Online Application Guide: Treasury Challan 32-A, Quotas & Test Scheme",
+    category: 'guides-and-resources',
+    organization: "Federal Public Service Commission (FPSC)",
+    jobType: "Federal Career Recruitment Guide",
+    location: "Pakistan (All Provinces & Regions)",
+    qualification: "Bachelor’s / Master’s Degree (14-16 Years)",
+    salary: "BPS-16 to BPS-19 Federal Pay Scales",
+    lastDate: "Comprehensive Evergreen Guide",
+    publishDate: "2026-10-30",
+    officialLink: "https://fpsc.gov.pk",
+    featured: Boolean(1),
+    logoInitial: "FPSC",
+    excerpt: "Official guide to applying for Federal Public Service Commission (FPSC) jobs. Review Treasury Challan Form 32-A deposit details, fee tiers, provincial quotas, and online application steps.",
+    featuredImage: "/images/fpsc-consolidated-advertisement-09-2026-announced.webp",
+    imageAlt: "FPSC Online Application Treasury Challan Form 32-A Guide CareerDost",
+    isVerified: Boolean(1),
+    noDeadline: Boolean(1)
+  },
+  {
+    id: 558,
+    slug: "national-job-portal-njp-pakistan-application-guide",
+    title: "National Job Portal (NJP) Guide: Profile Setup, Resume Builder & Online Application",
+    category: 'guides-and-resources',
+    organization: "National Job Portal (NJP), Ministry of Information Technology & Telecommunication",
+    jobType: "Federal Career Technology Guide",
+    location: "Pakistan (All Federal Ministries & Autonomous Bodies)",
+    qualification: "Matriculation to PhD (BPS-01 to BPS-22 / PPS Scales)",
+    salary: "Federal Basic Pay Scales & Project Pay Scales",
+    lastDate: "Comprehensive Evergreen Guide",
+    publishDate: "2026-10-30",
+    officialLink: "https://njp.gov.pk",
+    featured: Boolean(1),
+    logoInitial: "NJP",
+    excerpt: "Complete official guide to applying for federal government jobs on the National Job Portal (njp.gov.pk). Learn how to achieve 100% profile completion, build your online resume, and track applications.",
+    featuredImage: "/images/sindh-government-jobs-2026-spsc-sts-guide.webp",
+    imageAlt: "National Job Portal NJP Pakistan Online Application and Profile Guide CareerDost",
+    isVerified: Boolean(1),
+    noDeadline: Boolean(1)
+  },
+  {
+    id: 556,
+    slug: "spsc-exam-preparation-screening-challan-guide",
+    title: "SPSC Exam Preparation Guide: Screening Test, Syllabus, Challan & Quota Rules",
+    category: 'guides-and-resources',
+    organization: "Sindh Public Service Commission (SPSC)",
+    jobType: "Provincial Career Examination Guide",
+    location: "Sindh, Pakistan",
+    qualification: "Graduation / Bachelor’s Degree (14 or 16 Years)",
+    salary: "BPS-16 to BPS-18 Provincial Cadre Pay Scales",
+    lastDate: "Comprehensive Evergreen Guide",
+    publishDate: "2026-10-30",
+    officialLink: "https://spsc.gov.pk",
+    featured: Boolean(1),
+    logoInitial: "SPSC",
+    excerpt: "Comprehensive guide to Sindh Public Service Commission (SPSC) exams covering pre-interview screening tests, negative marking, 1Bill PSID fee challan generation, age relaxation, and syllabus breakdown.",
+    featuredImage: "/images/spsc-cce-2026-examination-reforms-age-attempts-screening.webp",
+    imageAlt: "SPSC Exam Preparation Screening Test Syllabus and Challan Guide CareerDost",
+    isVerified: Boolean(1),
+    noDeadline: Boolean(1)
+  },
+  {
     id: 591,
     slug: 'pakistan-cnic-domicile-prc-application-guide',
     title: "How to Apply for CNIC, Domicile & PRC in Pakistan: Step-by-Step Application Process, Required Documents & Fees",
@@ -7835,3 +7898,7 @@ export const listings = [
     "updatedAt": "2026-10-11 15:49:38"
   }
 ]
+
+export function getListingsByCategory(categorySlug) {
+  return listings.filter((l) => l.category === categorySlug)
+}

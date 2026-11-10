@@ -904,9 +904,11 @@ function generateCategoryHtml(slug, catMeta, articles, canonical) {
     const artImg = art.featured_image ? getAbsoluteUrl(art.featured_image) : ''
     const artAlt = escapeHtml(art.image_alt || art.title || '')
     const vTier = getVerificationTier(art)
-    const tierStyle = vTier.tier === 1
-      ? 'background:#ecfdf5;color:#065f46;border:1px solid #6ee7b7;'
-      : (vTier.tier === 2 ? 'background:#fffbeb;color:#92400e;border:1px solid #fcd34d;' : 'background:#f8fafc;color:#475569;border:1px solid #cbd5e1;')
+    const tierStyle = vTier.tier === 'editorial' || vTier.status === 'EDITORIAL_GUIDE'
+      ? 'background:#f0fdf4;color:#166534;border:1px solid #86efac;'
+      : (vTier.tier === 1
+        ? 'background:#ecfdf5;color:#065f46;border:1px solid #6ee7b7;'
+        : (vTier.tier === 2 ? 'background:#fffbeb;color:#92400e;border:1px solid #fcd34d;' : 'background:#f8fafc;color:#475569;border:1px solid #cbd5e1;'))
 
     return `
       <article class="bg-white border border-line rounded-xs overflow-hidden shadow-xs hover:border-green transition-all flex flex-col justify-between" style="background:#ffffff;border:1px solid #e7e5e4;border-radius:2px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 1px 2px rgba(0,0,0,0.05);">
@@ -2126,7 +2128,7 @@ export async function onRequest(context) {
           })
           .on('#root', { element: (e) => e.setInnerContent(pillarHtml, { html: true }) })
           .transform(response)
-        return withHtmlCacheHeaders(catRes)
+        return withHtmlCacheHeaders(catRes, 'public, max-age=0, s-maxage=60, must-revalidate')
       }
 
       if (context.env?.DB) {
@@ -2468,7 +2470,7 @@ export async function onRequest(context) {
             },
           })
           .transform(response)
-        return withHtmlCacheHeaders(catRes)
+        return withHtmlCacheHeaders(catRes, 'public, max-age=0, s-maxage=60, must-revalidate')
       } else {
         return new Response(generate404Html('Category Not Found', `The category "${escapeHtml(slug)}" does not exist.`), {
           status: 404,

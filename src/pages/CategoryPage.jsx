@@ -15,6 +15,12 @@ export default function CategoryPage() {
 
   const [categoriesList, setCategoriesList] = useState(() => defaultCategories)
   const [cat, setCat] = useState(() => defaultCategoryBySlug(slug) || null)
+  const [initialHydratedSlug, setInitialHydratedSlug] = useState(() => {
+    if (typeof window !== 'undefined' && Array.isArray(window.__INITIAL_CATEGORY_ARTICLES__) && window.__INITIAL_CATEGORY_SLUG__ === slug) {
+      return slug
+    }
+    return null
+  })
   const [items, setItems] = useState(() => {
     if (typeof window !== 'undefined' && Array.isArray(window.__INITIAL_CATEGORY_ARTICLES__) && window.__INITIAL_CATEGORY_SLUG__ === slug) {
       const preloaded = window.__INITIAL_CATEGORY_ARTICLES__
@@ -31,9 +37,6 @@ export default function CategoryPage() {
 
   useEffect(() => {
     let isMounted = true
-    if (!items.length) {
-      setLoading(true)
-    }
     setNotFound(false)
 
     getCategoriesFromDb().then((cats) => {
@@ -41,6 +44,28 @@ export default function CategoryPage() {
         setCategoriesList(cats)
       }
     })
+
+    const usedInitialSsr = initialHydratedSlug === slug && items.length > 0
+    if (usedInitialSsr) {
+      setInitialHydratedSlug(null)
+      let shouldRevalidate = false
+      try {
+        shouldRevalidate = Boolean(
+          window.localStorage?.getItem('careerdost_content_v') ||
+          window.localStorage?.getItem('careerdost_admin_token')
+        )
+      } catch {}
+      if (!shouldRevalidate) {
+        setLoading(false)
+        return () => {
+          isMounted = false
+        }
+      }
+    }
+
+    if (!items.length) {
+      setLoading(true)
+    }
 
     getCategoryBySlugFromDb(slug)
       .then(async (res) => {
@@ -55,7 +80,8 @@ export default function CategoryPage() {
             setCat(fallbackCat)
             try {
               const mod = await import('../data/listings')
-              setItems(mod.getListingsByCategory(slug))
+              const getListings = mod.getListingsByCategory || ((catSlug) => (mod.listings || []).filter((l) => l.category === catSlug))
+              setItems(getListings(slug))
             } catch {
               setItems([])
             }
@@ -75,7 +101,8 @@ export default function CategoryPage() {
           setCat(fallbackCat)
           try {
             const mod = await import('../data/listings')
-            setItems(mod.getListingsByCategory(slug))
+            const getListings = mod.getListingsByCategory || ((catSlug) => (mod.listings || []).filter((l) => l.category === catSlug))
+            setItems(getListings(slug))
           } catch {
             setItems([])
           }
