@@ -893,9 +893,11 @@ function generateCategoryHtml(slug, catMeta, articles, canonical) {
     const artTitle = escapeHtml(art.title || '')
     const artOrg = art.organization ? escapeHtml(art.organization) : ''
     const artLoc = art.location ? escapeHtml(art.location) : 'Pakistan'
+    const isNoDeadline = Boolean(art.no_deadline || art.noDeadline)
     const lastDateVal = art.last_date || art.lastDate
-    const lastDateYmd = normalizeDateToYMD(lastDateVal)
-    const isExpired = Boolean(
+    const isEvergreenText = /evergreen|guide|ongoing|rolling/i.test(String(lastDateVal || ''))
+    const lastDateYmd = (isNoDeadline || isEvergreenText) ? null : normalizeDateToYMD(lastDateVal)
+    const isExpired = !isNoDeadline && !isEvergreenText && Boolean(
       (lastDateYmd && lastDateYmd < todayYmd) ||
       (lastDateVal && /closed|expired/i.test(String(lastDateVal)))
     )
